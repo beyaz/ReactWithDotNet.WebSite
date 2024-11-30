@@ -12,7 +12,7 @@ public static class ReactWithDotNetIntegration
     public static void ConfigureReactWithDotNet(this WebApplication app)
     {
         app.UseMiddleware<ReactWithDotNetJavaScriptFiles>();
-        
+
         var map = typeof(Page)
             .GetFields(BindingFlags.Static | BindingFlags.Public)
             .Where(f => f.FieldType == typeof(PageRouteInfo))
@@ -46,13 +46,13 @@ public static class ReactWithDotNetIntegration
                 return;
             }
 
-#if DEBUG
+            #if DEBUG
             if (path == ReactWithDotNetDesigner.UrlPath)
             {
                 await WriteHtmlResponse(httpContext, typeof(MainLayout), typeof(ReactWithDotNetDesigner));
                 return;
             }
-#endif
+            #endif
 
             if (path == MetadataRequestHandlerPath)
             {
@@ -66,7 +66,7 @@ public static class ReactWithDotNetIntegration
 
     static Task HandleReactWithDotNetRequest(HttpContext httpContext)
     {
-        httpContext.Response.ContentType =  "application/json; charset=utf-8";
+        httpContext.Response.ContentType = "application/json; charset=utf-8";
 
         return ProcessReactWithDotNetComponentRequest(new()
         {
@@ -125,7 +125,6 @@ public static class ReactWithDotNetIntegration
             LayoutType            = layoutType,
             MainContentType       = mainContentType,
             HttpContext           = httpContext,
-            QueryString           = httpContext.Request.QueryString.ToString(),
             OnReactContextCreated = OnReactContextCreated
         });
     }
