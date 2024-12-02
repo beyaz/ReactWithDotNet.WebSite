@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using static ReactWithDotNet.WebSite.Deneme46;
 
 namespace ReactWithDotNet.WebSite;
 
@@ -361,20 +362,7 @@ class Deneme45
         }
     }
 
-    static void BoxTest1()
-    {
-        int a = 5;
-
-        object obj = a;
-
-        if (obj is 5)
-        {
-            console.log("success");
-            return;
-        }
-        
-        console.log("fail");
-    }
+    
     
     static void AutomaticallyLoadType()
     {
@@ -493,10 +481,12 @@ class Deneme45
     
     public static string Abc5()
     {
+        BoxTest1();
+        
         StructCreationTest();
         StructCreationGenericTest();
 
-        BoxTest1();
+        
         ExternalCallTest.Static_Void_Call();
         ExternalCallTest.Static_NonVoid_Call();
         LdInd();
@@ -509,5 +499,24 @@ class Deneme45
         AutomaticallyLoadType();
 
         return "E N D";
+    }
+}
+
+
+class Deneme46
+{
+    public static void BoxTest1()
+    {
+        int a = 5;
+
+        object obj = a;
+
+        if (obj is 5)
+        {
+            console.log("success");
+            return;
+        }
+        
+        console.log("fail");
     }
 }
