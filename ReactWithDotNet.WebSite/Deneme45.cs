@@ -405,46 +405,46 @@ class Deneme45
         
     }
 
-    struct MyStruct
+    public struct MyStruct
     {
         public int F0;
         public string F1;  
     }
     
-    struct MyStructGeneric<A,B>
+    public struct MyStructGeneric<A,B>
     {
         public int F0;
         public string F1; 
         public A F2;
         public B F3;
     }
+   
     
-    static void StructCreationTest()
+    public static string Abc5()
     {
-        var myStruct = new MyStruct
-        {
-            F0 = 4,
-            F1 = "abc"
-        };
+        BoxTest1();
         
-        if (myStruct.F1 != "abc")
-        {
-            console.log("fail");    
-            return;
-        }
-        
-        if (myStruct.F0 != 4)
-        {
-            console.log("fail");    
-            return;
-        }
+        StructCreationTest();
+        StructCreationGenericTest();
 
-        console.log("success");
+        
+        ExternalCallTest.Static_Void_Call();
+        ExternalCallTest.Static_NonVoid_Call();
+        LdInd();
+        NullableIntTest();
+        TryCatch_0();
+        TryCatch_1();
+        TryCatch_HandlerType();
+        TryCatchFinaly_0();
+        TryCatchFinaly_1();
+        AutomaticallyLoadType();
+
+        return "E N D";
     }
     
-    static void StructCreationGenericTest()
+    public static void StructCreationGenericTest()
     {
-        var myStruct = new MyStructGeneric<int,string>
+        var myStruct = new Deneme45.MyStructGeneric<int,string>
         {
             F0 = 4,
             F1 = "abc",
@@ -479,26 +479,27 @@ class Deneme45
         console.log("success");
     }
     
-    public static string Abc5()
+    public static void StructCreationTest()
     {
-        BoxTest1();
+        var myStruct = new Deneme45.MyStruct
+        {
+            F0 = 4,
+            F1 = "abc"
+        };
         
-        StructCreationTest();
-        StructCreationGenericTest();
-
+        if (myStruct.F1 != "abc")
+        {
+            console.log("fail");    
+            return;
+        }
         
-        ExternalCallTest.Static_Void_Call();
-        ExternalCallTest.Static_NonVoid_Call();
-        LdInd();
-        NullableIntTest();
-        TryCatch_0();
-        TryCatch_1();
-        TryCatch_HandlerType();
-        TryCatchFinaly_0();
-        TryCatchFinaly_1();
-        AutomaticallyLoadType();
+        if (myStruct.F0 != 4)
+        {
+            console.log("fail");    
+            return;
+        }
 
-        return "E N D";
+        console.log("success");
     }
 }
 
@@ -519,4 +520,9 @@ class Deneme46
         
         console.log("fail");
     }
+    
+     
+ 
+    
+    
 }
