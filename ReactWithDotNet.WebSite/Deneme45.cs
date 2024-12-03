@@ -84,113 +84,7 @@ class Deneme45
         }
     }
 
-    static void LdInd()
-    {
-        sbyte v0 = 1;
-        byte v1 = 1;
-        short v2 = 1;
-        int v3 = 1;
-        float v4 = 1;
-        long v5 = 1;
-
-        var response = refSByte(ref v0);
-        if (response == "0")
-        {
-            throw new Exception(nameof(LdInd));
-        }
-        response = refByte(ref v1);
-        if (response == "0")
-        {
-            throw new Exception(nameof(LdInd));
-        }
-
-        response = refShort(ref v2);
-        if (response == "0")
-        {
-            throw new Exception(nameof(LdInd));
-        }
-
-        response = refInt32(ref v3);
-        if (response == "0")
-        {
-            throw new Exception(nameof(LdInd));
-        }
-
-        response = refFloat(ref v4);
-        if (response == "0")
-        {
-            throw new Exception(nameof(LdInd));
-        }
-        response = refLong(ref v5);
-        if (response == "0")
-        {
-            throw new Exception(nameof(LdInd));
-        }
-
-        console.log("success");
-        
-        return;
-        
-        static string refSByte(ref sbyte value)
-        {
-            if (value == 0)
-            {
-                return "0";
-            }
-
-            return "1";
-        }
-        static string refByte(ref byte value)
-        {
-            if (value == 0)
-            {
-                return "0";
-            }
-
-            return "1";
-        }
-        
-        static string refShort(ref short value)
-        {
-            if (value == 0)
-            {
-                return "0";
-            }
-
-            return "1";
-        }
-        
-        
-        static string refInt32(ref int value)
-        {
-            if (value == 0)
-            {
-                return "0";
-            }
-
-            return "1";
-        }
-        
-        static string refFloat(ref float value)
-        {
-            if (value == 0)
-            {
-                return "0";
-            }
-
-            return "1";
-        }
-        
-        static string refLong(ref long value)
-        {
-            if (value == 0)
-            {
-                return "0";
-            }
-
-            return "1";
-        }
-    }
+   
 
 
 
@@ -198,31 +92,7 @@ class Deneme45
 
 
 
-    static void TryCatchFinaly_0()
-    {
-        string value = "0";
-        try
-        {
-            value += "1";
-        }
-        catch (Exception)
-        {
-            value += "2";
-        }
-        finally
-        {
-            value += "3";
-        }
-
-        if (value == "013")
-        {
-            console.log("success");
-        }
-        else
-        {
-            console.log("fail");
-        }
-    }
+   
     
     static void TryCatchFinaly_1()
     {
@@ -379,31 +249,7 @@ class Deneme45
         console.log("fail");
     }
 
-    static void NullableIntTest()
-    {
-        int? nullableInt = 5;
 
-        if (nullableInt.HasValue == false)
-        {
-            console.log("fail");    
-            return;
-        }
-        
-        if (nullableInt == null)
-        {
-            console.log("fail");    
-            return;
-        }
-        
-        if (nullableInt != 5)
-        {
-            console.log("fail");    
-            return;
-        }
-        
-        console.log("success");
-        
-    }
 
     public struct MyStruct
     {
@@ -422,6 +268,8 @@ class Deneme45
     
     public static string Abc5()
     {
+        AutomaticallyLoadMethod();
+        
         BoxTest1();
         
         StructCreationTest();
@@ -501,11 +349,81 @@ class Deneme45
 
         console.log("success");
     }
+    
+    public static void NullableIntTest()
+    {
+        int? nullableInt = 5;
+
+        if (nullableInt.HasValue == false)
+        {
+            console.log("fail");    
+            return;
+        }
+        
+        if (nullableInt == null)
+        {
+            console.log("fail");    
+            return;
+        }
+        
+        if (nullableInt != 5)
+        {
+            console.log("fail");    
+            return;
+        }
+        
+        console.log("success");
+        
+    }
+    
+    public static void TryCatchFinaly_0()
+    {
+        string value = "0";
+        try
+        {
+            value += "1";
+        }
+        catch (Exception)
+        {
+            value += "2";
+        }
+        finally
+        {
+            value += "3";
+        }
+
+        if (value == "013")
+        {
+            console.log("success");
+        }
+        else
+        {
+            console.log("fail");
+        }
+    }
+    
+    static void AutomaticallyLoadMethod()
+    {
+        var value = AddOne(35);
+        
+        if (value == 36)
+        {
+            console.log("success");
+            return;
+        }
+        
+        console.log("fail");
+    }
 }
 
 
 class Deneme46
 {
+    public static int AddOne(int value)
+    {
+        return value + 1;
+    }
+    
     public static void BoxTest1()
     {
         int a = 5;
@@ -521,7 +439,113 @@ class Deneme46
         console.log("fail");
     }
     
-     
+   public static void LdInd()
+    {
+        sbyte v0 = 1;
+        byte v1 = 1;
+        short v2 = 1;
+        int v3 = 1;
+        float v4 = 1;
+        long v5 = 1;
+
+        var response = refSByte(ref v0);
+        if (response == "0")
+        {
+            throw new Exception(nameof(LdInd));
+        }
+        response = refByte(ref v1);
+        if (response == "0")
+        {
+            throw new Exception(nameof(LdInd));
+        }
+
+        response = refShort(ref v2);
+        if (response == "0")
+        {
+            throw new Exception(nameof(LdInd));
+        }
+
+        response = refInt32(ref v3);
+        if (response == "0")
+        {
+            throw new Exception(nameof(LdInd));
+        }
+
+        response = refFloat(ref v4);
+        if (response == "0")
+        {
+            throw new Exception(nameof(LdInd));
+        }
+        response = refLong(ref v5);
+        if (response == "0")
+        {
+            throw new Exception(nameof(LdInd));
+        }
+
+        console.log("success");
+        
+        return;
+        
+        static string refSByte(ref sbyte value)
+        {
+            if (value == 0)
+            {
+                return "0";
+            }
+
+            return "1";
+        }
+        static string refByte(ref byte value)
+        {
+            if (value == 0)
+            {
+                return "0";
+            }
+
+            return "1";
+        }
+        
+        static string refShort(ref short value)
+        {
+            if (value == 0)
+            {
+                return "0";
+            }
+
+            return "1";
+        }
+        
+        
+        static string refInt32(ref int value)
+        {
+            if (value == 0)
+            {
+                return "0";
+            }
+
+            return "1";
+        }
+        
+        static string refFloat(ref float value)
+        {
+            if (value == 0)
+            {
+                return "0";
+            }
+
+            return "1";
+        }
+        
+        static string refLong(ref long value)
+        {
+            if (value == 0)
+            {
+                return "0";
+            }
+
+            return "1";
+        }
+    }
  
     
     
