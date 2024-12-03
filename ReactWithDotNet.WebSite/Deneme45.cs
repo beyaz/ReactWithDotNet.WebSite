@@ -307,28 +307,7 @@ class Deneme45
         console.log("success");
     }
     
-    public static void StructCreationTest()
-    {
-        var myStruct = new Deneme45.MyStruct
-        {
-            F0 = 4,
-            F1 = "abc"
-        };
-        
-        if (myStruct.F1 != "abc")
-        {
-            console.log("fail");    
-            return;
-        }
-        
-        if (myStruct.F0 != 4)
-        {
-            console.log("fail");    
-            return;
-        }
-
-        console.log("success");
-    }
+  
     
     public static void NullableIntTest()
     {
@@ -546,6 +525,29 @@ class Deneme46
 
             return "1";
         }
+    }
+   
+    public static void StructCreationTest()
+    {
+        var myStruct = new Deneme45.MyStruct
+        {
+            F0 = 4,
+            F1 = "abc"
+        };
+        
+        if (myStruct.F1 != "abc")
+        {
+            console.log("fail");    
+            return;
+        }
+        
+        if (myStruct.F0 != 4)
+        {
+            console.log("fail");    
+            return;
+        }
+
+        console.log("success");
     }
  
     
