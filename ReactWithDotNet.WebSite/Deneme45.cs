@@ -62,27 +62,7 @@ class Deneme45
 
    
     
-    static class ExternalCallTest
-    {
-        public static void Static_Void_Call()
-        {
-            console.log("success");
-        }
-        
-        public static void Static_NonVoid_Call()
-        {
-            var result = Math.max(1, 2);
-            if (result ==2)
-            {
-                console.log("success");    
-            }
-            else
-            {
-                console.log("fail");
-            }
-            
-        }
-    }
+  
 
    
 
@@ -419,6 +399,27 @@ class Deneme45
 
 class Deneme46
 {
+    public   static class ExternalCallTest
+    {
+        public static void Static_Void_Call()
+        {
+            console.log("success");
+        }
+        
+        public static void Static_NonVoid_Call()
+        {
+            var result = Math.max(1, 2);
+            if (result ==2)
+            {
+                console.log("success");    
+            }
+            else
+            {
+                console.log("fail");
+            }
+            
+        }
+    }
     public static int AddOne(int value)
     {
         return value + 1;
