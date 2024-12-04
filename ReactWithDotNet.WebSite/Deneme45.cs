@@ -112,33 +112,7 @@ class Deneme45
         }
     }
     
-    static void TryCatch_0()
-    {
-        var trace = "0";
-        
-        try
-        {
-            trace += "1";
 
-            throw new Exception("-abc-");
-        }
-        catch (Exception exception)
-        {
-            trace +=  "2";
-
-            trace += exception.Message;
-        }
-
-        
-        if (trace == "012-abc-")
-        {
-            console.log("success");
-        }
-        else
-        {
-            console.log("fail");
-        }
-    }
     
     static void TryCatch_HandlerType()
     {
@@ -550,6 +524,32 @@ class Deneme46
         console.log("success");
     }
  
-    
+    public     static void TryCatch_0()
+    {
+        var trace = "0";
+        
+        try
+        {
+            trace += "1";
+
+            throw new Exception("-abc-");
+        }
+        catch (Exception exception)
+        {
+            trace +=  "2";
+
+            trace += exception.Message;
+        }
+
+        
+        if (trace == "012-abc-")
+        {
+            console.log("success");
+        }
+        else
+        {
+            console.log("fail");
+        }
+    }
     
 }
