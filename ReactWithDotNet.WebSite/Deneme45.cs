@@ -105,6 +105,27 @@ class Deneme45
     
   
     
+  
+    
+   
+    
+    static void AutomaticallyLoadMethod()
+    {
+        var value = AddOne(35);
+        
+        if (value == 36)
+        {
+            console.log("success");
+            return;
+        }
+        
+        console.log("fail");
+    }
+}
+
+
+class Deneme46
+{
     public static void NullableIntTest()
     {
         int? nullableInt = 5;
@@ -131,25 +152,6 @@ class Deneme45
         
     }
     
-   
-    
-    static void AutomaticallyLoadMethod()
-    {
-        var value = AddOne(35);
-        
-        if (value == 36)
-        {
-            console.log("success");
-            return;
-        }
-        
-        console.log("fail");
-    }
-}
-
-
-class Deneme46
-{
     public static void TryCatchFinaly_0()
     {
         string value = "0";
