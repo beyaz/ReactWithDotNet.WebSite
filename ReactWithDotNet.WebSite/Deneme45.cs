@@ -44,28 +44,44 @@ class Deneme45
     
     public static string Abc5()
     {
+        GenericCallTest();
+
+        //AutomaticallyLoadMethod();
+
+        //BoxTest1();
+
+        //StructCreationTest();
+        //StructCreationGenericTest();
 
 
-        AutomaticallyLoadMethod();
-
-        BoxTest1();
-
-        StructCreationTest();
-        StructCreationGenericTest();
-
-
-        ExternalCallTest.Static_Void_Call();
-        ExternalCallTest.Static_NonVoid_Call();
-        LdInd();
-        NullableIntTest();
-        TryCatch_0();
-        TryCatch_1();
-        TryCatch_HandlerType();
-        TryCatchFinaly_0();
-        TryCatchFinaly_1();
-        AutomaticallyLoadType();
+        //ExternalCallTest.Static_Void_Call();
+        //ExternalCallTest.Static_NonVoid_Call();
+        //LdInd();
+        //NullableIntTest();
+        //TryCatch_0();
+        //TryCatch_1();
+        //TryCatch_HandlerType();
+        //TryCatchFinaly_0();
+        //TryCatchFinaly_1();
+        //AutomaticallyLoadType();
 
         return "E N D";
+    }
+
+    static void GenericCallTest()
+    {
+        var result = GetNames<int, string>("-");
+        if (result == "String-Int32")
+        {
+            console.log("success");
+            return;
+        }
+        console.log("fail");
+
+        static string GetNames<T1, T2>(string seperator)
+        {
+            return typeof(T2).Name + seperator + typeof(T1).Name;
+        }
     }
     
     public static void StructCreationGenericTest()
