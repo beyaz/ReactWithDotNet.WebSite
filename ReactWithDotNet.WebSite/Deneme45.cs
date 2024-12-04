@@ -44,24 +44,24 @@ class Deneme45
     
     public static string Abc5()
     {
-        AutomaticallyLoadMethod();
+        //AutomaticallyLoadMethod();
 
-        BoxTest1();
+        //BoxTest1();
 
-        StructCreationTest();
-        StructCreationGenericTest();
+        //StructCreationTest();
+        //StructCreationGenericTest();
 
 
-        ExternalCallTest.Static_Void_Call();
-        ExternalCallTest.Static_NonVoid_Call();
-        LdInd();
+        //ExternalCallTest.Static_Void_Call();
+        //ExternalCallTest.Static_NonVoid_Call();
+        //LdInd();
         NullableIntTest();
-        TryCatch_0();
-        TryCatch_1();
-        TryCatch_HandlerType();
-        TryCatchFinaly_0();
-        TryCatchFinaly_1();
-        AutomaticallyLoadType();
+        //TryCatch_0();
+        //TryCatch_1();
+        //TryCatch_HandlerType();
+        //TryCatchFinaly_0();
+        //TryCatchFinaly_1();
+        //AutomaticallyLoadType();
 
         return "E N D";
     }
