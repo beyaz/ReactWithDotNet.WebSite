@@ -131,6 +131,25 @@ class Deneme45
         
     }
     
+   
+    
+    static void AutomaticallyLoadMethod()
+    {
+        var value = AddOne(35);
+        
+        if (value == 36)
+        {
+            console.log("success");
+            return;
+        }
+        
+        console.log("fail");
+    }
+}
+
+
+class Deneme46
+{
     public static void TryCatchFinaly_0()
     {
         string value = "0";
@@ -156,24 +175,6 @@ class Deneme45
             console.log("fail");
         }
     }
-    
-    static void AutomaticallyLoadMethod()
-    {
-        var value = AddOne(35);
-        
-        if (value == 36)
-        {
-            console.log("success");
-            return;
-        }
-        
-        console.log("fail");
-    }
-}
-
-
-class Deneme46
-{
     public   static class ExternalCallTest
     {
         public static void Static_Void_Call()
