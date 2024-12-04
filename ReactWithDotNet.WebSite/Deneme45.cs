@@ -44,24 +44,26 @@ class Deneme45
     
     public static string Abc5()
     {
-        //AutomaticallyLoadMethod();
-
-        //BoxTest1();
-
-        //StructCreationTest();
-        //StructCreationGenericTest();
 
 
-        //ExternalCallTest.Static_Void_Call();
-        //ExternalCallTest.Static_NonVoid_Call();
-        //LdInd();
+        AutomaticallyLoadMethod();
+
+        BoxTest1();
+
+        StructCreationTest();
+        StructCreationGenericTest();
+
+
+        ExternalCallTest.Static_Void_Call();
+        ExternalCallTest.Static_NonVoid_Call();
+        LdInd();
         NullableIntTest();
-        //TryCatch_0();
-        //TryCatch_1();
-        //TryCatch_HandlerType();
-        //TryCatchFinaly_0();
-        //TryCatchFinaly_1();
-        //AutomaticallyLoadType();
+        TryCatch_0();
+        TryCatch_1();
+        TryCatch_HandlerType();
+        TryCatchFinaly_0();
+        TryCatchFinaly_1();
+        AutomaticallyLoadType();
 
         return "E N D";
     }
@@ -121,11 +123,7 @@ class Deneme45
         
         console.log("fail");
     }
-}
-
-
-class Deneme46
-{
+    
     public static void NullableIntTest()
     {
         int? nullableInt = 5;
@@ -151,6 +149,12 @@ class Deneme46
         console.log("success");
         
     }
+}
+
+
+class Deneme46
+{
+   
     
     public static void TryCatchFinaly_0()
     {
