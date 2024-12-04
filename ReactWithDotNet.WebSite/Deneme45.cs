@@ -5,6 +5,44 @@ namespace ReactWithDotNet.WebSite;
 
 class Deneme45
 {
+    
+    public static void TryCatch_HandlerType()
+    {
+        Exception instance = null;
+        
+        var trace = "0";
+        
+        try
+        {
+            trace += "1";
+
+            instance.Message.ToString();
+            
+            trace += "2";
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            trace +=  "3";
+        }
+        catch (ArgumentException)
+        {
+            trace +=  "4";
+        }
+        catch (NullReferenceException e)
+        {
+            trace +=  "5";
+        }
+
+        
+        if (trace == "015")
+        {
+            console.log("success");
+        }
+        else
+        {
+            console.log("fail");
+        }
+    }
     //public string FF1;
 
     //public Deneme45(string a)
@@ -74,117 +112,13 @@ class Deneme45
 
    
     
-    static void TryCatchFinaly_1()
-    {
-        string value = "0";
-
-        try
-        {
-            try
-            {
-                value += "1";
-            }
-            catch (Exception)
-            {
-                value +="2";
-            }
-            finally
-            {
-                value += "3";
-            }
-        }
-        catch (Exception)
-        {
-            value += "4";
-        }
-        finally
-        {
-            value += "5";
-        }
-
-        if (value == "0135")
-        {
-            console.log("success");
-        }
-        else
-        {
-            console.log("fail");
-        }
-    }
+    
     
 
     
-    static void TryCatch_HandlerType()
-    {
-        Exception instance = null;
-        
-        var trace = "0";
-        
-        try
-        {
-            trace += "1";
-
-            instance.Message.ToString();
-            
-            trace += "2";
-        }
-        catch (ArgumentOutOfRangeException)
-        {
-            trace +=  "3";
-        }
-        catch (ArgumentException)
-        {
-            trace +=  "4";
-        }
-        catch (NullReferenceException e)
-        {
-            trace +=  "5";
-        }
-
-        
-        if (trace == "015")
-        {
-            console.log("success");
-        }
-        else
-        {
-            console.log("fail");
-        }
-    }
     
-    static void TryCatch_1()
-    {
-        var trace = "0";
-        try
-        {
-            trace += "1";
-            
-            trace += Call1455("t");
-        }
-        catch (Exception exception)
-        {
-            trace +=  "2";
-
-            trace += exception.Message;
-        }
-
-        
-        if (trace == "012-abc-")
-        {
-            console.log("success");
-        }
-        else
-        {
-            console.log("fail");
-        }
-        
-        return;
-
-        static string Call1455(string a)
-        {
-            throw new Exception("-abc-");
-        }
-    }
+    
+    
 
     
     
@@ -552,4 +486,75 @@ class Deneme46
         }
     }
     
+    public static void TryCatch_1()
+    {
+        var trace = "0";
+        try
+        {
+            trace += "1";
+            
+            trace += Call1455("t");
+        }
+        catch (Exception exception)
+        {
+            trace +=  "2";
+
+            trace += exception.Message;
+        }
+
+        
+        if (trace == "012-abc-")
+        {
+            console.log("success");
+        }
+        else
+        {
+            console.log("fail");
+        }
+        
+        return;
+
+        static string Call1455(string a)
+        {
+            throw new Exception("-abc-");
+        }
+    }
+    
+    public static void TryCatchFinaly_1()
+    {
+        string value = "0";
+
+        try
+        {
+            try
+            {
+                value += "1";
+            }
+            catch (Exception)
+            {
+                value +="2";
+            }
+            finally
+            {
+                value += "3";
+            }
+        }
+        catch (Exception)
+        {
+            value += "4";
+        }
+        finally
+        {
+            value += "5";
+        }
+
+        if (value == "0135")
+        {
+            console.log("success");
+        }
+        else
+        {
+            console.log("fail");
+        }
+    }
 }
