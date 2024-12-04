@@ -6,43 +6,7 @@ namespace ReactWithDotNet.WebSite;
 class Deneme45
 {
     
-    public static void TryCatch_HandlerType()
-    {
-        Exception instance = null;
-        
-        var trace = "0";
-        
-        try
-        {
-            trace += "1";
-
-            instance.Message.ToString();
-            
-            trace += "2";
-        }
-        catch (ArgumentOutOfRangeException)
-        {
-            trace +=  "3";
-        }
-        catch (ArgumentException)
-        {
-            trace +=  "4";
-        }
-        catch (NullReferenceException e)
-        {
-            trace +=  "5";
-        }
-
-        
-        if (trace == "015")
-        {
-            console.log("success");
-        }
-        else
-        {
-            console.log("fail");
-        }
-    }
+    
     
     
     
@@ -81,13 +45,13 @@ class Deneme45
     public static string Abc5()
     {
         AutomaticallyLoadMethod();
-        
+
         BoxTest1();
-        
+
         StructCreationTest();
         StructCreationGenericTest();
 
-        
+
         ExternalCallTest.Static_Void_Call();
         ExternalCallTest.Static_NonVoid_Call();
         LdInd();
@@ -473,6 +437,44 @@ class Deneme46
         }
 
         if (value == "0135")
+        {
+            console.log("success");
+        }
+        else
+        {
+            console.log("fail");
+        }
+    }
+    
+    public static void TryCatch_HandlerType()
+    {
+        Exception instance = null;
+        
+        var trace = "0";
+        
+        try
+        {
+            trace += "1";
+
+            instance.Message.ToString();
+            
+            trace += "2";
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            trace +=  "3";
+        }
+        catch (ArgumentException)
+        {
+            trace +=  "4";
+        }
+        catch (NullReferenceException e)
+        {
+            trace +=  "5";
+        }
+
+        
+        if (trace == "015")
         {
             console.log("success");
         }
