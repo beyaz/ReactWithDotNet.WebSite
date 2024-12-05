@@ -44,7 +44,7 @@ class Deneme45
     
     public static string Abc5()
     {
-        GenericCallTest();
+        // GenericCallTest();
 
         //AutomaticallyLoadMethod();
 
@@ -80,6 +80,7 @@ class Deneme45
 
         static string GetNames<T1, T2>(string seperator)
         {
+            
             return typeof(T2).Name + seperator + typeof(T1).Name;
         }
     }
