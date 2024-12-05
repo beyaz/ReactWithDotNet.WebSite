@@ -3,7 +3,7 @@ using static ReactWithDotNet.WebSite.Deneme46;
 
 namespace ReactWithDotNet.WebSite;
 
-class Deneme45
+class Test45
 {
     
     
@@ -87,7 +87,7 @@ class Deneme45
     
     public static void StructCreationGenericTest()
     {
-        var myStruct = new Deneme45.MyStructGeneric<int,string>
+        var myStruct = new Test45.MyStructGeneric<int,string>
         {
             F0 = 4,
             F1 = "abc",
@@ -349,7 +349,7 @@ class Deneme46
    
     public static void StructCreationTest()
     {
-        var myStruct = new Deneme45.MyStruct
+        var myStruct = new Test45.MyStruct
         {
             F0 = 4,
             F1 = "abc"
