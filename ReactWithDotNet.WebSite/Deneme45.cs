@@ -54,7 +54,7 @@ class Deneme45
         //StructCreationGenericTest();
 
 
-        //ExternalCallTest.Static_Void_Call();
+        ExternalCallTest.Static_Void_Call();
         //ExternalCallTest.Static_NonVoid_Call();
         //LdInd();
         //NullableIntTest();
