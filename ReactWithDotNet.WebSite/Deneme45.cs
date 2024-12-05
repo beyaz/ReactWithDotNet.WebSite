@@ -44,7 +44,7 @@ class Deneme45
     
     public static string Abc5()
     {
-        // GenericCallTest();
+        //GenericCallTest();
 
         //AutomaticallyLoadMethod();
 
