@@ -10,6 +10,7 @@ class Test45
     
     
     
+    
     static void AutomaticallyLoadType()
     {
         var instance = new InvalidProgramException("abc");
@@ -44,6 +45,8 @@ class Test45
     
     public static string Abc5()
     {
+        DynamicLoadTypeAndCreateInstance();
+        
         //GenericCallTest();
 
         //AutomaticallyLoadMethod();
@@ -54,8 +57,8 @@ class Test45
         //StructCreationGenericTest();
 
 
-        ExternalCallTest.Static_Void_Call();
-        //ExternalCallTest.Static_NonVoid_Call();
+        // ExternalCallTest.Static_Void_Call();
+        // ExternalCallTest.Static_NonVoid_Call();
         //LdInd();
         //NullableIntTest();
         //TryCatch_0();
@@ -68,6 +71,23 @@ class Test45
         return "E N D";
     }
 
+    static void DynamicLoadTypeAndCreateInstance()
+    {
+        var instance = new Deneme46.ClassA("a");
+        if (instance.F1 != "a")
+        {
+            console.log("fail");
+            return;
+        }
+        
+        if (instance.F0 != 4)
+        {
+            console.log("fail");
+            return;
+        }
+        
+        console.log("success");
+    }
     static void GenericCallTest()
     {
         var result = GetNames<int, string>("-");
@@ -171,7 +191,17 @@ class Test45
 
 class Deneme46
 {
-   
+   public class ClassA
+   {
+       public int F0;
+       public string F1;
+
+       public ClassA( string f1)
+       {
+           F0 = 4;
+           F1 = f1;
+       }
+   }
     
     public static void TryCatchFinaly_0()
     {
