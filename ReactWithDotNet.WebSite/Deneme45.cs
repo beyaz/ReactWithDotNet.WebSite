@@ -47,7 +47,7 @@ class Test45
     {
         DynamicLoadTypeAndCreateInstance();
         
-        //GenericCallTest();
+        GenericCallTest();
 
         //AutomaticallyLoadMethod();
 
