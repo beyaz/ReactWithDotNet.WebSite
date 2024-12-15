@@ -81,16 +81,17 @@ sealed class MainLayout : PureComponent, IPageLayout
                 }
             },
             
-            new script
+            Environment.UserName == "beyaz" ? new script
             {
                 type = "text/javascript",
                 src  = "long.js"
-            },
-            new script
+            }: null,
+            
+            Environment.UserName == "beyaz" ? new script
             {
                 type = "text/javascript",
                 src = "clr.js"
-            }
+            } : null
         };
 
         IEnumerable<Element> arrangeFonts()
