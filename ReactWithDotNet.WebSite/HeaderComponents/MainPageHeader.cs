@@ -6,7 +6,9 @@ sealed class MainPageHeader : PureComponent
     {
         return new header(DisplayFlex, WidthFull, Zindex2,  JustifyContentCenter, BoxShadow(inset, 0,-1,1,0,rgb(231, 235, 240)))
         {
-            PositionSticky, Top(0), BackgroundColor(rgba(255, 255, 255, 0.8)), BackdropFilterBlur(6),
+            PositionSticky, Top(0), BackgroundColor(rgba(255, 255, 255, 0.8)), 
+            BackdropFilterBlur(6),
+            WebkitBackdropFilter("blur(8px)"),
             
             new div(ContainerStyle)
             {
