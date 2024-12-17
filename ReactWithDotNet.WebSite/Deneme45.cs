@@ -53,13 +53,13 @@ class Test45
 
         BoxTest1();
 
-        //StructCreationTest();
-        //StructCreationGenericTest();
+        StructCreationTest();
+        StructCreationGenericTest();
 
 
          ExternalCallTest.Static_Void_Call();
          ExternalCallTest.Static_NonVoid_Call();
-        //LdInd();
+         LdInd();
         //NullableIntTest();
         //TryCatch_0();
         //TryCatch_1();
@@ -88,66 +88,8 @@ class Test45
         
         console.log("success");
     }
-    static void GenericCallTest()
-    {
-        var result = GetNames<int, string>("-");
-        if (result == "String-Int32")
-        {
-            console.log("success");
-            return;
-        }
-        console.log("fail");
-
-        static string GetNames<T1, T2>(string seperator)
-        {
-            
-            return typeof(T2).Name + seperator + typeof(T1).Name;
-        }
-    }
-    
-    public static void StructCreationGenericTest()
-    {
-        var myStruct = new Test45.MyStructGeneric<int,string>
-        {
-            F0 = 4,
-            F1 = "abc",
-            F2 = 6,
-            F3 = "a"
-        };
-        
-        if (myStruct.F0 != 4)
-        {
-            console.log("fail");    
-            return;
-        }
-        
-        if (myStruct.F1 != "abc")
-        {
-            console.log("fail");    
-            return;
-        }
-        
-        if (myStruct.F2 != 6)
-        {
-            console.log("fail");    
-            return;
-        }
-        
-        if (myStruct.F3 != "a")
-        {
-            console.log("fail");    
-            return;
-        }
-
-        console.log("success");
-    }
-    
-  
-    
-  
-    
    
-    
+   
     static void AutomaticallyLoadMethod()
     {
         var value = AddOne(35);
@@ -191,6 +133,60 @@ class Test45
 
 class Deneme46
 {
+    public static void GenericCallTest()
+    {
+        var result = GetNames<int, string>("-");
+        if (result == "String-Int32")
+        {
+            console.log("success");
+            return;
+        }
+        console.log("fail");
+
+        static string GetNames<T1, T2>(string seperator)
+        {
+            return typeof(T2).Name + seperator + typeof(T1).Name;
+        }
+    }
+    
+    public static void StructCreationGenericTest()
+    {
+        var myStruct = new Test45.MyStructGeneric<int,string>
+        {
+            F0 = 4,
+            F1 = "abc",
+            F2 = 6,
+            F3 = "a"
+        };
+        
+        if (myStruct.F0 != 4)
+        {
+            console.log("fail");    
+            return;
+        }
+        
+        if (myStruct.F1 != "abc")
+        {
+            console.log("fail");    
+            return;
+        }
+        
+        if (myStruct.F2 != 6)
+        {
+            console.log("fail");    
+            return;
+        }
+        
+        if (myStruct.F3 != "a")
+        {
+            console.log("fail");    
+            return;
+        }
+
+        console.log("success");
+    }
+
+    
    public class ClassA
    {
        public int F0;
