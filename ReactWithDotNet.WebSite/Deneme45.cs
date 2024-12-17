@@ -45,21 +45,21 @@ class Test45
     
     public static string Abc5()
     {
-        DynamicLoadTypeAndCreateInstance();
+        //DynamicLoadTypeAndCreateInstance();
         
-        GenericCallTest();
+        //GenericCallTest();
 
-        //AutomaticallyLoadMethod();
+        ////AutomaticallyLoadMethod();
 
-        BoxTest1();
+        //BoxTest1();
 
-        StructCreationTest();
-        StructCreationGenericTest();
+        //StructCreationTest();
+        //StructCreationGenericTest();
 
 
-         ExternalCallTest.Static_Void_Call();
-         ExternalCallTest.Static_NonVoid_Call();
-         LdInd();
+        // ExternalCallTest.Static_Void_Call();
+        // ExternalCallTest.Static_NonVoid_Call();
+        // LdInd();
          NullableIntTest();
         //TryCatch_0();
         //TryCatch_1();
@@ -103,6 +103,12 @@ class Test45
         console.log("fail");
     }
     
+   
+}
+
+
+class Deneme46
+{
     public static void NullableIntTest()
     {
         int? nullableInt = 5;
@@ -128,11 +134,6 @@ class Test45
         console.log("success");
         
     }
-}
-
-
-class Deneme46
-{
     public static void GenericCallTest()
     {
         var result = GetNames<int, string>("-");
