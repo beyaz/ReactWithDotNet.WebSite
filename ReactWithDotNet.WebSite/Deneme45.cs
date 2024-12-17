@@ -60,7 +60,7 @@ class Test45
          ExternalCallTest.Static_Void_Call();
          ExternalCallTest.Static_NonVoid_Call();
          LdInd();
-        //NullableIntTest();
+         NullableIntTest();
         //TryCatch_0();
         //TryCatch_1();
         //TryCatch_HandlerType();
