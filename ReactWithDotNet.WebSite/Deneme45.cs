@@ -45,22 +45,22 @@ class Test45
     
     public static string Abc5()
     {
-        //DynamicLoadTypeAndCreateInstance();
-        
-        //GenericCallTest();
+        DynamicLoadTypeAndCreateInstance();
 
-        ////AutomaticallyLoadMethod();
+        GenericCallTest();
 
-        //BoxTest1();
+        //AutomaticallyLoadMethod();
 
-        //StructCreationTest();
-        //StructCreationGenericTest();
+        BoxTest1();
+
+        StructCreationTest();
+        StructCreationGenericTest();
 
 
-        // ExternalCallTest.Static_Void_Call();
-        // ExternalCallTest.Static_NonVoid_Call();
-        // LdInd();
-         NullableIntTest();
+        ExternalCallTest.Static_Void_Call();
+        ExternalCallTest.Static_NonVoid_Call();
+        LdInd();
+        NullableIntTest();
         //TryCatch_0();
         //TryCatch_1();
         //TryCatch_HandlerType();
