@@ -61,12 +61,12 @@ class Test45
         ExternalCallTest.Static_NonVoid_Call();
         LdInd();
         NullableIntTest();
-        // TryCatch_0();
-        //TryCatch_1();
-        //TryCatch_HandlerType();
-        //TryCatchFinaly_0();
-        //TryCatchFinaly_1();
-        //AutomaticallyLoadType();
+        TryCatch_0();
+        TryCatch_1();
+        TryCatch_HandlerType();
+        TryCatchFinaly_0();
+        TryCatchFinaly_1();
+        AutomaticallyLoadType();
 
         return "E N D";
     }
