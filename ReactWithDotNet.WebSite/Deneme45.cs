@@ -41,6 +41,14 @@ class Test45
         public A F2;
         public B F3;
     }
+    
+    public struct MyClassGeneric<A,B>
+    {
+        public int F0;
+        public string F1; 
+        public A F2;
+        public B F3;
+    }
    
     
     public static string Abc5()
@@ -55,6 +63,7 @@ class Test45
 
         StructCreationTest();
         StructCreationGenericTest();
+        GenericClassCreationTest();
 
 
         ExternalCallTest.Static_Void_Call();
@@ -187,6 +196,42 @@ class Deneme46
         console.log("success");
     }
 
+    public static void GenericClassCreationTest()
+    {
+        var myStruct = new Test45.MyClassGeneric<int,string>
+        {
+            F0 = 4,
+            F1 = "abc",
+            F2 = 6,
+            F3 = "a"
+        };
+        
+        if (myStruct.F0 != 4)
+        {
+            console.log("fail");    
+            return;
+        }
+        
+        if (myStruct.F1 != "abc")
+        {
+            console.log("fail");    
+            return;
+        }
+        
+        if (myStruct.F2 != 6)
+        {
+            console.log("fail");    
+            return;
+        }
+        
+        if (myStruct.F3 != "a")
+        {
+            console.log("fail");    
+            return;
+        }
+
+        console.log("success");
+    }
     
    public class ClassA
    {
