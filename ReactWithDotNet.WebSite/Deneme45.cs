@@ -53,6 +53,8 @@ class Test45
     
     public static string Abc5()
     {
+        Conv_I();
+        
         DynamicLoadTypeAndCreateInstance();
 
         GenericCallTest();
@@ -302,13 +304,20 @@ class Deneme46
 
         object obj = a;
 
-        if (obj is 5)
+        if (obj is not 5)
         {
-            console.log("success");
+            console.log("fail");
+            return;
+        }
+
+        int b = (int)obj;
+        if (b is not 5)
+        {
+            console.log("fail");
             return;
         }
         
-        console.log("fail");
+        console.log("success");
     }
     
    public static void LdInd()
@@ -578,5 +587,33 @@ class Deneme46
         {
             console.log("fail");
         }
+    }
+    
+    
+    public static void Conv_I()
+    {
+        {
+            double doubleValue = 123.45; 
+            int intValue = (int)doubleValue; // This will use conv.i in MSIL
+
+            if (intValue is not 123)
+            {
+                console.log("fail");
+                return;
+            }
+        }
+
+        {
+            long longValue = 9876543210; 
+            int intValue = (int)longValue;
+            if (intValue != 1286608618)
+            {
+                console.log("fail");
+                return;
+            }
+        }
+      
+        
+        console.log("success");
     }
 }
