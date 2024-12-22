@@ -612,6 +612,52 @@ class Deneme46
                 return;
             }
         }
+
+        {
+            var trace = "0";
+            try
+            {
+                trace+="1";
+                
+                long longValue = 9876543210;
+                int overflowIntValue = checked((int)longValue);
+                
+                trace+="2";
+            }
+            catch (OverflowException ex)
+            {
+                trace+="3";
+            }
+
+            if (trace is not "013")
+            {
+                console.log("fail");
+                return;
+            }
+        }
+
+        {
+            var trace = "0";
+            try
+            {
+                trace+="1";
+                
+                int intValue = int.MaxValue;
+                intValue = checked(intValue + 1);
+                
+                trace+="2";
+            }
+            catch (OverflowException ex)
+            {
+                trace+="3";
+            }
+
+            if (trace is not "013")
+            {
+                console.log("fail");
+                return;
+            }
+        }
       
         
         console.log("success");
