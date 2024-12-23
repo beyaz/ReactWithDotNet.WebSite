@@ -53,6 +53,10 @@ class Test45
     
     public static string Abc5()
     {
+        // SnakeGame.Start();
+        
+        StaticFieldAccess();
+        
         Conv_I();
         
         DynamicLoadTypeAndCreateInstance();
@@ -588,7 +592,22 @@ class Deneme46
             console.log("fail");
         }
     }
+
+    class StaticFieldAccessTestClass
+    {
+        public static string A;
+    }
     
+    public static void StaticFieldAccess()
+    {
+        StaticFieldAccessTestClass.A = "x";
+        if (StaticFieldAccessTestClass.A != "x")
+        {
+            console.log("fail");
+        }
+        
+        console.log("success");
+    }
     
     public static void Conv_I()
     {
