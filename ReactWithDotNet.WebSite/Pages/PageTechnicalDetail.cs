@@ -26,7 +26,7 @@ sealed class PageTechnicalDetail : PureComponent
             },
             
             SpaceY(50),
-            new img(WidthFull, ObjectFitContain)
+            new img(WidthFull, ObjectFitContain, BorderRadius(4))
             {
                 Src(Asset("TechnicalDetail1.drawio.png"))
             },
@@ -38,7 +38,7 @@ sealed class PageTechnicalDetail : PureComponent
             },
             
             SpaceY(20),
-            new img(WidthFull, ObjectFitContain)
+            new img(WidthFull, ObjectFitContain, BorderRadius(4))
             {
                 Src(Asset("TechnicalDetail.I.drawio.png"))
             },
@@ -50,7 +50,7 @@ sealed class PageTechnicalDetail : PureComponent
             },
             
             SpaceY(20),
-            new img(WidthFull, ObjectFitContain)
+            new img(WidthFull, ObjectFitContain, BorderRadius(4))
             {
                 Src(Asset("TechnicalDetail.O.drawio.png"))
             },
@@ -58,6 +58,17 @@ sealed class PageTechnicalDetail : PureComponent
             new p
             {
                 "As you can see at images, main idea is server driven UI, just like react server components.",
+                "Client component tree can be shown by using 'React Developer Tools'"
+            },
+            SpaceY(10),
+            new img(WidthFull, ObjectFitContain, BorderRadius(4))
+            {
+                Src(Asset("InReactDeveloperTools.png"))
+            },
+            
+            new p
+            {
+                
                 br,br,
                 "Main differences server is not nodejs, language is not typescript or js.",
                 br,
