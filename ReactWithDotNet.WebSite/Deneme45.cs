@@ -595,13 +595,18 @@ class Deneme46
 
     class StaticFieldAccessTestClass
     {
-        public static string A;
+        public static string A = "x0";
     }
     
     public static void StaticFieldAccess()
     {
-        StaticFieldAccessTestClass.A = "x";
-        if (StaticFieldAccessTestClass.A != "x")
+        if (StaticFieldAccessTestClass.A != "x0")
+        {
+            console.log("fail");
+        }
+     
+        StaticFieldAccessTestClass.A = "x1";
+        if (StaticFieldAccessTestClass.A != "x1")
         {
             console.log("fail");
         }
