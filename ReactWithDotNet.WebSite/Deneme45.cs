@@ -53,36 +53,51 @@ class Test45
     
     public static string Abc5()
     {
-        // SnakeGame.Start();
+        for (int i = 0; i < 50; i++)
+        {
+            if (i == 1)
+            {
+                console.time("ALL_TIME");
+            }
+
+            // SnakeGame.Start();
+
+            StaticFieldAccess();
+
+            Conv_I();
+
+            DynamicLoadTypeAndCreateInstance();
+
+            GenericCallTest();
+
+            AutomaticallyLoadMethod();
+
+            BoxTest1();
+
+            StructCreationTest();
+            StructCreationGenericTest();
+            GenericClassCreationTest();
+
+
+            ExternalCallTest.Static_Void_Call();
+            ExternalCallTest.Static_NonVoid_Call();
+            LdInd();
+            NullableIntTest();
+            TryCatch_0();
+            TryCatch_1();
+            TryCatch_HandlerType();
+            TryCatchFinaly_0();
+            TryCatchFinaly_1();
+            AutomaticallyLoadType();
+            
+            if (i == 1)
+            {
+                console.timeEnd("ALL_TIME");
+            }
+
+        }
+
         
-        StaticFieldAccess();
-        
-        Conv_I();
-        
-        DynamicLoadTypeAndCreateInstance();
-
-        GenericCallTest();
-
-        AutomaticallyLoadMethod();
-
-        BoxTest1();
-
-        StructCreationTest();
-        StructCreationGenericTest();
-        GenericClassCreationTest();
-
-
-        ExternalCallTest.Static_Void_Call();
-        ExternalCallTest.Static_NonVoid_Call();
-        LdInd();
-        NullableIntTest();
-        TryCatch_0();
-        TryCatch_1();
-        TryCatch_HandlerType();
-        TryCatchFinaly_0();
-        TryCatchFinaly_1();
-        AutomaticallyLoadType();
-
         return "E N D";
     }
 
@@ -607,6 +622,8 @@ class Deneme46
         {
             console.log("fail1");
         }
+        StaticFieldAccessTestClass1.A = "x0";
+        
         
         StaticFieldAccessTestClass2.A = "x";
         if (StaticFieldAccessTestClass2.B != "x0")
