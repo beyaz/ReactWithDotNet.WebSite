@@ -593,22 +593,30 @@ class Deneme46
         }
     }
 
-    class StaticFieldAccessTestClass
-    {
-        public static string A = "x0";
-    }
+   
     
     public static void StaticFieldAccess()
     {
-        if (StaticFieldAccessTestClass.A != "x0")
+        if (StaticFieldAccessTestClass1.A != "x0")
         {
-            console.log("fail");
+            console.log("fail0");
         }
      
-        StaticFieldAccessTestClass.A = "x1";
-        if (StaticFieldAccessTestClass.A != "x1")
+        StaticFieldAccessTestClass1.A = "x1";
+        if (StaticFieldAccessTestClass1.A != "x1")
         {
-            console.log("fail");
+            console.log("fail1");
+        }
+        
+        StaticFieldAccessTestClass2.A = "x";
+        if (StaticFieldAccessTestClass2.B != "x0")
+        {
+            console.log("fail2");
+        }
+        
+        if (StaticFieldAccessTestClass2.A != "x")
+        {
+            console.log("fail3");
         }
         
         console.log("success");
@@ -686,4 +694,15 @@ class Deneme46
         
         console.log("success");
     }
+}
+
+class StaticFieldAccessTestClass1
+{
+    public static string A = "x0";
+}
+
+class StaticFieldAccessTestClass2
+{
+    public static string B = "x0";
+    public static string A;
 }
