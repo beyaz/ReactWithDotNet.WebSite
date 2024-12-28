@@ -1,4 +1,5 @@
 ﻿namespace ReactWithDotNet.WebSite;
+using Math = ReactWithDotNet.Math;
 
 using System;
 
@@ -43,6 +44,16 @@ class DomElementStyle
 static class window
 {
     public static extern void setInterval(Action action, int timeout);
+}
+
+
+
+class Random
+{
+    public int Next(int min, int max)
+    {
+        return (int)Math.floor(Math.random()*max + min); 
+    }
 }
 
 

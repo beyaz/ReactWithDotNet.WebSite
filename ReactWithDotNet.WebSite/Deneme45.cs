@@ -63,7 +63,7 @@ class Test45
                 console.time("ALL_TIME");
             }
 
-            // SnakeGame.Start();
+            SnakeGame.Start();
 
             TupleTests();
             
