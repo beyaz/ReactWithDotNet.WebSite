@@ -53,7 +53,7 @@ class Test45
     
     public static string Abc5()
     {
-        // SnakeGame.Start();
+        SnakeGame.Start();
 
         ExternalUnloadedApiTest();
 
@@ -658,6 +658,12 @@ class Deneme46
         var element = document.createElement("div");
         
         element.innerHTML = "t";
+
+        if (element.innerHTML != "t")
+        {
+            console.log("fail");    
+            return;
+        }
         
         console.log("success");
     }
