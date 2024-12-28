@@ -64,6 +64,8 @@ class Test45
 
             //SnakeGame.Start();
 
+            TupleTests();
+            
             StaticFieldAccess();
 
             Conv_I();
@@ -639,7 +641,18 @@ class Deneme46
         }
     }
 
-   
+
+    public static void TupleTests()
+    {
+        var tuple = (X: "A", 5);
+
+        if (tuple.X != "A")
+        {
+            console.log("fail");
+        }
+        
+        console.log("success");
+    }
     
     public static void StaticFieldAccess()
     {
