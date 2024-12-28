@@ -189,24 +189,24 @@ class Random
         var scoreDiv = document.getElementById("score");
         scoreDiv.textContent = "Score: " + score.ToString();
 
-        //// Render the grid
-        //for (int r = 0; r < Rows; r++)
-        //{
-        //    var rowDiv = document.createElement("div");
-        //    rowDiv.style.display = "flex";
+        // Render the grid
+        for (int r = 0; r < Rows; r++)
+        {
+            var rowDiv = document.createElement("div");
+            rowDiv.style.display = "flex";
 
-        //    for (int c = 0; c < Columns; c++)
-        //    {
-        //        var cell = document.createElement("div");
-        //        cell.style.width = $"{CellSize}px";
-        //        cell.style.height = $"{CellSize}px";
-        //        cell.style.border = "1px solid black";
-        //        cell.style.backgroundColor = grid[r, c] == 1 ? "green" : grid[r, c] == 2 ? "red" : "white";
-        //        rowDiv.appendChild(cell);
-        //    }
+            for (int c = 0; c < Columns; c++)
+            {
+                var cell = document.createElement("div");
+                cell.style.width = $"{CellSize}px";
+                cell.style.height = $"{CellSize}px";
+                cell.style.border = "1px solid black";
+                cell.style.backgroundColor = grid[r, c] == 1 ? "green" : grid[r, c] == 2 ? "red" : "white";
+                rowDiv.appendChild(cell);
+            }
 
-        //    container.appendChild(rowDiv);
-        //}
+            container.appendChild(rowDiv);
+        }
     }
 
         private static void RenderGameOver()
