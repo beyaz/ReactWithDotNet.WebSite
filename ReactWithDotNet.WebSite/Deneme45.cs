@@ -676,6 +676,27 @@ class Deneme46
             }
         }
         
+        {
+            var arr =  new (int A,string B)[44];
+        
+            arr[22] = (95, "H");
+
+            if (arr.Length != 44)
+            {
+                console.log("fail");
+            }
+        
+            if (arr[22].A != 95)
+            {
+                console.log("fail");
+            }
+            
+            if (arr[22].B != "H")
+            {
+                console.log("fail");
+            }
+        }
+        
         console.log("success");
     }
 
