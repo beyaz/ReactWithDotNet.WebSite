@@ -76,14 +76,14 @@ class Random
         {
             InitializeGame();
 
-            // Render initial state
+            //// Render initial state
             Render();
 
-            // Start the game loop
-            window.setInterval(GameLoop, 200);
+            //// Start the game loop
+            //window.setInterval(GameLoop, 200);
 
-            // Attach controls
-            AttachControls();
+            //// Attach controls
+            //AttachControls();
         }
 
         private static void InitializeGame()

@@ -53,6 +53,8 @@ class Test45
     
     public static string Abc5()
     {
+        SnakeGame.Start();
+        
         ArrayIndexAccess();
         MultidimensionalArray();
         
@@ -63,7 +65,7 @@ class Test45
                 console.time("ALL_TIME");
             }
 
-            // SnakeGame.Start();
+            
 
             TupleTests();
             
@@ -163,7 +165,14 @@ class Deneme46
             console.log("fail");
             return;
         }
+        
         if (matrix[1, 1] != 4)
+        {
+            console.log("fail");
+            return;
+        }
+        
+        if (matrix[0,0] != 0)
         {
             console.log("fail");
             return;
