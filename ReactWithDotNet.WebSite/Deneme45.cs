@@ -53,6 +53,8 @@ class Test45
     
     public static string Abc5()
     {
+        MultidimensionalArray();
+        
         for (int i = 0; i < 50; i++)
         {
             if (i == 1)
@@ -60,7 +62,7 @@ class Test45
                 console.time("ALL_TIME");
             }
 
-            // SnakeGame.Start();
+            //SnakeGame.Start();
 
             StaticFieldAccess();
 
@@ -139,6 +141,35 @@ class Test45
 
 class Deneme46
 {
+    public static void MultidimensionalArray()
+    {
+        var matrix = new int[3, 2];
+
+        // v00   v01
+        // v10   v11
+        // v20   v21
+
+        matrix[0, 1] = 2;
+        matrix[1, 1] = 4;
+        matrix[2, 1] = 5;
+
+
+
+        if (matrix.Length != 6)
+        {
+            console.log("fail");
+            return;
+        }
+        if (matrix[1, 1] != 4)
+        {
+            console.log("fail");
+            return;
+        }
+
+
+
+        console.log("success");
+    }
     public static void NullableIntTest()
     {
         int? nullableInt = 5;
