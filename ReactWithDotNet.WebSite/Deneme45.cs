@@ -53,8 +53,10 @@ class Test45
     
     public static string Abc5()
     {
-        SnakeGame.Start();
-        
+        // SnakeGame.Start();
+
+        ExternalUnloadedApiTest();
+
         ArrayIndexAccess();
         MultidimensionalArray();
         
@@ -651,6 +653,14 @@ class Deneme46
         }
     }
 
+    public static void ExternalUnloadedApiTest()
+    {
+        var element = document.createElement("div");
+        
+        element.innerHTML = "t";
+        
+        console.log("success");
+    }
     public static void ArrayIndexAccess()
     {
         {
