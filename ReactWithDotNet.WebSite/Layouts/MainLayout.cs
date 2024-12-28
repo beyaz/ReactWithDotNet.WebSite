@@ -79,6 +79,8 @@ sealed class MainLayout : PureComponent, IPageLayout
                           });
                           """
                 }
+                
+                ,new div(Id("game"))
             },
             
             Environment.UserName == "beyaz" ? new script
