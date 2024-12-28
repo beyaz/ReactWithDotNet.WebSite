@@ -53,6 +53,7 @@ class Test45
     
     public static string Abc5()
     {
+        ArrayIndexAccess();
         MultidimensionalArray();
         
         for (int i = 0; i < 50; i++)
@@ -641,6 +642,42 @@ class Deneme46
         }
     }
 
+    public static void ArrayIndexAccess()
+    {
+        {
+            var arr = new int[3];
+        
+            arr[2] = 9;
+
+            if (arr.Length != 3)
+            {
+                console.log("fail");
+            }
+        
+            if (arr[2] != 9)
+            {
+                console.log("fail");
+            }
+        }
+
+        {
+            var arr = new Object[3];
+        
+            arr[2] = 9;
+
+            if (arr.Length != 3)
+            {
+                console.log("fail");
+            }
+        
+            if ((int)arr[2] != 9)
+            {
+                console.log("fail");
+            }
+        }
+        
+        console.log("success");
+    }
 
     public static void TupleTests()
     {
