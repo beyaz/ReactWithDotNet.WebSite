@@ -63,7 +63,7 @@ class Test45
                 console.time("ALL_TIME");
             }
 
-            SnakeGame.Start();
+            // SnakeGame.Start();
 
             TupleTests();
             
@@ -655,6 +655,11 @@ class Deneme46
             }
         
             if (arr[2] != 9)
+            {
+                console.log("fail");
+            }
+            
+            if (arr[0] != 0)
             {
                 console.log("fail");
             }
