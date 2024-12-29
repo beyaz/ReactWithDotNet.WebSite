@@ -53,8 +53,10 @@ class Test45
     
     public static string Abc5()
     {
-        SnakeGame.Start();
+        // SnakeGame.Start();
 
+        StringInterpolation();
+        
         ExternalUnloadedApiTest();
 
         ArrayIndexAccess();
@@ -667,6 +669,24 @@ class Deneme46
         
         console.log("success");
     }
+    
+    public static void StringInterpolation()
+    {
+        var a = 4;
+        var b = "T";
+        
+        var str = $"abc_{a}_{b}";
+        
+
+        if (str != "abc_4_T")
+        {
+            console.log("fail");    
+            return;
+        }
+        
+        console.log("success");
+    }
+    
     public static void ArrayIndexAccess()
     {
         {
