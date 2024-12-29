@@ -55,9 +55,9 @@ class Test45
     {
         // SnakeGame.Start();
 
-        StringInterpolation();
+        //StringInterpolation();
         
-        ExternalUnloadedApiTest();
+         ExternalUnloadedApiTest();
 
         ArrayIndexAccess();
         MultidimensionalArray();
@@ -79,7 +79,7 @@ class Test45
 
             DynamicLoadTypeAndCreateInstance();
 
-            GenericCallTest();
+            // GenericCallTest();
 
             AutomaticallyLoadMethod();
 
