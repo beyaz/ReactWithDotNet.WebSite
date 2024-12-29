@@ -672,13 +672,13 @@ class Deneme46
     
     public static void StringInterpolation()
     {
-        var a = 4;
+        var a = 49;
         var b = "T";
         
         var str = $"abc_{a}_{b}";
         
 
-        if (str != "abc_4_T")
+        if (str != "abc_49_T")
         {
             console.log("fail");    
             return;
