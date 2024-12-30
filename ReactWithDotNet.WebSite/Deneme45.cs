@@ -158,7 +158,15 @@ class Deneme46
         var item = new CircularTypeAndParameter();
         item.Field1 = "X";
 
-        var value = CircularTypeAndParameter.CurrentClassAsParameter(item);
+
+        var value = CircularTypeAndParameter.GenericCall<int, short>(6, 7);
+        if (value != "Int32")
+        {
+            console.log("fail");
+            return;
+        }
+        
+        value = CircularTypeAndParameter.CurrentClassAsParameter(item);
         if (value != "X")
         {
             console.log("fail");
@@ -913,5 +921,10 @@ class CircularTypeAndParameter
     public static string CurrentClassAsParameter(CircularTypeAndParameter parameter)
     {
         return parameter.Field1;
+    }
+
+    public static string GenericCall<A, B>(A a, B b)
+    {
+        return typeof(A).Name;
     }
 }
