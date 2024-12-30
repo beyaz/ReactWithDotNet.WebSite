@@ -53,7 +53,7 @@ class Test45
     
     public static string Abc5()
     {
-        CircularTypeAndParameterTest();
+        // CircularTypeAndParameterTest();
         
         // SnakeGame.Start();
 
