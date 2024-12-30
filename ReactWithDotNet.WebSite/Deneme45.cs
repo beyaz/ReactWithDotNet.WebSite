@@ -79,7 +79,7 @@ class Test45
 
             DynamicLoadTypeAndCreateInstance();
 
-            // GenericCallTest();
+            GenericCallTest();
 
             AutomaticallyLoadMethod();
 
@@ -213,6 +213,7 @@ class Deneme46
     }
     public static void GenericCallTest()
     {
+
         var result = GetNames<int, string>("-");
         if (result == "String-Int32")
         {
@@ -223,9 +224,16 @@ class Deneme46
 
         static string GetNames<T1, T2>(string seperator)
         {
-            return typeof(T2).Name + seperator + typeof(T1).Name;
+            return typeof(T2).Name +seperator +  typeof(T1).Name;
+        }
+        
+        static string GetName_1<T1, T2>()
+        {
+            return  typeof(T1).Name;
         }
     }
+    
+   
     
     public static void StructCreationGenericTest()
     {
