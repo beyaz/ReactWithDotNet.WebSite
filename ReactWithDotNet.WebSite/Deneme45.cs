@@ -905,6 +905,11 @@ class CircularTypeAndParameter
 {
     public string Field1;
 
+    public string CurrentClassAsParameter2(CircularTypeAndParameter parameter)
+    {
+        return parameter.Field1;
+    }
+    
     public static string CurrentClassAsParameter(CircularTypeAndParameter parameter)
     {
         return parameter.Field1;
