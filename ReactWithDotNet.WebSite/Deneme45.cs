@@ -53,6 +53,8 @@ class Test45
     
     public static string Abc5()
     {
+        CircularTypeAndParameterTest();
+        
         // SnakeGame.Start();
 
         //StringInterpolation();
@@ -150,6 +152,21 @@ class Test45
 
 class Deneme46
 {
+
+    public static void CircularTypeAndParameterTest()
+    {
+        var item = new CircularTypeAndParameter();
+        item.Field1 = "X";
+
+        var value = CircularTypeAndParameter.CurrentClassAsParameter(item);
+        if (value != "X")
+        {
+            console.log("fail");
+            return;
+        }
+        
+        console.log("success");
+    }
     public static void MultidimensionalArray()
     {
         var matrix = new int[3, 2];
@@ -882,4 +899,14 @@ class StaticFieldAccessTestClass2
 {
     public static string B = "x0";
     public static string A;
+}
+
+class CircularTypeAndParameter
+{
+    public string Field1;
+
+    public static string CurrentClassAsParameter(CircularTypeAndParameter parameter)
+    {
+        return parameter.Field1;
+    }
 }
