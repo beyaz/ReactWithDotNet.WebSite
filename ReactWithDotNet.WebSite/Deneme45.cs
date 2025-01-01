@@ -53,25 +53,26 @@ class Test45
     
     public static string Abc5()
     {
+        
         // CircularTypeAndParameterTest();
         
         // SnakeGame.Start();
 
         //StringInterpolation();
         
-         ExternalUnloadedApiTest();
-
-        ArrayIndexAccess();
-        MultidimensionalArray();
+       
         
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 100; i++)
         {
             if (i == 1)
             {
                 console.time("ALL_TIME");
             }
 
-            
+            ExternalUnloadedApiTest();
+
+            ArrayIndexAccess();
+            MultidimensionalArray();
 
             TupleTests();
             
