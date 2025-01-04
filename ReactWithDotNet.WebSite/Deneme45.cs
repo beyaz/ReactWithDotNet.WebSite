@@ -43,6 +43,11 @@ class Test45
         public string F1; 
         public A F2;
         public B F3;
+
+        public string GetNameOfA()
+        {
+            return typeof(A).Name;
+        }
     }
     
     public struct MyClassGeneric<A,B>
@@ -56,6 +61,7 @@ class Test45
     
     public static string Abc5()
     {
+        
         
         // CircularTypeAndParameterTest();
         
@@ -297,6 +303,13 @@ class Deneme46
             console.log("fail");    
             return;
         }
+        
+        if (myStruct.GetNameOfA() != "Int32")
+        {
+            console.log("fail");    
+            return;
+        }
+        
 
         console.log("success");
     }
