@@ -1,4 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿global using static ReactWithDotNet.window;
+
+using System.Runtime.InteropServices;
+
 using static ReactWithDotNet.WebSite.Deneme46;
 
 namespace ReactWithDotNet.WebSite;
@@ -381,7 +384,7 @@ class Deneme46
         
         public static void Static_NonVoid_Call()
         {
-            var result = Math.max(1, 2);
+            var result = window.Math.max(1, 2);
             if (result ==2)
             {
                 console.log("success");    

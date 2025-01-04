@@ -1,50 +1,9 @@
 ﻿namespace ReactWithDotNet.WebSite;
-using Math = ReactWithDotNet.Math;
 
 using System;
 
-[External]
-static class document
-{
-    public static extern DomElement getElementById(string id);
-
-    public static extern DomElement createElement(string tag);
-
-    public static extern void addEventListener(string keydown, Action<DomEventArg> action);
-}
-
-[External]
-class DomElement
-{
-    public string innerHTML;
-    public string textContent;
-    public DomElementStyle style;
-
-    public extern void appendChild(DomElement child);
-}
-
-[External]
-class DomEventArg
-{
-    public string key;
-}
-
-[External]
-class DomElementStyle
-{
-    public string display;
-    public string width;
-    public string height;
-    public string border;
-    public string backgroundColor;
-}
 
 
-[External]
-static class window
-{
-    public static extern void setInterval(Action action, int timeout);
-}
 
 
 
@@ -52,7 +11,7 @@ class Random
 {
     public int Next(int min, int max)
     {
-        return (int)Math.floor(Math.random()*max + min); 
+        return (int)window.Math.floor(window.Math.random()*max + min); 
     }
 }
 
