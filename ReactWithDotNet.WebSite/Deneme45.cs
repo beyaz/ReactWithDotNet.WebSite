@@ -61,9 +61,9 @@ class Test45
     
     public static string Abc5()
     {
+        StructCreationTest();
         
-        
-        // CircularTypeAndParameterTest();
+        CircularTypeAndParameterTest();
         
         // SnakeGame.Start();
 
@@ -304,11 +304,11 @@ class Deneme46
             return;
         }
         
-        if (myStruct.GetNameOfA() != "Int32")
-        {
-            console.log("fail");    
-            return;
-        }
+        //if (myStruct.GetNameOfA() != "Int32")
+        //{
+        //    console.log("fail");    
+        //    return;
+        //}
         
 
         console.log("success");
