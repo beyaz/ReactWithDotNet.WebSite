@@ -111,6 +111,8 @@ class Test45
             TryCatchFinaly_1();
             AutomaticallyLoadType();
             
+            // CircularTypeAndParameterTest();
+            
             if (i == 1)
             {
                 console.timeEnd("ALL_TIME");
