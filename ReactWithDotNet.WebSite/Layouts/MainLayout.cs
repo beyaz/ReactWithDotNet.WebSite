@@ -71,7 +71,6 @@ sealed class MainLayout : PureComponent, IPageLayout
                           ReactWithDotNet.StrictMode = false;
 
                           ReactWithDotNet.RequestHandlerPath = '{{RequestHandlerPath}}';
-                          ReactWithDotNet.MetadataRequestHandlerPath = '{{MetadataRequestHandlerPath}}';
 
                           ReactWithDotNet.RenderComponentIn({
                             idOfContainerHtmlElement: '{{ContainerDomElementId}}',
@@ -80,20 +79,8 @@ sealed class MainLayout : PureComponent, IPageLayout
                           """
                 }
                 
-                ,new div(Id("game"))
-            },
-            
-            Environment.UserName == "beyaz" ? new script
-            {
-                type = "text/javascript",
-                src  = "long.js"
-            }: null,
-            
-            Environment.UserName == "beyaz" ? new script
-            {
-                type = "text/javascript",
-                src = "clr.js"
-            } : null
+                
+            }
         };
 
         IEnumerable<Element> arrangeFonts()

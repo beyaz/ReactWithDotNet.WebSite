@@ -22,8 +22,6 @@ public static class ReactWithDotNetIntegration
 
         RequestHandlerPath = "/" + nameof(HandleReactWithDotNetRequest);
 
-        MetadataRequestHandlerPath = "/" + nameof(GetMetadata);
-
         app.Use(async (httpContext, next) =>
         {
             var path = httpContext.Request.Path.Value ?? string.Empty;
@@ -53,12 +51,6 @@ public static class ReactWithDotNetIntegration
                 return;
             }
             #endif
-
-            if (path == MetadataRequestHandlerPath)
-            {
-                await GetMetadata(httpContext);
-                return;
-            }
 
             await next();
         });
