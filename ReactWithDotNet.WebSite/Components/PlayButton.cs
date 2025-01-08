@@ -37,7 +37,7 @@ sealed class PlayButton : Component<PlayButton.State>
 
         return new FlexRowCentered(Padding(3, 10), SizeFitContent, BorderRadius(3), style)
         {
-            new IconPlay { Size = 25 },
+            new IconPlay { Size = 22 },
 
             Label,
 

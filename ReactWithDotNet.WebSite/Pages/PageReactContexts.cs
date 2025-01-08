@@ -124,7 +124,7 @@ sealed class PageReactContexts : PureComponent
                     {
                         var dbConnection = DbConnection[Context];
                         
-                        dbConnection.....
+                        dbConnection.Query(...
                         
                         return Task.CompletedTask;
                     }
