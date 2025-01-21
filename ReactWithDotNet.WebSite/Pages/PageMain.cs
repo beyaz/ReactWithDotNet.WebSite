@@ -25,9 +25,6 @@ class PageMain : PureComponent
         {
             return new FlexColumn(AlignItemsCenter)
             {
-                new CounterSample(),
-                new CounterSample(),
-                
                 new div(FontFamily_PlusJakartaSans_ExtraBold, FontSize40, LG(FontSize50), FontWeight800, WhenMediaMaxWidth(MD, TextAlignCenter))
                 {
                     LineHeight(50), LG(LineHeight(60)),
