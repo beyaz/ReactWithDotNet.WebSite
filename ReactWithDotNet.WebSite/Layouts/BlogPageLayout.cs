@@ -2,7 +2,7 @@
 
 namespace ReactWithDotNet.WebSite;
 
-sealed class PageLayout : PureComponent
+sealed class PageLayout : Component
 {
     protected override Element render()
     {
