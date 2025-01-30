@@ -18,10 +18,10 @@ sealed class PageMadeBy : PureComponent
             },
             new
             {
-                Name  = "Postman alternative for .net core assemblies",
-                Url   = "https://github.com/beyaz/ApiInspector",
+                Name    = "Postman alternative for .net core assemblies",
+                Url     = "https://github.com/beyaz/ApiInspector",
                 UrlText = "Api Inspector",
-                Image = "api.inspector.png"
+                Image   = "api.inspector.png"
             },
             new
             {
@@ -50,7 +50,7 @@ sealed class PageMadeBy : PureComponent
                 {
                     style =
                     {
-                        Size(250,220),
+                        Size(250, 220),
                         AlignItemsCenter,
                         Gap(4),
                         Padding(16),
