@@ -61,6 +61,13 @@ static class MenuAccess
                     PageLink    = Page.LiveEditor.Url,
                     Description = "Import any html / Live Editor",
                     SvgFileName = "import.svg"
+                },
+                new()
+                {
+                    Title       = "Made by ReactWithDotNet",
+                    PageLink    = Page.MadeBy.Url,
+                    Description = "Web sites or apps using ReactWithDotNet",
+                    SvgFileName = "import.svg"
                 }
             ]
         }
