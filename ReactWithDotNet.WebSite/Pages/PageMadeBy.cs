@@ -11,83 +11,73 @@ sealed class PageMadeBy : PureComponent
         {
             new h1
             {
-                "Project Milestones"
+                "Sites or applications that using ReactWithDotNet"
             },
             SpaceY(16),
             new p
             {
-                "The main milestones of this project are listed below."
+                "Here is a list of some applications that using ReactWithDotNet technology."
             },
             SpaceY(16),
-            new MilestoneContainer
+            new FlexRow(Gap(32), FlexWrap)
             {
-                new h5 { "Milestone 1: Core Concept" },
-                new Progressbar { Value = 95 },
-                new p
+                new Card
                 {
-                    "Core react conceps like Functional components, Class components, PureComponents and communication react js client and .net core server."
-                }
-            },
-            SpaceY(32),
-            new MilestoneContainer
-            {
-                new h5 { "Milestone 2: Creating wrapper classes of popular react libraries like MUI, AntDesign." },
-                new Progressbar { Value = 5 },
-                new p
+                    new h5 { "Special Villa Promotion and Rezervation" },
+                    new img(SizeFull, BorderRadius(5))
+                    {
+                        Src(Asset("alyavillas.com.jpg"))
+                    },
+                    new a
+                    {
+                        href = "alyavillas.com",
+                        text = "alyavillas.com"
+                    }
+                },
+                
+                new Card
                 {
-                    "When this milestone completed, you can use MUI, or other famous components in your project. This insfrastructure is ready to use. We are plan to generate wrapper classes automatically."
-                }
-            },
-            SpaceY(32),
-            new MilestoneContainer
-            {
-                new h5 { "Milestone 3: Use Client option" },
-                new Progressbar { Value = 10 },
-                new p
+                    new h5 { "Postman alternative for .net core dlls" },
+                    new img(Size(100), BorderRadius(5),ObjectFitCover)
+                    {
+                        Src(Asset("api.inspector.png"))
+                    },
+                    new a
+                    {
+                        href = "https://github.com/beyaz/ApiInspector",
+                        text = "ApiInspector"
+                    }
+                },
+                
+                new Card
                 {
-                    "After this part finished, you can write js code in c# language. I'm planning mini .net runtime in js language. My plan is not to build a new c# to js compiler. My plan is creating a new MSIL code interpreter in js language. Not getting all .net core assemblies. Only required part of MSIL codes will be downloaded into client side."
-                }
-            },
-            SpaceY(32),
-            new MilestoneContainer
-            {
-                new h5 { "Milestone 4: React Native Integration" },
-                new Progressbar { Value = 0 },
-                new p
-                {
-                    "React native user interfaces will be build by server driven ui."
-                }
+                    new h5 { "Tourism agency (hotel search)" },
+                    new img(SizeFull, BorderRadius(5))
+                    {
+                        Src(Asset("hotel.app.com.jpg"))
+                    },
+                    new a
+                    {
+                        href = "https://www.elcitur.com.tr/hotel",
+                        text = "https://www.elcitur.com.tr/hotel"
+                    }
+                },
             }
+            
         };
     }
 
-    class MilestoneContainer : PureComponent
+    class Card : PureComponent
     {
         protected override Element render()
         {
-            return new FlexColumn(Gap(4), Padding(32), Background(White), BorderRadius(8), Border(1, solid, Gray200), Hover(BorderColor(Gray300)))
+            return new FlexColumn(Size(250), AlignItemsCenter, Gap(4), Padding(16), Background(White), BorderRadius(8), Border(1, solid, Gray200), Hover(BorderColor(Gray300)))
             {
-                children
+                children,
+                
+                TextAlignCenter
             };
         }
     }
 
-    class Progressbar : PureComponent
-    {
-        public int Value { get; init; } = 10;
-
-        protected override Element render()
-        {
-            return new div(SizeFull, BorderRadius(4), Border(1, solid, Blue300), Size(200, 25), WhenMediaMinWidth(450, Width(300)))
-            {
-                new FlexRowCentered(Width(Value, 100), Background(linear_gradient(90, Blue100, Blue300)), HeightFull, FontSize11, BorderRadius(4)),
-
-                PositionRelative,
-                new FlexRowCentered(PositionAbsolute, Inset0, FontWeight500, FontSize12)
-                {
-                    "%" + Value
-                }
-            };
-        }
-    }
 }
