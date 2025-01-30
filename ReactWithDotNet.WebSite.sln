@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactWithDotNet.WebSite.Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactWithDotNet", "..\ReactWithDotNet\ReactWithDotNet\ReactWithDotNet.csproj", "{7A2CF587-2015-4996-B6CA-DD2DDBC4F2CD}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactWithDotNet.Test", "..\ReactWithDotNet\ReactWithDotNet.Test\ReactWithDotNet.Test.csproj", "{BFA5D04D-36BE-4450-B40B-2872D5B19B51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{7A2CF587-2015-4996-B6CA-DD2DDBC4F2CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A2CF587-2015-4996-B6CA-DD2DDBC4F2CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A2CF587-2015-4996-B6CA-DD2DDBC4F2CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFA5D04D-36BE-4450-B40B-2872D5B19B51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFA5D04D-36BE-4450-B40B-2872D5B19B51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFA5D04D-36BE-4450-B40B-2872D5B19B51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFA5D04D-36BE-4450-B40B-2872D5B19B51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
