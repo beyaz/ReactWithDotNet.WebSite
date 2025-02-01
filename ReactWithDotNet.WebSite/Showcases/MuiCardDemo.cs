@@ -43,6 +43,16 @@ class MuiCardDemo : PureComponent
                         new Button { size = "small", children = { "Learn More" } }
                     }
                 }
+            },
+            
+            new Accordion
+            {
+                Accordion.DefaultExpanded(true),
+                new AccordionSummary
+                {
+                    //ExpandIcon(new ExpandMoreIcon()),
+                    new Typography { children = { "Accordion 1" } }
+                },
             }
         };
     }
