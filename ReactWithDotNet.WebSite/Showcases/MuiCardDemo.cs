@@ -50,7 +50,7 @@ class MuiCardDemo : PureComponent
                 Accordion.DefaultExpanded(true),
                 new AccordionSummary
                 {
-                    //ExpandIcon(new ExpandMoreIcon()),
+                    AccordionSummary.ExpandIcon(new ExpandMoreIcon()),
                     new Typography { children = { "Accordion 1" } }
                 },
             }
