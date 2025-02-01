@@ -16,6 +16,12 @@ sealed class PageShowcase : Component<PageShowcase.State>
         },
         new()
         {
+            TargetType = typeof(MuiAccordionDemo),
+            Height     = 400,
+            Label      = "Mui Accordion"
+        },
+        new()
+        {
             TargetType = typeof(MuiTextFieldDemo),
             Height     = 150,
             Label      = "Mui Text Field"
