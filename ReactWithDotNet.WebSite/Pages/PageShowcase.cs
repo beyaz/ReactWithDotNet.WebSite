@@ -22,6 +22,13 @@ sealed class PageShowcase : Component<PageShowcase.State>
         },
         new()
         {
+            TargetType = typeof(MuiAutoCompleteDemo),
+            Height     = 400,
+            Label      = "Mui Auto Complete"
+        },
+        
+        new()
+        {
             TargetType = typeof(MuiTextFieldDemo),
             Height     = 150,
             Label      = "Mui Text Field"
