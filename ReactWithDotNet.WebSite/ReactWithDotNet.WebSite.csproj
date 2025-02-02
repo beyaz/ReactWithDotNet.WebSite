@@ -24,7 +24,7 @@
 		<Compile Update="Showcases\MonacoEditorDemo.cs">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Compile>
-		<Compile Update="Showcases\Mui.Accordion.cs">
+		<Compile Update="Showcases\MuiAccordionDemo.cs">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Compile>
 		<Compile Update="Showcases\MuiCardDemo.cs">
