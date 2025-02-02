@@ -10,49 +10,39 @@ class MuiAutoCompleteDemo : Component<MuiAutoCompleteDemo.State>
         {
             new div
             {
-                state.IsExpanded is true ? "Expanded" : "Collapsed"
+                $"Selected Country is '{state.SelectedCountryType?.label}'"
             },
-            new Accordion
+            new Autocomplete<CountryType>
             {
-                defaultExpanded = true,
-
-                onChange = OnChange,
-
-                children =
+                options = Countries,
+                // autoHighlight = true
+                getOptionLabel = x => x.label,
+                renderOption = (_, option)=> new FlexRow
                 {
-                    new AccordionSummary
+                    new img(Size(20))
                     {
-                        expandIcon = new ExpandMoreIcon(),
-                        children =
-                        {
-                            new Typography
-                            {
-                                "Accordion 1"
-                            }
-                        }
+                        src = $"https://flagcdn.com/w20/{option.code.ToLower()}.png"
                     },
+                        
+                    option.label
+                },
+                onChange = OnChange
 
-                    new AccordionDetails
-                    {
-                        """
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                               malesuada lacus ex, sit amet blandit leo lobortis eget.
-                        """
-                    }
-                }
             }
         };
     }
 
-    Task OnChange(MouseEvent arg1, bool? expanded)
+    Task OnChange(ChangeEvent arg1, CountryType selectedItem)
     {
-        state.IsExpanded = expanded;
-
+        state.SelectedCountryType = selectedItem;
+        
         return Task.CompletedTask;
     }
 
+   
+
     internal class State
     {
-        public bool? IsExpanded { get; set; }
+        public CountryType SelectedCountryType { get; set; }
     }
 }
