@@ -26,7 +26,8 @@ class MuiAutoCompleteDemo : Component<MuiAutoCompleteDemo.State>
                         
                     option.label
                 },
-                onChange = OnChange
+                onChange = OnChange,
+                // renderInput = 
 
             }
         };
