@@ -55,31 +55,7 @@ sealed class MainLayout : PureComponent, IPageLayout
             },
             new body(Margin(0), Height100vh)
             {
-                new div(Id(ContainerDomElementId), SizeFull),
-
-                // After page first rendered in client then connect with react system in background.
-                // So user first iteraction time will be minimize.
-                
-                new script
-                {
-                    type = "module",
-
-                    text =
-                        $$"""
-                          import {ReactWithDotNet} from '{{IndexJsFilePath}}';
-
-                          ReactWithDotNet.StrictMode = false;
-
-                          ReactWithDotNet.RequestHandlerPath = '{{RequestHandlerPath}}';
-
-                          ReactWithDotNet.RenderComponentIn({
-                            idOfContainerHtmlElement: '{{ContainerDomElementId}}',
-                            renderInfo: {{RenderInfo.ToJsonString()}}
-                          });
-                          """
-                }
-                
-                
+                new div(Id(ContainerDomElementId), SizeFull)
             }
         };
 
@@ -100,6 +76,22 @@ sealed class MainLayout : PureComponent, IPageLayout
             ];
         }
     }
+
+    public string InitialScript =>
+        $$"""
+          import {ReactWithDotNet} from '{{IndexJsFilePath}}';
+
+          ReactWithDotNet.StrictMode = false;
+
+          ReactWithDotNet.RequestHandlerPath = '{{RequestHandlerPath}}';
+
+          ReactWithDotNet.RenderComponentIn({
+            idOfContainerHtmlElement: '{{ContainerDomElementId}}',
+            renderInfo: {{RenderInfo.ToJsonString()}}
+          });
+          """;
+
+
 }
 
 partial class Extensions
