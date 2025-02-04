@@ -20,12 +20,6 @@ sealed class PageShowcase : Component<PageShowcase.State>
             Height     = 400,
             Label      = "Mui Accordion"
         },
-        new()
-        {
-            TargetType = typeof(MuiAutoCompleteDemo),
-            Height     = 400,
-            Label      = "Mui Auto Complete"
-        },
         
         new()
         {
