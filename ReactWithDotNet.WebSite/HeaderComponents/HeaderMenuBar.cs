@@ -26,6 +26,39 @@ sealed class HeaderMenuBar : PureComponent
         };
     }
 
+    class SocialMediaLink : PureComponent
+    {
+        public string Text { get; init; }
+        public string Link { get; init; }
+        public string Svg { get; init; }
+        
+        protected override Element render()
+        {
+            return new a(Href(Link))
+            {
+                DisplayFlex, FlexDirectionRow, AlignItemsCenter, JustifyContentCenter,
+                Border(Solid(1, Theme.grey_50)),
+                BorderRadius,
+                Padding(7),
+                Transition(BackgroundColor, 200, cubic_bezier(0.4, 0, 0.2, 1), 0),
+                Hover(Border(Solid(1, Theme.grey_300)), Background(Theme.grey_50)),
+
+                new Tooltip
+                {
+                    arrow = true,
+                    title = Text,
+
+                    children =
+                    {
+                        new svg(Size(20), svg.Fill(Theme.Blue700), svg.ViewBox(0, 0, 24, 24))
+                        {
+                            new path { d = Svg }
+                        }
+                    }
+                }
+            };
+        }
+    }
     sealed class SocialMediaLinks : PureComponent
     {
         protected override Element render()
