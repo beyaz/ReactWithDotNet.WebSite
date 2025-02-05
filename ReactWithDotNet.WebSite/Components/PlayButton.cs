@@ -101,6 +101,7 @@ sealed class PlayButton : Component<PlayButton.State>
 
                 new FlexRowCentered(WidthFitContent, HeightAuto, Padding(16), Background(White), BorderRadius(8))
                 {
+                    OnClick(OnPlayerClicked),
                     new div(style)
                     {
                         new ReactPlayer
@@ -117,6 +118,12 @@ sealed class PlayButton : Component<PlayButton.State>
                     }
                 }
             };
+        }
+
+        [StopPropagation]
+        Task OnPlayerClicked(MouseEvent _)
+        {
+            return Task.CompletedTask;
         }
 
         internal class VideoPlayerState
