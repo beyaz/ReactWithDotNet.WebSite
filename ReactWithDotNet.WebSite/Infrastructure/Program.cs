@@ -2,7 +2,6 @@ using System.IO.Compression;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -41,7 +40,6 @@ public class Program
         app.UseStaticFiles(new StaticFileOptions
         {
             RequestPath         = new("/wwwroot"),
-            ContentTypeProvider = new Utf8CharsetContentTypeProvider(),
             OnPrepareResponse   = ctx => { ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={TimeSpan.FromMinutes(5).TotalSeconds}"); }
         });
 
@@ -52,27 +50,4 @@ public class Program
         app.Run();
     }
 
-    class Utf8CharsetContentTypeProvider : IContentTypeProvider
-    {
-        readonly IContentTypeProvider _defaultProvider = new FileExtensionContentTypeProvider();
-
-        public bool TryGetContentType(string subpath, out string contentType)
-        {
-            subpath = subpath.ToLower();
-
-            if (subpath.EndsWith(".js", StringComparison.OrdinalIgnoreCase))
-            {
-                contentType = "application/javascript; charset=utf-8";
-                return true;
-            }
-
-            if (subpath.EndsWith(".css", StringComparison.OrdinalIgnoreCase))
-            {
-                contentType = "text/css; charset=utf-8";
-                return true;
-            }
-
-            return _defaultProvider.TryGetContentType(subpath, out contentType);
-        }
-    }
 }
