@@ -39,8 +39,14 @@ public class Program
 
         app.UseStaticFiles(new StaticFileOptions
         {
-            RequestPath         = new("/wwwroot"),
-            OnPrepareResponse   = ctx => { ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={TimeSpan.FromMinutes(5).TotalSeconds}"); }
+            RequestPath = new("/wwwroot"),
+
+            OnPrepareResponse = ctx =>
+            {
+                var maxAge = TimeSpan.FromMinutes(5).TotalSeconds;
+
+                ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={maxAge}");
+            }
         });
 
         app.UseResponseCompression();
@@ -49,5 +55,4 @@ public class Program
 
         app.Run();
     }
-
 }

@@ -13,7 +13,7 @@ public static class ReactWithDotNetIntegration
     {
         app.UseMiddleware<ReactWithDotNetJavaScriptFiles>();
 
-        var map = typeof(Page)
+        var routeMap = typeof(Page)
             .GetFields(BindingFlags.Static | BindingFlags.Public)
             .Where(f => f.FieldType == typeof(PageRouteInfo))
             .Select(f => (PageRouteInfo)f.GetValue(null))
@@ -32,7 +32,7 @@ public static class ReactWithDotNetIntegration
                 return;
             }
 
-            if (map.TryGetValue(path, out var routeInfo))
+            if (routeMap.TryGetValue(path, out var routeInfo))
             {
                 await WriteHtmlResponse(httpContext, typeof(MainLayout), routeInfo.page);
                 return;
