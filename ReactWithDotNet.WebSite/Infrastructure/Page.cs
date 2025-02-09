@@ -42,8 +42,4 @@ static class Page
     {
         return LivePreview.Url + $"?{Components.LivePreview.QueryParameterNameOfGuid}={guid}";
     }
-    
-
-
-    
 }
