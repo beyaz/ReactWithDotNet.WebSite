@@ -109,6 +109,10 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
     static string GetName(this HtmlAttribute htmlAttribute)
     {
         var name = htmlAttribute.Name;
+        if (name.StartsWith(":"))
+        {
+            name = name[1..];
+        }
 
         if (htmlAttribute.OriginalName != name)
         {
