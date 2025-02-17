@@ -56,7 +56,14 @@ sealed class PageShowcase : Component<PageShowcase.State>
             TargetType = typeof(MonacoEditorDemo),
             Height     = 500,
             Label      = "Monaco Editor"
-        }
+        },
+        new()
+        {
+            TargetType = typeof(BasicDashboardDemo),
+            Height     = 500,
+            Label      = "Basic Dashboard"
+        },
+        
     ];
 
     protected override Task constructor()
