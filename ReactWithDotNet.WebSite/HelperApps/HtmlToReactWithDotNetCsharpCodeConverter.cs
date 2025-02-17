@@ -407,7 +407,6 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
                 data.modifiers.Remove(textModifierCode);
             }
 
-            var isBodyWritten = false;
             var isConstructorWritten = false;
             
             if (data.modifiers.Count > 0)
@@ -421,42 +420,33 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
 
             var lines = new List<string> { sb.ToString() };
 
+            List<string> objectInitializations = [];
+            
             if (textModifierCode is not null)
             {
-                isBodyWritten  = true;
-                
-                lines.Add("{");
-
-                lines.Add(textModifierCode.PartParameterWithoutParanthesis.RemoveFromStart("\"").RemoveFromEnd("\""));
-
-                lines.Add("}");
+                objectInitializations.Add(textModifierCode.PartParameterWithoutParanthesis.RemoveFromStart("\"").RemoveFromEnd("\""));
             }
 
             if (data.htmlNode.Attributes.Any())
             {
-                isBodyWritten  = true;
-                
-                lines.Add("{");
-
                 foreach (var list in data.htmlNode.Attributes.Select(attributeToString))
                 {
-                    if (list.Count > 0)
-                    {
-                        lines.AddRange(list);
-                    }
-                    else
-                    {
-                        lines.Add(list[0]);
-                    }
-
-                    lines[^1] += ",";
+                    objectInitializations.AddRange(list);
                 }
+            }
+
+            if (objectInitializations.Count > 0)
+            {
+                lines.Add("{");
+
+                lines.AddRange(objectInitializations.Select(line => line + ","));
 
                 lines[^1] = lines[^1].RemoveFromEnd(",");
+                
                 lines.Add("}");
             }
 
-            if (isConstructorWritten is false && isBodyWritten is false)
+            if (isConstructorWritten is false && objectInitializations.Count is 0)
             {
                 lines[^1] += "()";
             }
@@ -1075,7 +1065,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
 
         static (bool success, string[] parameters) tryParseViewBoxValues(string value)
         {
-            var parameters = value.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray();
+            var parameters = value.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (parameters.Length == 4)
             {
                 return (true, parameters);
