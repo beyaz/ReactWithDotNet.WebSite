@@ -838,43 +838,27 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
         {
             protected override Element render()
             {
-                return new FlexRow(BorderBottomWidth("0px"), JustifyContentNormal, Gap(16), BorderColor(rgb(228, 231, 236)), WebkitBoxPack("justify"), AlignItemsCenter, WidthFull, BorderWidth(0), BorderStyle(solid), Padding(16, 0))
+                return new FlexRow( PaddingLeftRight(12), AlignItemsCenter, WidthFull, Gap(8), Border(1,solid,rgb(228, 231, 236)),  BorderRadius(8))
                 {
-                    
-                   
-                    
-                    new div(DisplayBlock, BoxSizingBorderBox)
+                    SvgIcon.Search,
+                    new input(WidthFull, Color(rgb(29, 41, 57)), BorderNone, Background(none), FontSize14, LineHeight20,  Height(44),  FontFamily("Outfit, sans-serif"), FontWeight400, LetterSpacingNormal)
                     {
-                        new form(form.Action("https://formbold.com/s/unique_form_id"), form.Method("POST"), BoxSizingBorderBox)
+                        type = "text",
+                        placeholder = "Search or type command...",
+                        style =
                         {
-                            new div(PositionRelative, WidthFull)
-                            {
-                                new button(BorderNone, Transform("matrix(1, 0, 0, 1, 0, -10)"), Top(22), Left(16), PositionAbsolute, CursorPointer, BackgroundColor(rgba(0, 0, 0, 0)))
-                                {
-                                    new svg(ViewBox(0, 0, 20, 20), Fill(none), svg.Size(20), Fill(rgb(102, 112, 133)))
-                                    {
-                                        new path
-                                        {
-                                            fillRule = "evenodd",
-                                            clipRule = "evenodd",
-                                            d        = "M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z",
-                                            fill     = ""
-                                        }
-                                    }
-                                },
-                                new input(input.Type("text"), input.Placeholder("Search or type command..."), WidthFull, BoxShadow("rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(16, 24, 40, 0.05) 0px 1px 2px 0px"), Color(rgb(29, 41, 57)), FontSize14, LineHeight20, BackgroundColor("rgba(0, 0, 0, 0)"), BorderColor(rgb(228, 231, 236)), BorderWidth(1), BorderRadius(8), Height(44), Appearance(none), Padding(10, 56, 10, 48), FontFamily("Outfit, sans-serif"), FontWeight400, LetterSpacingNormal, Margin(0), BorderStyle(solid)),
-                                new button(Color(rgb(102, 112, 133)), LetterSpacing(-0.2), FontSize12, LineHeight16, BackgroundColor(rgb(249, 250, 251)), BorderColor(rgb(228, 231, 236)), BorderWidth(1), BorderRadius(8), Gap(2), AlignItemsCenter, Transform("matrix(1, 0, 0, 1, 0, -13.5)"), DisplayFlex, Top(22), Right(10), PositionAbsolute, CursorPointer, Appearance("button"), BackgroundImage(none), TextTransform(none), FontFamily("Outfit, sans-serif"), FontWeight400, Margin(0), Padding(4.5, 7), BorderStyle(solid))
-                                {
-                                    new span(BoxSizingBorderBox)
-                                    {
-                                        "⌘"
-                                    },
-                                    new span(BoxSizingBorderBox)
-                                    {
-                                        "K"
-                                    }
-                                }
-                            }
+                            Focus(BorderNone, OutlineNone)
+                        }
+                    },
+                    new FlexRow(Color(rgb(102, 112, 133)),  FontSize12, LineHeight16, BackgroundColor(rgb(249, 250, 251)), Border(1,solid,rgb(228, 231, 236)), BorderRadius(8), Gap(2), AlignItemsCenter,  CursorPointer, FontFamily("Outfit, sans-serif"), FontWeight400, Padding(5, 7))
+                    {
+                        new span
+                        {
+                            "⌘"
+                        },
+                        new span
+                        {
+                            "K"
                         }
                     }
                 };
@@ -1014,6 +998,8 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
         public static SvgIcon ArrowDown => new SvgIcon(nameof(ArrowDown));
         
         public static SvgIcon UserProfile => new SvgIcon(nameof(UserProfile));
+
+        public static SvgIcon Search => new SvgIcon(nameof(Search));
         
 
         public readonly string Name;
@@ -1073,6 +1059,16 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
                     }
                 },
                     
+                nameof(Search) =>new svg(ViewBox(0, 0, 20, 20), Fill(none), svg.Size(20), Fill(rgb(102, 112, 133)))
+                {
+                    new path
+                    {
+                        fillRule = "evenodd",
+                        clipRule = "evenodd",
+                        d        = "M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z",
+                        fill     = ""
+                    }
+                },
                 
                     _ => throw new ArgumentOutOfRangeException(Name)
             };
