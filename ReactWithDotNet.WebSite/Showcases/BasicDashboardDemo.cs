@@ -1185,4 +1185,10 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
             };
         }
     }
+
+
+    static Element AAAA()
+    {
+        return new div(Size(200), Background(Yellow100), Hover(Background(Blue200)));
+    }
 }
