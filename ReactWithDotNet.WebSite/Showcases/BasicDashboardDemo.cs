@@ -840,41 +840,14 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
             {
                 return new FlexRow(BorderBottomWidth("0px"), JustifyContentNormal, Gap(16), BorderColor(rgb(228, 231, 236)), WebkitBoxPack("justify"), AlignItemsCenter, WidthFull, BorderWidth(0), BorderStyle(solid), Padding(16, 0))
                 {
-                    new button(BorderWidth(1), Width(2.75 * rem), Height(44), Color(rgb(102, 112, 133)), BorderColor(rgb(228, 231, 236)), BorderRadius(8), JustifyContentCenter, AlignItemsCenter, DisplayFlex, CursorPointer, Appearance("button"), BackgroundColor("rgba(0, 0, 0, 0)"), BackgroundImage(none), TextTransform(none), FontFamily("Outfit, sans-serif"), FontSize16, FontWeight400, LineHeight24, LetterSpacingNormal, Margin(0), BorderStyle(solid))
-                    {
-                        new svg(svg.Width(16), svg.Height(12), ViewBox(0, 0, 16, 12))
-                        {
-                            new path
-                            {
-                                fillRule = "evenodd",
-                                clipRule = "evenodd",
-                                d        = "M0.583252 1C0.583252 0.585788 0.919038 0.25 1.33325 0.25H14.6666C15.0808 0.25 15.4166 0.585786 15.4166 1C15.4166 1.41421 15.0808 1.75 14.6666 1.75L1.33325 1.75C0.919038 1.75 0.583252 1.41422 0.583252 1ZM0.583252 11C0.583252 10.5858 0.919038 10.25 1.33325 10.25L14.6666 10.25C15.0808 10.25 15.4166 10.5858 15.4166 11C15.4166 11.4142 15.0808 11.75 14.6666 11.75L1.33325 11.75C0.919038 11.75 0.583252 11.4142 0.583252 11ZM1.33325 5.25C0.919038 5.25 0.583252 5.58579 0.583252 6C0.583252 6.41421 0.919038 6.75 1.33325 6.75L7.99992 6.75C8.41413 6.75 8.74992 6.41421 8.74992 6C8.74992 5.58579 8.41413 5.25 7.99992 5.25L1.33325 5.25Z"
-                            }
-                        }
-                    },
-                    new a(Href("index.html"), DisplayNone, Color(rgb(0, 0, 0)), TextDecoration("none solid rgb(0, 0, 0)"), BoxSizingBorderBox)
-                    {
-                        new img(Src("src/images/logo/logo.svg"), Alt("Logo"), MaxWidth("100%"), HeightAuto, DisplayBlock, VerticalAlignMiddle, BoxSizingBorderBox),
-                        new img(Src("src/images/logo/logo-dark.svg"), Alt("Logo"), DisplayNone, MaxWidth("100%"), HeightAuto, VerticalAlignMiddle, BoxSizingBorderBox)
-                    },
-                    new button("menuToggle ? 'bg-gray-100 dark:bg-gray-800' : ''", DisplayNone, Color(rgb(52, 64, 84)), BorderRadius(8), JustifyContentCenter, AlignItemsCenter, Width("2.5rem"), Height(40), ZIndex("99999"), CursorPointer, Appearance("button"), BackgroundColor("rgba(0, 0, 0, 0)"), BackgroundImage(none), TextTransform(none), FontFamily("Outfit, sans-serif"), FontSize16, FontWeight400, LineHeight24, LetterSpacingNormal, Margin(0), Padding(0), BoxSizingBorderBox)
-                    {
-                        new svg(ViewBox(0, 0, 24, 24), Fill(none), svg.Size(24), Fill(rgb(52, 64, 84)), DisplayBlock, VerticalAlignMiddle, BoxSizingBorderBox, TouchAction(none))
-                        {
-                            new path(BoxSizingBorderBox)
-                            {
-                                fillRule = "evenodd",
-                                clipRule = "evenodd",
-                                d        = "M5.99902 10.4951C6.82745 10.4951 7.49902 11.1667 7.49902 11.9951V12.0051C7.49902 12.8335 6.82745 13.5051 5.99902 13.5051C5.1706 13.5051 4.49902 12.8335 4.49902 12.0051V11.9951C4.49902 11.1667 5.1706 10.4951 5.99902 10.4951ZM17.999 10.4951C18.8275 10.4951 19.499 11.1667 19.499 11.9951V12.0051C19.499 12.8335 18.8275 13.5051 17.999 13.5051C17.1706 13.5051 16.499 12.8335 16.499 12.0051V11.9951C16.499 11.1667 17.1706 10.4951 17.999 10.4951ZM13.499 11.9951C13.499 11.1667 12.8275 10.4951 11.999 10.4951C11.1706 10.4951 10.499 11.1667 10.499 11.9951V12.0051C10.499 12.8335 11.1706 13.5051 11.999 13.5051C12.8275 13.5051 13.499 12.8335 13.499 12.0051V11.9951Z",
-                                fill     = ""
-                            }
-                        }
-                    },
+                    
+                   
+                    
                     new div(DisplayBlock, BoxSizingBorderBox)
                     {
                         new form(form.Action("https://formbold.com/s/unique_form_id"), form.Method("POST"), BoxSizingBorderBox)
                         {
-                            new div(PositionRelative, BoxSizingBorderBox)
+                            new div(PositionRelative, WidthFull)
                             {
                                 new button(BorderNone, Transform("matrix(1, 0, 0, 1, 0, -10)"), Top(22), Left(16), PositionAbsolute, CursorPointer, BackgroundColor(rgba(0, 0, 0, 0)))
                                 {
@@ -889,7 +862,7 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
                                         }
                                     }
                                 },
-                                new input(input.Type("text"), input.Placeholder("Search or type command..."), Width(430), BoxShadow("rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(16, 24, 40, 0.05) 0px 1px 2px 0px"), Color(rgb(29, 41, 57)), FontSize14, LineHeight20, BackgroundColor("rgba(0, 0, 0, 0)"), BorderColor(rgb(228, 231, 236)), BorderWidth(1), BorderRadius(8), Height(44), Appearance(none), Padding(10, 56, 10, 48), FontFamily("Outfit, sans-serif"), FontWeight400, LetterSpacingNormal, Margin(0), BorderStyle(solid)),
+                                new input(input.Type("text"), input.Placeholder("Search or type command..."), WidthFull, BoxShadow("rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(16, 24, 40, 0.05) 0px 1px 2px 0px"), Color(rgb(29, 41, 57)), FontSize14, LineHeight20, BackgroundColor("rgba(0, 0, 0, 0)"), BorderColor(rgb(228, 231, 236)), BorderWidth(1), BorderRadius(8), Height(44), Appearance(none), Padding(10, 56, 10, 48), FontFamily("Outfit, sans-serif"), FontWeight400, LetterSpacingNormal, Margin(0), BorderStyle(solid)),
                                 new button(Color(rgb(102, 112, 133)), LetterSpacing(-0.2), FontSize12, LineHeight16, BackgroundColor(rgb(249, 250, 251)), BorderColor(rgb(228, 231, 236)), BorderWidth(1), BorderRadius(8), Gap(2), AlignItemsCenter, Transform("matrix(1, 0, 0, 1, 0, -13.5)"), DisplayFlex, Top(22), Right(10), PositionAbsolute, CursorPointer, Appearance("button"), BackgroundImage(none), TextTransform(none), FontFamily("Outfit, sans-serif"), FontWeight400, Margin(0), Padding(4.5, 7), BorderStyle(solid))
                                 {
                                     new span(BoxSizingBorderBox)
