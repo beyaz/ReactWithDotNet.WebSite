@@ -841,7 +841,7 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
                 return new FlexRow( PaddingLeftRight(12), AlignItemsCenter, WidthFull, Gap(8), Border(1,solid,rgb(228, 231, 236)),  BorderRadius(8))
                 {
                     SvgIcon.Search,
-                    new input(WidthFull, Color(rgb(29, 41, 57)), BorderNone, Background(none), FontSize14, LineHeight20,  Height(44),  FontFamily("Outfit, sans-serif"), FontWeight400, LetterSpacingNormal)
+                    new input(WidthFull, Color(rgb(29, 41, 57)), BorderNone, Background(none), FontSize14, LineHeight20,  Height(44),  FontFamily("Outfit, sans-serif"))
                     {
                         type = "text",
                         placeholder = "Search or type command...",
