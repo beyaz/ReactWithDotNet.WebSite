@@ -806,30 +806,24 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
         {
             protected override Element render()
             {
-                return new FlexRow(Gap(12), AlignItemsCenter, BoxSizingBorderBox)
+                var icon = new svg(ViewBox(0, 0, 20, 20), svg.Size(20), Fill(rgb(102, 112, 133)))
                 {
-                    new div(PositionRelative, BoxSizingBorderBox)
+                    new path(BoxSizingBorderBox)
                     {
-                        new button(TransitionProperty("color, background-color, border-color, text-decoration-color, fill, stroke"), TransitionTimingFunction("cubic-bezier(0.4, 0, 0.2, 1)"), TransitionDuration("0.15s"), Color(rgb(102, 112, 133)), BackgroundColor(rgb(255, 255, 255)), BorderColor(rgb(228, 231, 236)), BorderWidth(1), BorderRadius(9999), JustifyContentCenter, AlignItemsCenter, Width("2.75rem"), Height(44), DisplayFlex, PositionRelative, CursorPointer, Margin(0), Padding(0), BorderStyle(solid))
-                        {
-                            Hover(Background(Gray200)),
-
-                            new span("!notifying ? 'hidden' : 'flex'", BackgroundColor(rgb(253, 133, 58)), BorderRadius(9999), Width("0.5rem"), Height(8), DisplayFlex, ZIndex("1"), Top(2), Right(0), PositionAbsolute, BoxSizingBorderBox)
-                            {
-                                new span(Opacity(0.0821308), BackgroundColor(rgb(253, 133, 58)), BorderRadius(9999), Animation("1s cubic-bezier(0, 0, 0.2, 1) 0s infinite normal none running ping"), WidthFull, Height(8), DisplayFlex, ZIndex("-1"), PositionAbsolute, BoxSizingBorderBox)
-                            },
-                            new svg(ViewBox(0, 0, 20, 20), Fill(none), svg.Size(20), Fill(rgb(102, 112, 133)), DisplayBlock, VerticalAlignMiddle, BoxSizingBorderBox, TouchAction(none))
-                            {
-                                new path(BoxSizingBorderBox)
-                                {
-                                    fillRule = "evenodd",
-                                    clipRule = "evenodd",
-                                    d        = "M10.75 2.29248C10.75 1.87827 10.4143 1.54248 10 1.54248C9.58583 1.54248 9.25004 1.87827 9.25004 2.29248V2.83613C6.08266 3.20733 3.62504 5.9004 3.62504 9.16748V14.4591H3.33337C2.91916 14.4591 2.58337 14.7949 2.58337 15.2091C2.58337 15.6234 2.91916 15.9591 3.33337 15.9591H4.37504H15.625H16.6667C17.0809 15.9591 17.4167 15.6234 17.4167 15.2091C17.4167 14.7949 17.0809 14.4591 16.6667 14.4591H16.375V9.16748C16.375 5.9004 13.9174 3.20733 10.75 2.83613V2.29248ZM14.875 14.4591V9.16748C14.875 6.47509 12.6924 4.29248 10 4.29248C7.30765 4.29248 5.12504 6.47509 5.12504 9.16748V14.4591H14.875ZM8.00004 17.7085C8.00004 18.1228 8.33583 18.4585 8.75004 18.4585H11.25C11.6643 18.4585 12 18.1228 12 17.7085C12 17.2943 11.6643 16.9585 11.25 16.9585H8.75004C8.33583 16.9585 8.00004 17.2943 8.00004 17.7085Z",
-                                    fill     = ""
-                                }
-                            }
-                        }
+                        fillRule = "evenodd",
+                        clipRule = "evenodd",
+                        d        = "M10.75 2.29248C10.75 1.87827 10.4143 1.54248 10 1.54248C9.58583 1.54248 9.25004 1.87827 9.25004 2.29248V2.83613C6.08266 3.20733 3.62504 5.9004 3.62504 9.16748V14.4591H3.33337C2.91916 14.4591 2.58337 14.7949 2.58337 15.2091C2.58337 15.6234 2.91916 15.9591 3.33337 15.9591H4.37504H15.625H16.6667C17.0809 15.9591 17.4167 15.6234 17.4167 15.2091C17.4167 14.7949 17.0809 14.4591 16.6667 14.4591H16.375V9.16748C16.375 5.9004 13.9174 3.20733 10.75 2.83613V2.29248ZM14.875 14.4591V9.16748C14.875 6.47509 12.6924 4.29248 10 4.29248C7.30765 4.29248 5.12504 6.47509 5.12504 9.16748V14.4591H14.875ZM8.00004 17.7085C8.00004 18.1228 8.33583 18.4585 8.75004 18.4585H11.25C11.6643 18.4585 12 18.1228 12 17.7085C12 17.2943 11.6643 16.9585 11.25 16.9585H8.75004C8.33583 16.9585 8.00004 17.2943 8.00004 17.7085Z",
+                        fill     = ""
                     }
+                };
+                
+                return new button( TransitionDuration("1.15s"), Color(rgb(102, 112, 133)), BackgroundColor(rgb(255, 255, 255)), Border(1,solid,rgb(228, 231, 236)), BorderRadius(9999),  Width("2.75rem"), Height(44), DisplayFlexRowCentered, PositionRelative, CursorPointer)
+                {
+                    Hover(Background(Gray200)),
+
+                    new span( BackgroundColor(rgb(253, 133, 58)), BorderRadius(9999), Size(8), DisplayFlex, Zindex(1), Top(2), Right(0), PositionAbsolute),
+                            
+                    icon
                 };
             }
         }
