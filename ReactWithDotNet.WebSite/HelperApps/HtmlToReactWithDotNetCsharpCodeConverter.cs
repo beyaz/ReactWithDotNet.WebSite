@@ -3,9 +3,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Web;
-using System.Xml.Linq;
 using HtmlAgilityPack;
-using YamlDotNet.Core.Tokens;
 using PropertyInfo = System.Reflection.PropertyInfo;
 
 namespace ReactWithDotNet.WebSite.HelperApps;
@@ -776,6 +774,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
                 data.style.height = null;
             }
             
+            // Border
             if (data.style.border.HasValue() && data.style.borderRadius.HasValue())
             {
                 var valueParts = data.style.border.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -788,6 +787,56 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
                         data.style.borderRadius = null;
                     }
                 }
+            }
+            
+            // Font
+            if (data.style.font is null &&
+                data.style.fontWeight.HasValue() && 
+                data.style.fontSize.HasValue() && 
+                data.style.fontFamily.HasValue())
+            {
+                var fontWeight = data.style.fontWeight;
+                if (!(fontWeight is "100" ||
+                      fontWeight is "200"||
+                      fontWeight is "300"||
+                      fontWeight is "400"||
+                      fontWeight is "500"||
+                      fontWeight is "600"||
+                      fontWeight is "700"||
+                      fontWeight is "800"||
+                      fontWeight is "900"))
+                {
+                    fontWeight = '"' + fontWeight + '"';
+                }
+                
+                var fontSize = data.style.fontSize.RemovePixelFromEnd();
+
+                var lineHeight = string.Empty;
+                
+                if (data.style.lineHeight.HasValue())
+                {
+                    lineHeight = ", " + data.style.lineHeight.RemovePixelFromEnd();
+                    
+                    data.style.lineHeight = null;
+                }
+                
+                var fontFamily = data.style.fontFamily.Replace('"','\'');
+
+                var color = string.Empty;
+                
+                if (data.style.color.HasValue())
+                {
+                    color = ", " + '"' +data.style.color + '"';
+
+                    data.style.color = null;
+                }
+
+                data.style.font = MarkAsAlreadyCalculatedModifier($"Font({fontWeight}, {fontSize}{lineHeight}, \"{fontFamily}\"{color})");
+
+                data.style.fontFamily = null;
+                data.style.fontSize   = null;
+                data.style.fontWeight = null;
+               
             }
             
 
