@@ -3,7 +3,9 @@ using System.Reflection;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Web;
+using System.Xml.Linq;
 using HtmlAgilityPack;
+using YamlDotNet.Core.Tokens;
 using PropertyInfo = System.Reflection.PropertyInfo;
 
 namespace ReactWithDotNet.WebSite.HelperApps;
@@ -221,6 +223,16 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
         }
 
         return data;
+    }
+    
+    static string getStringParameter(string prm)
+    {
+        if (IsGlobalDeclaredStringVariable(prm))
+        {
+            return prm;
+        }
+
+        return '"' + prm + '"';
     }
 
     class AgilityPackageOverride
@@ -763,6 +775,21 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
 
                 data.style.height = null;
             }
+            
+            if (data.style.border.HasValue() && data.style.borderRadius.HasValue())
+            {
+                var valueParts = data.style.border.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (valueParts.Length == 3)
+                {
+                    if (valueParts[0].EndsWithPixel() && data.style.borderRadius.EndsWithPixel())
+                    {
+                        data.style.border = MarkAsAlreadyCalculatedModifier($"Border({valueParts[0].RemovePixelFromEnd()}, {getStringParameter(valueParts[1])}, {getStringParameter(valueParts[2])}, {data.style.borderRadius.RemovePixelFromEnd()})");
+                        
+                        data.style.borderRadius = null;
+                    }
+                }
+            }
+            
 
             return data;
         }
@@ -1271,15 +1298,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
             
             return success($"{CamelCase(name)}(\"{value}\")");
 
-            static string getStringParameter(string prm)
-            {
-                if (IsGlobalDeclaredStringVariable(prm))
-                {
-                    return prm;
-                }
-
-                return '"' + prm + '"';
-            }
+            
         }
 
         return default;
