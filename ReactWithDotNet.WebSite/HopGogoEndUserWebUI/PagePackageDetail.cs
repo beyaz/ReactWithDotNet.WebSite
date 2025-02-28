@@ -49,7 +49,11 @@ public class PagePackageDetail: Component
             
             new FlexRowCentered(Border(1, "#360D57", solid, 10), Padding(5, 12, 5, 8))
             {
-                Color("#360D57"), FontSize14, FontFamily("Euclid Circular B"), FontWeight500, LineHeight20, WhiteSpaceNoWrap,
+                Font(500,14, 20,"Euclid Circular B", "#360D57"),
+                
+                // FontWeight500, FontSize14, LineHeight20, FontFamily("Euclid Circular B"), 
+                 
+                 WhiteSpaceNoWrap,
                 
                     "Change your preferences"
                 
