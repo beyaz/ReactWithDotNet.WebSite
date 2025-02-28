@@ -10,6 +10,16 @@ public class HtmlToCSharpTests
     public void _0()
     {
         Assert("""
+               <span style = "border:1px red solid;">xYz1</span>
+               """,
+               """
+               new span(Border(1, "red", solid))
+               {
+                   "xYz1"
+               }
+               """);
+        
+        Assert("""
                <div></div>
                """,
                """

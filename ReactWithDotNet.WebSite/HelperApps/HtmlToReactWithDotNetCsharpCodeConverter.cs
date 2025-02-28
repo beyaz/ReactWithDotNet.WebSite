@@ -1257,7 +1257,29 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
                 return success($"{CamelCase(name)}({value})");
             }
 
+            if (name.Equals("Border", StringComparison.OrdinalIgnoreCase))
+            {
+                var valueParts = value.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (valueParts.Length == 3)
+                {
+                    if (valueParts[0].EndsWithPixel())
+                    {
+                        return success($"Border({valueParts[0].RemovePixelFromEnd()}, {getStringParameter(valueParts[1])}, {getStringParameter(valueParts[2])})");
+                    }
+                }
+            }
+            
             return success($"{CamelCase(name)}(\"{value}\")");
+
+            static string getStringParameter(string prm)
+            {
+                if (IsGlobalDeclaredStringVariable(prm))
+                {
+                    return prm;
+                }
+
+                return '"' + prm + '"';
+            }
         }
 
         return default;
