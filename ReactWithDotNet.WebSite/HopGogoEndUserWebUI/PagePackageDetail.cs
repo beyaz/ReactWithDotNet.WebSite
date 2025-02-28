@@ -31,32 +31,30 @@ public class PagePackageDetail: Component
                 {
                     "Additional Preferences"
                 },
-            
-                new[]
-                {
-                    "Nature",
-                    "Skiing",
-                    "Casa Cook Miami",
-                    "Nature",
-                    "Skiing",
-                    "Casa Cook Miami"
+
+                SpaceX(8),
                 
-                }.Select(label => new div(TextAlignCenter, Padding(8), BorderRadius(6), MarginLeft(8), Background("#EEDAFF"), Color("#210835"), FontSize13, FontFamily("Outfit"), FontWeight500, LineHeight16)
+                new FlexRow(Gap(8))
                 {
-                    label
-                })
+                    new[]
+                    {
+                        "Nature",
+                        "Skiing",
+                        "Casa Cook Miami",
+                        "Nature",
+                        "Skiing",
+                        "Casa Cook Miami"
+
+                    }.Select(label => new span(TextAlignCenter, Padding(8), BorderRadius(6), Background("#EEDAFF"), Font(500, 13, 16, "Outfit", "#210835"))
+                    {
+                        label
+                    })
+                }
             },
-            
-            new FlexRowCentered(Border(1, "#360D57", solid, 10), Padding(5, 12, 5, 8))
+
+            new FlexRowCentered(Padding(5, 12, 5, 8), Border(1, "#360D57", solid, 10), Font(500, 14, 20, "Euclid Circular B", "#360D57"))
             {
-                Font(500,14, 20,"Euclid Circular B", "#360D57"),
-                
-                // FontWeight500, FontSize14, LineHeight20, FontFamily("Euclid Circular B"), 
-                 
-                 WhiteSpaceNoWrap,
-                
-                    "Change your preferences"
-                
+                "Change your preferences"
             }
         };
     }
