@@ -47,7 +47,7 @@ public class PagePackageDetail: Component
                 })
             },
             
-            new FlexRowCentered(BorderRadius(10), Border(1, "#360D57", solid), Padding(5, 12, 5, 8))
+            new FlexRowCentered(Border(1, "#360D57", solid, 10), Padding(5, 12, 5, 8))
             {
                 Color("#360D57"), FontSize14, FontFamily("Euclid Circular B"), FontWeight500, LineHeight20, WhiteSpaceNoWrap,
                 
