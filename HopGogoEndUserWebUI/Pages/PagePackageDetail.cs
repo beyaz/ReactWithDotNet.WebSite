@@ -11,7 +11,7 @@ sealed class PagePackageDetail : Component
             new Breadcrumbs(),
             SectionAdditionalPreferences(),
 
-            new FlexRow(Gap(8), PaddingBottom(16))
+            new FlexRow(Gap(8), PaddingBottom(16), JustifyContentCenter)
             {
                 Sections, SectionImageGalery
             },
@@ -179,6 +179,8 @@ sealed class PagePackageDetail : Component
         {
             return new FlexRow(AlignItemsCenter, JustifyContentSpaceBetween, Border(1, solid, "#6A6A6A", 10), Padding(18, 12), Font(600, 15, 20, "Euclid Circular B", "black"))
             {
+                Hover(Background(Gray200)),
+                
                 new div
                 {
                     beginDate
