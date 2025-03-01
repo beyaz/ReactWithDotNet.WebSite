@@ -9,7 +9,7 @@ static class ReactWithDotNetIntegration
     {
         app.UseMiddleware<ReactWithDotNetJavaScriptFiles>();
 
-        var routeMap = typeof(PageList)
+        var routeMap = typeof(Routing)
             .GetFields(BindingFlags.Static | BindingFlags.Public)
             .Where(f => f.FieldType == typeof(PageRouteInfo))
             .Select(f => (PageRouteInfo)f.GetValue(null))
