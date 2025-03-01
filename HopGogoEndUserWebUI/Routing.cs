@@ -6,4 +6,7 @@ static class Routing
 {
     // H o m e
     public static readonly PageRouteInfo Home = new("/", typeof(PagePackageDetail));
+    
+    public static readonly PageRouteInfo Filter = new("/Filter", typeof(PageFilter));
+    
 }

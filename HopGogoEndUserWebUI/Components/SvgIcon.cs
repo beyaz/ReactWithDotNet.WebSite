@@ -9,6 +9,8 @@ sealed class SvgIcon : PureComponent
         _name = name;
     }
 
+    public static SvgIcon Svg_Chevron_down_minor => new(nameof(Svg_Chevron_down_minor));
+
     public static SvgIcon Svg_Chevron_right_minor => new(nameof(Svg_Chevron_right_minor));
 
     public static SvgIcon Svg_Close => new(nameof(Svg_Close));
@@ -29,6 +31,18 @@ sealed class SvgIcon : PureComponent
     {
         return _name switch
         {
+            nameof(Svg_Chevron_down_minor)
+                => new svg(Fill(none), ViewBox(0, 0, 20, 20), svg.Size(20))
+                {
+                    new path
+                    {
+                        fill     = "#000",
+                        fillRule = "evenodd",
+                        d        = "M10 12.5a.831.831 0 0 1-.589-.244L5.244 8.09a.832.832 0 1 1 1.179-1.178L10 10.49l3.578-3.578a.832.832 0 1 1 1.178 1.178l-4.167 4.167A.831.831 0 0 1 10 12.5Z",
+                        clipRule = "evenodd"
+                    }
+                },
+            
             nameof(Svg_Chevron_right_minor)
                 => new(svg.Size(20, 21), ViewBox(0, 0, 20, 21), Fill(none))
                 {
