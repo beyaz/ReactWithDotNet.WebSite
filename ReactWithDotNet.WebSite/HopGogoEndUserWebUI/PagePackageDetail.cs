@@ -1,4 +1,5 @@
-﻿using static HopGogoEndUserWebUI.SvgIcon;
+﻿using System.Linq;
+using static HopGogoEndUserWebUI.SvgIcon;
 
 namespace HopGogoEndUserWebUI;
 
@@ -92,44 +93,144 @@ public class PagePackageDetail: Component
 
     Element Detail()
     {
-        return new FlexColumn(Background(White), PaddingLeft(64))
+        return new FlexColumn(Background(White), PaddingLeft(64), PaddingTop(24))
         {
-            new FlexRow(Gap(8))
+            TopSummaryCard,
+            SectionDestination
+        };
+    }
+
+    Element SectionDestination()
+    {
+        var items = new[]
+        {
+            new
+            {
+                Label = "İstanbul", 
+                Day  = 0
+            },
+            new
+            {
+                Label = "Bali", 
+                Day      = 2
+            },
+            new
+            {
+                Label = "Sri Lanka", 
+                Day = 1
+            },
+            new
+            {
+                Label = "Dubai", 
+                Day     = 2
+            },
+            new
+            {
+                Label = "İstanbul",
+                Day  = 0
+            }
+        };
+        
+        return new FlexColumn(Gap(8))
+        {
+            new div(TextDecorationUnderline, WordWrapBreakWord, Font(600, 15, 20, "Euclid Circular B", "#210835"))
+            {
+                "Destinations"
+            },
+            
+            new FlexRow(JustifyContentSpaceAround)
+            {
+                items.Select((item, index) => new FlexColumn(AlignItemsCenter, Gap(8))
+                {
+                    new img(Src(DummySrc(64)), Size(64), BorderRadius(50)),
+                    
+                    new FlexColumnCentered(Border(1, solid, "#6A6A6A", 8), Padding(8), PositionRelative)
+                    {
+                        SvgClose + PositionAbsolute + TopRight(4),
+                        
+                        new div(WordWrapBreakWord, Font(600, 13, 20, "Euclid Circular B", "black"))
+                        {
+                            item.Label
+                        },
+                        new FlexRow(Gap(8), AlignItemsCenter)
+                        {
+                            SvgNegative + When(index == 0 || index == items.Length -1, VisibilityHidden),
+                            
+                            new div(WordWrapBreakWord, Font(400, 13, 20, "Euclid Circular B", "black"))
+                            {
+                                index == 0 ?"From" : index == items.Length-1 ? "Return" : $"{item.Day} days"
+                            },
+
+                            SvgPlus + When(index == 0 || index == items.Length-1, VisibilityHidden),
+                        }
+                    }
+                })
+            }
+            
+        };
+    }
+    Element TopSummaryCard()
+    {
+        return new FlexRow(Gap(8), Background(White), WidthFull)
             {
                 new img(Src(DummySrc(175,150)), Size(175, 150)),
                 
-                new FlexColumn(JustifyContentSpaceBetween)
+                new FlexColumn(JustifyContentSpaceBetween, WidthFull)
                 {
-                    new FlexColumn
+                    new FlexRow(Gap(24), JustifyContentSpaceBetween)
                     {
-                        new div(WhiteSpaceNoWrap, Font(600, 18, 20, "Euclid Circular B", "#210835"))
+                        new FlexColumn
                         {
-                            "Sri Lanka Culture Package"
-                        },
+                            new div(WhiteSpaceNoWrap, Font(600, 18, 20, "Euclid Circular B", "#210835"))
+                            {
+                                "Sri Lanka Culture Package"
+                            },
                     
-                        SpaceY(5),
-                        new FlexRow(AlignItemsCenter)
-                        {
-                            new div(Font(600, 13, 11, "Euclid Circular B", "black"))
+                            SpaceY(5),
+                            new FlexRow(AlignItemsCenter)
                             {
-                                "98%"
+                                new div(Font(600, 13, 11, "Euclid Circular B", "black"))
+                                {
+                                    "98%"
+                                },
+                                new div(Font(300, 13, "Euclid Circular B", "black"))
+                                {
+                                    "match to your preferences"
+                                },
                             },
-                            new div(Font(300, 13, "Euclid Circular B", "black"))
-                            {
-                                "match to your preferences"
-                            },
-                        },
                         
-                        SpaceY(10),
-                        new FlexRow(Gap(8))
-                        {
-                            Dislike, Like
-                        }
-                    },
+                            SpaceY(10),
+                            new FlexRow(Gap(8))
+                            {
+                                Dislike, Like
+                            }
+                        },
                     
-                    new FlexColumn
-                    {
-                        Refresh_bold
+                        new FlexColumn(AlignItemsFlexEnd, Gap(4))
+                        {
+                           new FlexRow(AlignItemsCenter, Gap(4))
+                           {
+                               Refresh_bold,
+                               new div(WordWrapBreakWord, Font(600, 13, "Euclid Circular B", "#6A6A6A"))
+                               {
+                                   "$1.200"
+                               },
+                               new div(WordWrapBreakWord, Font(600, 16, "Euclid Circular B", "black"))
+                               {
+                                   "$890"
+                               },
+                           },
+                            new div(WordWrapBreakWord, Font(300, 10, "Euclid Circular B", "black"))
+                            {
+                                "5 min. ago price"
+                            },
+                        
+                            new FlexRowCentered(Background("#0CBCC5"), Border(1, "#0CBCC5", solid, 10), Padding(6,12), WidthFitContent)
+                            {
+                                Font(500, 14, 20, "Euclid Circular B", "white"),
+                                "Buy Package"
+                            }
+                        },
                     },
                     
                    new FlexColumn(Gap(4))
@@ -166,12 +267,7 @@ public class PagePackageDetail: Component
                        }
                    }
                 }
-            },
-
-            new div(TextDecorationUnderline, WordWrapBreakWord, Font(600, 15, 20, "Euclid Circular B", "#210835"))
-            {
-                "Destinations"
-            }
-        };
+            };
     }
+    
 }

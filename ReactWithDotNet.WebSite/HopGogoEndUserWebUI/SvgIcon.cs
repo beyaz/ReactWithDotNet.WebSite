@@ -18,7 +18,13 @@ sealed class SvgIcon : PureComponent
     public static SvgIcon PersonWithBaggage => new(nameof(PersonWithBaggage));
 
     public static SvgIcon Refresh_bold => new(nameof(Refresh_bold));
+    public static SvgIcon SvgNegative => new(nameof(SvgNegative));
+
+    public static SvgIcon SvgPlus => new(nameof(SvgPlus));
     
+    public static SvgIcon SvgClose => new(nameof(SvgClose));
+    
+
     protected override Element render()
     {
         return _name switch
@@ -57,7 +63,7 @@ sealed class SvgIcon : PureComponent
                 },
 
             nameof(PersonWithBaggage)
-                => new svg(svg.Width(12), svg.Height(18), ViewBox(0, 0, 12, 18), Fill(none))
+                => new(svg.Width(12), svg.Height(18), ViewBox(0, 0, 12, 18), Fill(none))
                 {
                     new path
                     {
@@ -80,14 +86,44 @@ sealed class SvgIcon : PureComponent
                         fill = "black"
                     }
                 },
-            
+
             nameof(Refresh_bold)
-                =>new svg(Fill(none), ViewBox(0, 0, 24, 24), svg.Size(24))
+                => new(Fill(none), ViewBox(0, 0, 24, 24), svg.Size(24))
                 {
                     new path
                     {
                         fill = "#000",
                         d    = "M12.08 2.25c-4.795 0-8.735 3.663-9.119 8.333h-.96a.75.75 0 0 0-.529 1.283l1.68 1.666a.75.75 0 0 0 1.056 0l1.68-1.666a.75.75 0 0 0-.528-1.283h-.893c.38-3.831 3.638-6.833 7.612-6.833a7.66 7.66 0 0 1 6.537 3.643.751.751 0 1 0 1.277-.786A9.16 9.16 0 0 0 12.08 2.25Zm8.761 8.217a.75.75 0 0 0-1.054 0L18.1 12.133a.75.75 0 0 0 .527 1.284h.9c-.383 3.83-3.652 6.833-7.645 6.833a7.7 7.7 0 0 1-6.565-3.644.75.75 0 0 0-1.277.788 9.2 9.2 0 0 0 7.842 4.356c4.808 0 8.765-3.66 9.15-8.333H22a.75.75 0 0 0 .527-1.284l-1.686-1.666Z"
+                    }
+                },
+
+            nameof(SvgPlus)
+                => new(svg.Width(14), svg.Height(12), Fill(none), ViewBox(0, 0, 14, 12))
+                {
+                    new path
+                    {
+                        stroke = "#000",
+                        d      = "M0 6.5h13.038M6.5 0v12"
+                    }
+                },
+
+            nameof(SvgNegative)
+                => new svg(svg.Width(14), svg.Height(1), Fill(none), ViewBox(0, 0, 14, 1))
+                {
+                    new path
+                    {
+                        stroke = "#000",
+                        d      = "M0 .5h13.038"
+                    }
+                },
+            
+            nameof(SvgClose)
+                => new svg(Fill(none), ViewBox(0, 0, 15, 15), svg.Size(15))
+                {
+                    new path
+                    {
+                        fill = "#8C9196",
+                        d    = "m6.469 7.5-3.13-3.13a.73.73 0 0 1 1.03-1.031L7.5 6.469l3.13-3.13a.73.73 0 0 1 1.031 1.03L8.532 7.5l3.13 3.13a.73.73 0 0 1-1.03 1.031L7.5 8.532l-3.13 3.13a.73.73 0 0 1-1.031-1.03L6.469 7.5Z"
                     }
                 },
 
