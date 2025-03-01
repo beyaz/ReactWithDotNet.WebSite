@@ -22,7 +22,10 @@ public class PagePackageDetail: Component
             BreadCrumbPaths(),
             AdditionalPreferences(),
             
-            Detail()
+            new FlexRow(Gap(8))
+            {
+                Detail, SectionImageGalery
+            }
         };
     }
 
@@ -93,10 +96,12 @@ public class PagePackageDetail: Component
 
     Element Detail()
     {
-        return new FlexColumn(Background(White), PaddingLeft(64), PaddingTop(24))
+        return new FlexColumn(Background(White), PaddingLeft(64), PaddingY(24), Gap(24))
         {
             TopSummaryCard,
-            SectionDestination
+            SectionDestination,
+            SectionOverview,
+            SectionBuy
         };
     }
 
@@ -138,7 +143,7 @@ public class PagePackageDetail: Component
                 "Destinations"
             },
             
-            new FlexRow(JustifyContentSpaceAround)
+            new FlexRow(JustifyContentSpaceBetween)
             {
                 items.Select((item, index) => new FlexColumn(AlignItemsCenter, Gap(8))
                 {
@@ -268,6 +273,95 @@ public class PagePackageDetail: Component
                    }
                 }
             };
+    }
+    
+    
+    
+     Element SectionOverview()
+    {
+        return new FlexColumn(Gap(8))
+        {
+            new div(TextDecorationUnderline, Font(600, 15, 20, "Euclid Circular B", "#210835"))
+            {
+                "Overview"
+            },
+            
+            new FlexColumn(Gap(8))
+            {
+                Item("28 Jan 2025","Flight to Bali","TK0945","09.15","18:15",80, 2),
+                Item("28 Jan 2025","Flight to Bali","TK0945","09.15","18:15",80, 2),
+                Item("28 Jan 2025","Flight to Bali","TK0945","09.15","18:15",80, 2),
+                Item("28 Jan 2025","Flight to Bali","TK0945","09.15","18:15",80, 2),
+                Item("28 Jan 2025","Flight to Bali","TK0945","09.15","18:15",80, 2)
+            }
+            
+        };
+        
+        
+        static Element Item(string beginDate, string flightTo, string flyNumber, string departure, string arrival, decimal amount, int numberOfAdult)
+        {
+            return new FlexRow(AlignItemsCenter, JustifyContentSpaceBetween, Border(1,solid,"#6A6A6A", 10), Padding(18, 12), Font(600, 15, 20, "Euclid Circular B", "black"))
+            {
+                new div
+                {
+                    beginDate
+                },
+                
+                new FlexColumn
+                {
+                    new div{flightTo},
+                    new div{flyNumber}
+                },
+                
+                new FlexColumn
+                {
+                    new div{"Departure: "+ departure},
+                    new div{"Arrival: " + arrival}
+                },
+                
+                new FlexColumn
+                {
+                    new div(Font(600, 20, "Euclid Circular B", "#3E14FB"))
+                    {
+                        "$"+amount
+                    },
+                    new div(Font(400, 12, 20, "Euclid Circular B", "#6A6A6A"))
+                    {
+                        numberOfAdult+" adults"
+                    }
+                }
+            };
+        }
+
+    }
+
+    Element SectionBuy()
+    {
+        return new FlexRowCentered
+        {
+            new FlexRowCentered(Background("#0CBCC5"), Border(1,solid,"#6A6A6A",9), Padding(8,16), Font(500, 14, 20, "Euclid Circular B", "white"))
+            {
+                "Buy Package"
+            }
+        };
+    }
+
+    Element SectionImageGalery()
+    {
+        return new FlexColumn(Gap(8))
+        {
+            new FlexRow(Gap(8), Height(500),WidthFull)
+            {
+                new FlexColumn(Gap(8), Width(1,2))
+                {
+                    new img(Height(50*percent)){ src    = DummySrc(250) },
+                    new img(Height(50*percent)) { src = DummySrc(250) }
+                },
+                new img(Width(1,2)){ src = DummySrc(250, 500) }
+            },
+            SpaceY(8),
+            new img{ src = DummySrc(500, 400)}
+        };
     }
     
 }
