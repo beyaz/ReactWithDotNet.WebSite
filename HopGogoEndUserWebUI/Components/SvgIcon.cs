@@ -9,27 +9,27 @@ sealed class SvgIcon : PureComponent
         _name = name;
     }
 
-    public static SvgIcon Chevron_right_minor => new(nameof(Chevron_right_minor));
+    public static SvgIcon Svg_Chevron_right_minor => new(nameof(Svg_Chevron_right_minor));
 
-    public static SvgIcon Dislike => new(nameof(Dislike));
+    public static SvgIcon Svg_Close => new(nameof(Svg_Close));
 
-    public static SvgIcon Like => new(nameof(Like));
+    public static SvgIcon Svg_Dislike => new(nameof(Svg_Dislike));
 
-    public static SvgIcon PersonWithBaggage => new(nameof(PersonWithBaggage));
+    public static SvgIcon Svg_Like => new(nameof(Svg_Like));
 
-    public static SvgIcon Refresh_bold => new(nameof(Refresh_bold));
-    public static SvgIcon SvgNegative => new(nameof(SvgNegative));
+    public static SvgIcon Svg_Negative => new(nameof(Svg_Negative));
 
-    public static SvgIcon SvgPlus => new(nameof(SvgPlus));
-    
-    public static SvgIcon SvgClose => new(nameof(SvgClose));
-    
+    public static SvgIcon Svg_PersonWithBaggage => new(nameof(Svg_PersonWithBaggage));
+
+    public static SvgIcon Svg_Plus => new(nameof(Svg_Plus));
+
+    public static SvgIcon Svg_Refresh_bold => new(nameof(Svg_Refresh_bold));
 
     protected override Element render()
     {
         return _name switch
         {
-            nameof(Chevron_right_minor)
+            nameof(Svg_Chevron_right_minor)
                 => new(svg.Size(20, 21), ViewBox(0, 0, 20, 21), Fill(none))
                 {
                     new path
@@ -41,7 +41,7 @@ sealed class SvgIcon : PureComponent
                     }
                 },
 
-            nameof(Dislike)
+            nameof(Svg_Dislike)
                 => new(svg.Size(16), ViewBox(0, 0, 16, 16), Fill(none))
                 {
                     new path
@@ -51,7 +51,7 @@ sealed class SvgIcon : PureComponent
                     }
                 },
 
-            nameof(Like)
+            nameof(Svg_Like)
                 => new(ViewBox(0, 0, 16, 16), Fill(none), svg.Size(16))
                 {
                     new path
@@ -62,7 +62,7 @@ sealed class SvgIcon : PureComponent
                     }
                 },
 
-            nameof(PersonWithBaggage)
+            nameof(Svg_PersonWithBaggage)
                 => new(svg.Width(12), svg.Height(18), ViewBox(0, 0, 12, 18), Fill(none))
                 {
                     new path
@@ -87,7 +87,7 @@ sealed class SvgIcon : PureComponent
                     }
                 },
 
-            nameof(Refresh_bold)
+            nameof(Svg_Refresh_bold)
                 => new(Fill(none), ViewBox(0, 0, 24, 24), svg.Size(24))
                 {
                     new path
@@ -97,7 +97,7 @@ sealed class SvgIcon : PureComponent
                     }
                 },
 
-            nameof(SvgPlus)
+            nameof(Svg_Plus)
                 => new(svg.Width(14), svg.Height(12), Fill(none), ViewBox(0, 0, 14, 12))
                 {
                     new path
@@ -107,8 +107,8 @@ sealed class SvgIcon : PureComponent
                     }
                 },
 
-            nameof(SvgNegative)
-                => new svg(svg.Width(14), svg.Height(1), Fill(none), ViewBox(0, 0, 14, 1))
+            nameof(Svg_Negative)
+                => new(svg.Width(14), svg.Height(1), Fill(none), ViewBox(0, 0, 14, 1))
                 {
                     new path
                     {
@@ -116,8 +116,8 @@ sealed class SvgIcon : PureComponent
                         d      = "M0 .5h13.038"
                     }
                 },
-            
-            nameof(SvgClose)
+
+            nameof(Svg_Close)
                 => new svg(Fill(none), ViewBox(0, 0, 15, 15), svg.Size(15))
                 {
                     new path

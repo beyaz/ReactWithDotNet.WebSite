@@ -1,6 +1,4 @@
-﻿using static HopGogoEndUserWebUI.SvgIcon;
-
-namespace HopGogoEndUserWebUI.Pages;
+﻿namespace HopGogoEndUserWebUI.Pages;
 
 sealed class PagePackageDetail : Component
 {
@@ -8,15 +6,6 @@ sealed class PagePackageDetail : Component
     {
         return new div
         {
-            new link
-            {
-                href = "https://fonts.cdnfonts.com/css/euclid-circular-b", rel = "stylesheet"
-            },
-            new link
-            {
-                href = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Outfit:wght@100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Wix+Madefor+Text:ital,wght@0,400..800;1,400..800&display=swap", rel = "stylesheet"
-            },
-
             new Header(),
             SpaceY(1),
             new Breadcrumbs(),
@@ -126,7 +115,7 @@ sealed class PagePackageDetail : Component
 
                     new FlexColumnCentered(Border(1, solid, "#6A6A6A", 8), Padding(8), PositionRelative)
                     {
-                        SvgClose + PositionAbsolute + TopRight(4),
+                        Svg_Close + PositionAbsolute + TopRight(4),
 
                         new div(WordWrapBreakWord, Font(600, 13, 20, "Euclid Circular B", "black"))
                         {
@@ -134,14 +123,14 @@ sealed class PagePackageDetail : Component
                         },
                         new FlexRow(Gap(8), AlignItemsCenter)
                         {
-                            SvgNegative + When(index == 0 || index == items.Length - 1, VisibilityHidden),
+                            Svg_Negative + When(index == 0 || index == items.Length - 1, VisibilityHidden),
 
                             new div(WordWrapBreakWord, Font(400, 13, 20, "Euclid Circular B", "black"))
                             {
                                 index == 0 ? "From" : index == items.Length - 1 ? "Return" : $"{item.Day} days"
                             },
 
-                            SvgPlus + When(index == 0 || index == items.Length - 1, VisibilityHidden)
+                            Svg_Plus + When(index == 0 || index == items.Length - 1, VisibilityHidden)
                         }
                     }
                 })
@@ -266,7 +255,7 @@ sealed class PagePackageDetail : Component
                         SpaceY(10),
                         new FlexRow(Gap(8))
                         {
-                            Dislike, Like
+                            Svg_Dislike, Svg_Like
                         }
                     },
 
@@ -274,7 +263,7 @@ sealed class PagePackageDetail : Component
                     {
                         new FlexRow(AlignItemsCenter, Gap(4))
                         {
-                            Refresh_bold,
+                            Svg_Refresh_bold,
                             new div(WordWrapBreakWord, Font(600, 13, "Euclid Circular B", "#6A6A6A"))
                             {
                                 "$1.200"
@@ -315,7 +304,7 @@ sealed class PagePackageDetail : Component
                     {
                         new FlexRow(AlignItemsCenter, Gap(8), Border(1, solid, "#6A6A6A", 6), Padding(4), WidthFitContent)
                         {
-                            PersonWithBaggage,
+                            Svg_PersonWithBaggage,
                             new div(Font(600, 13, "Outfit", "black"))
                             {
                                 "2 Adults"

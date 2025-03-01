@@ -6,7 +6,5 @@ global using System.Linq;
 global using static ReactWithDotNet.Mixin;
 global using System.Threading.Tasks;
 global using ReactWithDotNet.UIDesigner;
-
-
-
 global using HopGogoEndUserWebUI.Pages;
+global using static HopGogoEndUserWebUI.SvgIcon;
