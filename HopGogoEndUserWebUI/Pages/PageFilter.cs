@@ -42,6 +42,7 @@ sealed class PageFilter : Component
 
     }
 
+    
     class SectionFilter : Component
     {
         protected override Element render()
@@ -50,40 +51,77 @@ sealed class PageFilter : Component
             {
                 new FlexRow
                 {
-                    new FlexRowCentered(PaddingX(16), Height(50), Background(White), Border(1, "#6A6A6A", solid, 13), Font(400, 16, "Outfit", "black"))
-                    {
-                        "From: İstanbul, Türkey",
-                        
-                        Svg_Chevron_down_minor + MarginLeft(16),
-                        
-                        PositionRelative,
-                        new FlexColumn(PositionAbsolute, Gap(16),  WidthFull, Top(50), Left(0), Border(1, "#6A6A6A", solid, 13))
-                        {
-                            Background(White),
-                            Enumerable.Range(1,4).Select(i=>new FlexRow(JustifyContentSpaceBetween)
-                            {
-                                Hover(Background("#F0F2F5")),
-                                
-                                Padding(16),
-                                
-                                new FlexColumn(AlignItemsCenter)
-                                {
-                                    new div(Font(400, 16, "Outfit", "black"), WhiteSpaceNoWrap)
-                                    {
-                                        "Tekirdağ, Turkey " + i
-                                    },
-                                    new div(Font(400, 13, "Outfit", "#777373"))
-                                    {
-                                        "102 km from Istanbul"
-                                    }
-                                },
-                                Svg_Plus + Size(24)
-                            })
-                        }
-                    }
+                    new AutoFilterBox()
                 }
             };
         }
     }
 
+}
+
+record AutoFilterBoxState
+{
+    public bool IsSuggestionsVisible { get; init; }
+}
+
+class AutoFilterBox : Component<AutoFilterBoxState>
+{
+    public string SelectedValue { get; set; }
+        
+    protected override Element render()
+    {
+        return new FlexRowCentered(PaddingX(16), Height(50), Background(White), Border(1, "#6A6A6A", solid, 13), Font(400, 16, "Outfit", "black"))
+        {
+            "From: İstanbul, Türkey",
+
+            Svg_Chevron_down_minor + MarginLeft(16),
+
+            OnClick(OnClicked),
+
+            PositionRelative,
+            When(state.IsSuggestionsVisible, () =>
+                     new FlexColumn(PositionAbsolute, Gap(16), WidthFull, Top(50), Left(0), Border(1, "#6A6A6A", solid, 13))
+                     {
+                         Background(White),
+                         Enumerable.Range(1, 4).Select(i => new FlexRow(JustifyContentSpaceBetween)
+                         {
+                             OnClick(OnSuggestionItemClicked),
+                             Hover(Background("#F0F2F5")),
+
+                             Padding(16),
+
+                             new FlexColumn(AlignItemsCenter)
+                             {
+                                 new div(Font(400, 16, "Outfit", "black"), WhiteSpaceNoWrap)
+                                 {
+                                     "Tekirdağ, Turkey " + i
+                                 },
+                                 new div(Font(400, 13, "Outfit", "#777373"))
+                                 {
+                                     "102 km from Istanbul"
+                                 }
+                             },
+                             Svg_Plus + Size(24)
+                         })
+                     })
+        };
+    }
+
+    [StopPropagation]
+    Task OnSuggestionItemClicked(MouseEvent e)
+    {
+        state = state with { IsSuggestionsVisible = false };
+        
+        return Task.CompletedTask;
+    }
+    
+    [StopPropagation]
+    Task OnClicked(MouseEvent e)
+    {
+        state = state with { IsSuggestionsVisible = !state.IsSuggestionsVisible};
+        
+        return Task.CompletedTask;
+    }
+    
+    
 }
