@@ -27,7 +27,10 @@ sealed class PageFilter : Component
                     }
                 },
 
-                new SectionFilter()
+                new SectionFilter(),
+                
+                SpaceY(24)
+                
             }
         };
     }
@@ -44,7 +47,7 @@ sealed class PageFilter : Component
     {
         protected override Element render()
         {
-            return new FlexColumn(SizeFull, MinHeight(500), Padding(24), Background("#F5F5F5"), BoxShadow(0, 2, 4, rgba(25, 33, 61, 0.16)), BorderRadius(16))
+            return new FlexColumn(SizeFull, Gap(24), MinHeight(500), Padding(24), Background("#F5F5F5"), BoxShadow(0, 2, 4, rgba(25, 33, 61, 0.16)), BorderRadius(16))
             {
                 new FlexRow(Gap(24))
                 {
@@ -58,8 +61,64 @@ sealed class PageFilter : Component
                     {
                         Placeholder = "Select from airport",
                         Prefix      = "Return"
+                    },
+                    
+                    new PassengerSelector()
+                },
+                
+                new FlexRow(PaddingX(24), AlignItemsCenter,Height(50), Background(White), Border(1, "#6A6A6A", solid, 13))
+                {
+                    new div(Font(400, 16, "Outfit", "black"))
+                    {
+                        "Departure:"
+                    },
+                    new div(Font(600, 16, "Outfit", "black"))
+                    {
+                        "Tue, 28 Jan - Fri, 28 Feb"
                     }
+                },
+                
+                new FlexColumn(Width(400))
+                {
+                    new FlexRow(JustifyContentSpaceBetween)
+                    {
+                        new div(Font(400, 16, "Outfit", "black"))
+                        {
+                            "Add Destinations"
+                        },
+                        new FlexRowCentered
+                        {
+                            Svg_Plus + Color("#2659C3"),
+                            new div(Font(400, 16, "Outfit", "#2659C3"))
+                            {
+                                "Add Destination"
+                            }
+                        }
+                    },
+                    
+                    new FlexRow(PaddingX(24), AlignItemsCenter,Height(50), Background(White), Border(1, "#6A6A6A", solid, 13))
+                    {
+                        new div(Font(400, 16, "Outfit", "#6A6A6A"))
+                        {
+                            "First Destination"
+                        }
+                    },
+                    
+                    
+                },
+                
+                new FlexRow(WidthFull, JustifyContentFlexEnd)
+                {
+                    SearchTripButton
                 }
+            };
+        }
+
+        Element SearchTripButton()
+        {
+            return new InlineFlexRowCentered(Width(135), Height(50), Padding(10), Background("#0CBCC5"), BorderRadius(10), Font(700, 16, "Outfit", "white"))
+            {
+                "Search Trip"
             };
         }
     }

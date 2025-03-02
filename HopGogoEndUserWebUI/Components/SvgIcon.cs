@@ -130,8 +130,8 @@ sealed class SvgIcon : PureComponent
                 {
                     new path
                     {
-                        stroke = "#000",
-                        d      = "M0 6.5h13.038M6.5 0v12"
+                        stroke   = "#000",
+                        d        = "M0 6.5h13.038M6.5 0v12"
                     }
                 },
 
@@ -158,4 +158,6 @@ sealed class SvgIcon : PureComponent
             _ => throw new NotSupportedException(_name)
         };
     }
+    
+    
 }
