@@ -20,7 +20,7 @@ sealed class PassengerSelector : Component<PassengerSelectorState>
     {
         state = new()
         {
-            PassengerInfo = new() { NumberOfAdults = 1 }
+            PassengerInfo = new() { NumberOfAdults = 1, NumberOfChildren = 2, NumberOfInfants = 1}
         };
         
         return Task.CompletedTask;
@@ -50,7 +50,7 @@ sealed class PassengerSelector : Component<PassengerSelectorState>
             Svg_PersonWithBaggage, calculatedText, icon + MarginLeft(16),
 
             PositionRelative,
-            When(state.IsPopupVisible, ()=>PopupContent() + PositionAbsolute + Top(51)+ Left(0)),
+            When(state.IsPopupVisible, ()=>PopupContent() + PositionAbsolute + Top(51)+ Right(0)),
 
             OnClick(TogglePopup)
         };
