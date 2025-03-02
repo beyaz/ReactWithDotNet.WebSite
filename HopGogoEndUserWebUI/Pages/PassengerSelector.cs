@@ -9,9 +9,8 @@ sealed record PassengerInfo
 
 sealed record PassengerSelectorState
 {
-    public PassengerInfo PassengerInfo { get; set; }
-    
     public bool IsPopupVisible { get; set; }
+    public PassengerInfo PassengerInfo { get; set; }
 }
 
 sealed class PassengerSelector : Component<PassengerSelectorState>
@@ -20,9 +19,9 @@ sealed class PassengerSelector : Component<PassengerSelectorState>
     {
         state = new()
         {
-            PassengerInfo = new() { NumberOfAdults = 1, NumberOfChildren = 2, NumberOfInfants = 1}
+            PassengerInfo = new() { NumberOfAdults = 1, NumberOfChildren = 2, NumberOfInfants = 1 }
         };
-        
+
         return Task.CompletedTask;
     }
 
@@ -44,22 +43,63 @@ sealed class PassengerSelector : Component<PassengerSelectorState>
         {
             icon = Svg_Chevron_up_minor;
         }
-        
-        return new FlexRowCentered(PaddingX(16),Gap(4), Height(50), WidthFitContent, Background(White), Border(1, "#6A6A6A", solid, 13), Font(400, 16, "Outfit", "black"))
+
+        return new FlexRowCentered(PaddingX(16), Gap(4), Height(50), WidthFitContent, Background(White), Border(1, "#6A6A6A", solid, 13), Font(400, 16, "Outfit", "black"))
         {
             Svg_PersonWithBaggage, calculatedText, icon + MarginLeft(16),
 
             PositionRelative,
-            When(state.IsPopupVisible, ()=>PopupContent() + PositionAbsolute + Top(51)+ Right(0)),
+            When(state.IsPopupVisible, () => PopupContent() + PositionAbsolute + Top(51) + Right(0)),
 
             OnClick(TogglePopup)
         };
     }
 
-    Task TogglePopup(MouseEvent e)
+    [StopPropagation]
+    Task OnNumberOfAdultsNegativeClicked(MouseEvent e)
     {
-        state.IsPopupVisible = !state.IsPopupVisible;
-        
+        state.PassengerInfo.NumberOfAdults--;
+
+        return Task.CompletedTask;
+    }
+
+    [StopPropagation]
+    Task OnNumberOfAdultsPlusClicked(MouseEvent e)
+    {
+        state.PassengerInfo.NumberOfAdults++;
+
+        return Task.CompletedTask;
+    }
+
+    [StopPropagation]
+    Task OnNumberOfChildrenNegativeClicked(MouseEvent e)
+    {
+        state.PassengerInfo.NumberOfChildren--;
+
+        return Task.CompletedTask;
+    }
+
+    [StopPropagation]
+    Task OnNumberOfChildrenPlusClicked(MouseEvent e)
+    {
+        state.PassengerInfo.NumberOfChildren++;
+
+        return Task.CompletedTask;
+    }
+
+    [StopPropagation]
+    Task OnNumberOfInfantsNegativeClicked(MouseEvent e)
+    {
+        state.PassengerInfo.NumberOfInfants--;
+
+        return Task.CompletedTask;
+    }
+
+    [StopPropagation]
+    Task OnNumberOfInfantsPlusClicked(MouseEvent e)
+    {
+        state.PassengerInfo.NumberOfInfants++;
+
         return Task.CompletedTask;
     }
 
@@ -71,8 +111,8 @@ sealed class PassengerSelector : Component<PassengerSelectorState>
             {
                 "Passengers"
             },
-            
-            new FlexRow(JustifyContentSpaceBetween,Gap(50))
+
+            new FlexRow(JustifyContentSpaceBetween, Gap(50))
             {
                 new FlexColumn(Gap(4))
                 {
@@ -85,14 +125,13 @@ sealed class PassengerSelector : Component<PassengerSelectorState>
                         "Over 11"
                     }
                 },
-                
+
                 new FlexRowCentered(Gap(12))
                 {
                     new FlexRowCentered(Background("#D9D9D9"), BorderRadius(16), Size(24), OnClick(OnNumberOfAdultsNegativeClicked))
                     {
                         Svg_Negative
-                    }
-                    ,
+                    },
                     new div(Font(400, 16, "Outfit", "black"))
                     {
                         state.PassengerInfo.NumberOfAdults.ToString()
@@ -103,7 +142,7 @@ sealed class PassengerSelector : Component<PassengerSelectorState>
                     }
                 }
             },
-            
+
             new FlexRow(JustifyContentSpaceBetween)
             {
                 new FlexColumn(Gap(4))
@@ -117,14 +156,13 @@ sealed class PassengerSelector : Component<PassengerSelectorState>
                         "2-11"
                     }
                 },
-                
+
                 new FlexRowCentered(Gap(12))
                 {
                     new FlexRowCentered(Background("#D9D9D9"), BorderRadius(16), Size(24), OnClick(OnNumberOfChildrenNegativeClicked))
                     {
                         Svg_Negative
-                    }
-                    ,
+                    },
                     new div(Font(400, 16, "Outfit", "black"))
                     {
                         state.PassengerInfo.NumberOfChildren.ToString()
@@ -135,7 +173,7 @@ sealed class PassengerSelector : Component<PassengerSelectorState>
                     }
                 }
             },
-            
+
             new FlexRow(JustifyContentSpaceBetween)
             {
                 new FlexColumn(Gap(4))
@@ -149,14 +187,13 @@ sealed class PassengerSelector : Component<PassengerSelectorState>
                         "Under 2"
                     }
                 },
-                
+
                 new FlexRowCentered(Gap(12))
                 {
                     new FlexRowCentered(Background("#D9D9D9"), BorderRadius(16), Size(24), OnClick(OnNumberOfInfantsNegativeClicked))
                     {
                         Svg_Negative
-                    }
-                    ,
+                    },
                     new div(Font(400, 16, "Outfit", "black"))
                     {
                         state.PassengerInfo.NumberOfInfants.ToString()
@@ -167,56 +204,13 @@ sealed class PassengerSelector : Component<PassengerSelectorState>
                     }
                 }
             }
-            
         };
     }
 
-    [StopPropagation]
-    Task OnNumberOfAdultsNegativeClicked(MouseEvent e)
+    Task TogglePopup(MouseEvent e)
     {
-        state.PassengerInfo.NumberOfAdults--;
-        
-        return Task.CompletedTask;
-    }
-    
-    [StopPropagation]
-    Task OnNumberOfAdultsPlusClicked(MouseEvent e)
-    {
-        state.PassengerInfo.NumberOfAdults++;
-        
-        return Task.CompletedTask;
-    }
-    
-    
-    [StopPropagation]
-    Task OnNumberOfChildrenNegativeClicked(MouseEvent e)
-    {
-        state.PassengerInfo.NumberOfChildren--;
-        
-        return Task.CompletedTask;
-    }
-    
-    [StopPropagation]
-    Task OnNumberOfChildrenPlusClicked(MouseEvent e)
-    {
-        state.PassengerInfo.NumberOfChildren++;
-        
-        return Task.CompletedTask;
-    }
-    
-    [StopPropagation]
-    Task OnNumberOfInfantsNegativeClicked(MouseEvent e)
-    {
-        state.PassengerInfo.NumberOfInfants--;
-        
-        return Task.CompletedTask;
-    }
-    
-    [StopPropagation]
-    Task OnNumberOfInfantsPlusClicked(MouseEvent e)
-    {
-        state.PassengerInfo.NumberOfInfants++;
-        
+        state.IsPopupVisible = !state.IsPopupVisible;
+
         return Task.CompletedTask;
     }
 }
