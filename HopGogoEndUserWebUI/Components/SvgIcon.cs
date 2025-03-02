@@ -13,6 +13,8 @@ sealed class SvgIcon : PureComponent
 
     public static SvgIcon Svg_Chevron_right_minor => new(nameof(Svg_Chevron_right_minor));
 
+    public static SvgIcon Svg_Chevron_up_minor => new(nameof(Svg_Chevron_up_minor));
+
     public static SvgIcon Svg_Close => new(nameof(Svg_Close));
 
     public static SvgIcon Svg_Dislike => new(nameof(Svg_Dislike));
@@ -32,7 +34,7 @@ sealed class SvgIcon : PureComponent
         return _name switch
         {
             nameof(Svg_Chevron_down_minor)
-                => new svg(Fill(none), ViewBox(0, 0, 20, 20), svg.Size(20))
+                => new(Fill(none), ViewBox(0, 0, 20, 20), svg.Size(20))
                 {
                     new path
                     {
@@ -42,7 +44,7 @@ sealed class SvgIcon : PureComponent
                         clipRule = "evenodd"
                     }
                 },
-            
+
             nameof(Svg_Chevron_right_minor)
                 => new(svg.Size(20, 21), ViewBox(0, 0, 20, 21), Fill(none))
                 {
@@ -52,6 +54,18 @@ sealed class SvgIcon : PureComponent
                         clipRule = "evenodd",
                         d        = "M7.50053 15.4545C7.2872 15.4545 7.07387 15.3725 6.91137 15.2094C6.58553 14.8824 6.58553 14.3538 6.91137 14.0268L10.4889 10.4363L6.91137 6.84584C6.58553 6.51883 6.58553 5.99025 6.91137 5.66323C7.2372 5.33621 7.76387 5.33621 8.0897 5.66323L12.2564 9.84503C12.5822 10.172 12.5822 10.7006 12.2564 11.0276L8.0897 15.2094C7.9272 15.3725 7.71387 15.4545 7.50053 15.4545Z",
                         fill     = "#878787"
+                    }
+                },
+            
+            nameof(Svg_Chevron_up_minor)
+                => new svg(ViewBox(0, 0, 20, 20), Fill(none), svg.Size(20))
+                {
+                    new path
+                    {
+                        fillRule = "evenodd",
+                        clipRule = "evenodd",
+                        d        = "M9.99979 7.49971C10.2131 7.49971 10.4265 7.58138 10.589 7.74388L14.7556 11.9105C15.0815 12.2364 15.0815 12.763 14.7556 13.0889C14.4298 13.4147 13.9031 13.4147 13.5773 13.0889L9.99979 9.51138L6.42229 13.0889C6.09646 13.4147 5.56979 13.4147 5.24396 13.0889C4.91813 12.763 4.91813 12.2364 5.24396 11.9105L9.41062 7.74388C9.57312 7.58138 9.78646 7.49971 9.99979 7.49971Z",
+                        fill     = "black"
                     }
                 },
 

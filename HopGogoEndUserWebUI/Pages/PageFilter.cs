@@ -45,13 +45,70 @@ sealed class PageFilter : Component
     
     class SectionFilter : Component
     {
+        record AirportInfo
+        {
+            public string Name { get; init; }
+            public string MiniDescription { get; init; }
+        }
+
+        sealed class AirportSelection : AutoFilterBox<AirportInfo>
+        {
+            public AirportSelection()
+            {
+                Placeholder = "Select from airport";
+            }
+
+            protected override Element RenderItem(AirportInfo record)
+            {
+                return new FlexColumn
+                {
+                    new div(Font(400, 16, "Outfit", "black"), WhiteSpaceNoWrap)
+                    {
+                        record.Name
+                    },
+                    new div(Font(400, 13, "Outfit", "#777373"))
+                    {
+                        record.MiniDescription
+                    }
+                };
+            }
+
+            protected override string GetSelectedValueText(AirportInfo airportInfo)
+            {
+                return "From: " + airportInfo.Name;
+            }
+
+            protected override IReadOnlyList<AirportInfo> GetItemsSource()
+            {
+                // dummy data
+                return Enumerable.Range(1, 4).Select(i => new AirportInfo
+                {
+                    Name            = "Airport " + i,
+                    MiniDescription = DummySentence(3)
+                }).ToList();
+
+
+
+            }
+
+            protected override IReadOnlyList<AirportInfo> GetDefaultSuggestions()
+            {
+                // dummy data
+                return Enumerable.Range(1, 4).Select(i => new AirportInfo
+                {
+                    Name            = "Airport Default" + i,
+                    MiniDescription = DummySentence(3)
+                }).ToList();
+            }
+        }
+        
         protected override Element render()
         {
             return new FlexColumn(SizeFull, MinHeight(500), Padding(24), Background("#F5F5F5"), BoxShadow(0, 2, 4, rgba(25, 33, 61, 0.16)), BorderRadius(16))
             {
                 new FlexRow
                 {
-                    new AutoFilterBox()
+                    new AirportSelection()
                 }
             };
         }
@@ -59,69 +116,3 @@ sealed class PageFilter : Component
 
 }
 
-record AutoFilterBoxState
-{
-    public bool IsSuggestionsVisible { get; init; }
-}
-
-class AutoFilterBox : Component<AutoFilterBoxState>
-{
-    public string SelectedValue { get; set; }
-        
-    protected override Element render()
-    {
-        return new FlexRowCentered(PaddingX(16), Height(50), Background(White), Border(1, "#6A6A6A", solid, 13), Font(400, 16, "Outfit", "black"))
-        {
-            "From: İstanbul, Türkey",
-
-            Svg_Chevron_down_minor + MarginLeft(16),
-
-            OnClick(OnClicked),
-
-            PositionRelative,
-            When(state.IsSuggestionsVisible, () =>
-                     new FlexColumn(PositionAbsolute, Gap(16), WidthFull, Top(50), Left(0), Border(1, "#6A6A6A", solid, 13))
-                     {
-                         Background(White),
-                         Enumerable.Range(1, 4).Select(i => new FlexRow(JustifyContentSpaceBetween)
-                         {
-                             OnClick(OnSuggestionItemClicked),
-                             Hover(Background("#F0F2F5")),
-
-                             Padding(16),
-
-                             new FlexColumn(AlignItemsCenter)
-                             {
-                                 new div(Font(400, 16, "Outfit", "black"), WhiteSpaceNoWrap)
-                                 {
-                                     "Tekirdağ, Turkey " + i
-                                 },
-                                 new div(Font(400, 13, "Outfit", "#777373"))
-                                 {
-                                     "102 km from Istanbul"
-                                 }
-                             },
-                             Svg_Plus + Size(24)
-                         })
-                     })
-        };
-    }
-
-    [StopPropagation]
-    Task OnSuggestionItemClicked(MouseEvent e)
-    {
-        state = state with { IsSuggestionsVisible = false };
-        
-        return Task.CompletedTask;
-    }
-    
-    [StopPropagation]
-    Task OnClicked(MouseEvent e)
-    {
-        state = state with { IsSuggestionsVisible = !state.IsSuggestionsVisible};
-        
-        return Task.CompletedTask;
-    }
-    
-    
-}
