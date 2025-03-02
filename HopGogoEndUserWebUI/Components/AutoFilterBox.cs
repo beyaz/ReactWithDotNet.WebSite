@@ -91,6 +91,8 @@ abstract class AutoFilterBox<TRecord> : Component<AutoFilterBoxState<TRecord>>
 
                              When(index == state.SelectedIndex, Background(Gray300)),
 
+                             When(index == 0, BorderTopLeftRadius(13), BorderTopRightRadius(13)),
+
                              Data("index", index)
                          })
                      })
