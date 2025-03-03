@@ -22,6 +22,8 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
         { "preserveaspectratio", "preserveAspectRatio" }
     };
 
+    static readonly IReadOnlyList<(string Name, string Value)> GlobalDeclaredStringFields = typeof(Mixin).GetFields(BindingFlags.Static | BindingFlags.Public).Where(f => f.FieldType == typeof(string)).Select(f => (f.Name, (string)f.GetValue(null))).ToList();
+
     static readonly List<string> ignoredTags = ["rect", "path", "circle", "line"];
 
     public static string HtmlToCSharp(string htmlRootNode)
@@ -139,6 +141,11 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
         return name;
     }
 
+    static string getStringParameter(string prm)
+    {
+        return TryGetGlobalDeclaredStringConstValue(prm) ?? '"' + prm + '"';
+    }
+
     static string GetTagName(this HtmlAttribute htmlAttribute)
     {
         return htmlAttribute.OwnerNode.Name;
@@ -153,10 +160,6 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
     {
         return x.EndsWith("px", StringComparison.OrdinalIgnoreCase);
     }
-
-    static readonly IReadOnlyList<(string Name, string Value)> GlobalDeclaredStringFields = typeof(Mixin).GetFields(BindingFlags.Static | BindingFlags.Public).Where(f => f.FieldType == typeof(string)).Select(f=>(f.Name, (string)f.GetValue(null))).ToList();
-    
-    
 
     static IReadOnlyList<HtmlAttribute> RemoveAll(this HtmlAttributeCollection htmlAttributeCollection, Func<HtmlAttribute, bool> match)
     {
@@ -211,76 +214,6 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
         return data;
     }
 
-    static string TryGetGlobalDeclaredStringConstValue(string value)
-    {
-        if (value == none ||
-            value == auto ||
-            value == inset ||
-            value == inherit ||
-            value == transparent ||
-            value == solid ||
-            value == dotted)
-        {
-            return value;
-        }
-
-        var item = GlobalDeclaredStringFields.FirstOrDefault(x => x.Value.Equals(value, StringComparison.OrdinalIgnoreCase));
-        if (item.Name is not null)
-        {
-            return item.Name;
-        }
-        
-        return null;
-    }
-    static string getStringParameter(string prm)
-    {
-        return TryGetGlobalDeclaredStringConstValue(prm) ?? '"' + prm + '"';
-    }
-
-    class AgilityPackageOverride
-    {
-        public static string Encode(string styleText)
-        {
-            var index = 0;
-            while (true)
-            {
-                var (hasChange, newIndex, styleTextNewValue) = EncodeUrl(styleText,index);
-                if (hasChange is false)
-                {
-                    return styleText;
-                }
-
-                index = newIndex;
-
-                styleText = styleTextNewValue;
-            }
-        }
-    
-        static (bool hasChange, int newIndex, string styleTextNewValue) EncodeUrl(string styleText, int startIndex)
-        {
-            var beginIndex = styleText.IndexOf("url(", startIndex, StringComparison.OrdinalIgnoreCase);
-            if (beginIndex  > 0)
-            {
-                var endIndex = styleText.IndexOf(")", beginIndex, StringComparison.OrdinalIgnoreCase);
-                if (endIndex > 0)
-                {
-                    var value = styleText.Substring(beginIndex, endIndex - beginIndex + 1);
-
-                    var partBegin = styleText.Substring(0, beginIndex);
-                    var partEnd = styleText.Substring(endIndex+1, styleText.Length - endIndex -1);
-            
-                    return (hasChange: true, newIndex: endIndex+1, styleTextNewValue: partBegin + EncodeValue(value) + partEnd);
-                }
-            }
-
-            return default;
-        }
-        
-        static string EncodeValue(string value) => UrlEncoder.Default.Encode(value);
-        public static string DecodeValue(string value) => HttpUtility.UrlDecode(value);
-
-    }
-   
     static string RemovePixelFromEnd(this string value)
     {
         return value?.RemoveFromEnd("px");
@@ -422,11 +355,11 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
             }
 
             var isConstructorWritten = false;
-            
+
             if (data.modifiers.Count > 0)
             {
                 isConstructorWritten = true;
-                
+
                 sb.Append("(");
                 sb.Append(JoinModifiers(data.modifiers));
                 sb.Append(")");
@@ -435,7 +368,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
             var lines = new List<string> { sb.ToString() };
 
             List<string> objectInitializations = [];
-            
+
             if (textModifierCode is not null)
             {
                 objectInitializations.Add(textModifierCode.PartParameterWithoutParanthesis.RemoveFromStart("\"").RemoveFromEnd("\""));
@@ -456,7 +389,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
                 lines.AddRange(objectInitializations.Select(line => line + ","));
 
                 lines[^1] = lines[^1].RemoveFromEnd(",");
-                
+
                 lines.Add("}");
             }
 
@@ -464,7 +397,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
             {
                 lines[^1] += "()";
             }
-            
+
             return lines;
 
             List<string> attributeToString(HtmlAttribute attribute)
@@ -658,7 +591,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
             {
                 return data;
             }
-            
+
             // border
             foreach (var prefix in new[] { "borderTop", "borderRight", "borderLeft", "borderBottom" })
             {
@@ -767,7 +700,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
 
                 data.style.height = null;
             }
-            
+
             // Border
             if (data.style.border.HasValue() && data.style.borderRadius.HasValue())
             {
@@ -777,47 +710,47 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
                     if (valueParts[0].EndsWithPixel() && data.style.borderRadius.EndsWithPixel())
                     {
                         data.style.border = MarkAsAlreadyCalculatedModifier($"Border({valueParts[0].RemovePixelFromEnd()}, {getStringParameter(valueParts[1])}, {getStringParameter(valueParts[2])}, {data.style.borderRadius.RemovePixelFromEnd()})");
-                        
+
                         data.style.borderRadius = null;
                     }
                 }
             }
-            
+
             // Font
             if (data.style.font is null &&
-                data.style.fontWeight.HasValue() && 
-                data.style.fontSize.HasValue() && 
+                data.style.fontWeight.HasValue() &&
+                data.style.fontSize.HasValue() &&
                 data.style.fontFamily.HasValue())
             {
                 var fontWeight = data.style.fontWeight;
                 if (!(fontWeight is "100" ||
-                      fontWeight is "200"||
-                      fontWeight is "300"||
-                      fontWeight is "400"||
-                      fontWeight is "500"||
-                      fontWeight is "600"||
-                      fontWeight is "700"||
-                      fontWeight is "800"||
+                      fontWeight is "200" ||
+                      fontWeight is "300" ||
+                      fontWeight is "400" ||
+                      fontWeight is "500" ||
+                      fontWeight is "600" ||
+                      fontWeight is "700" ||
+                      fontWeight is "800" ||
                       fontWeight is "900"))
                 {
                     fontWeight = '"' + fontWeight + '"';
                 }
-                
+
                 var fontSize = data.style.fontSize.RemovePixelFromEnd();
 
                 var lineHeight = string.Empty;
-                
+
                 if (data.style.lineHeight.HasValue())
                 {
                     lineHeight = ", " + data.style.lineHeight.RemovePixelFromEnd();
-                    
+
                     data.style.lineHeight = null;
                 }
-                
-                var fontFamily = data.style.fontFamily.Replace('"','\'');
+
+                var fontFamily = data.style.fontFamily.Replace('"', '\'');
 
                 var color = string.Empty;
-                
+
                 if (data.style.color.HasValue())
                 {
                     color = ", " + getStringParameter(data.style.color);
@@ -830,9 +763,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
                 data.style.fontFamily = null;
                 data.style.fontSize   = null;
                 data.style.fontWeight = null;
-               
             }
-            
 
             return data;
         }
@@ -1338,10 +1269,8 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
                     }
                 }
             }
-            
-            return success($"{CamelCase(name)}(\"{value}\")");
 
-            
+            return success($"{CamelCase(name)}(\"{value}\")");
         }
 
         return default;
@@ -1388,6 +1317,78 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
     static Type TryFindTypeOfHtmlTag(string htmlTagName)
     {
         return typeof(div).Assembly.GetType(nameof(ReactWithDotNet) + "." + htmlTagName, false, true);
+    }
+
+    static string TryGetGlobalDeclaredStringConstValue(string value)
+    {
+        if (value == none ||
+            value == auto ||
+            value == inset ||
+            value == inherit ||
+            value == transparent ||
+            value == solid ||
+            value == dotted)
+        {
+            return value;
+        }
+
+        var item = GlobalDeclaredStringFields.FirstOrDefault(x => x.Value.Equals(value, StringComparison.OrdinalIgnoreCase));
+        if (item.Name is not null)
+        {
+            return item.Name;
+        }
+
+        return null;
+    }
+
+    class AgilityPackageOverride
+    {
+        public static string DecodeValue(string value)
+        {
+            return HttpUtility.UrlDecode(value);
+        }
+
+        public static string Encode(string styleText)
+        {
+            var index = 0;
+            while (true)
+            {
+                var (hasChange, newIndex, styleTextNewValue) = EncodeUrl(styleText, index);
+                if (hasChange is false)
+                {
+                    return styleText;
+                }
+
+                index = newIndex;
+
+                styleText = styleTextNewValue;
+            }
+        }
+
+        static (bool hasChange, int newIndex, string styleTextNewValue) EncodeUrl(string styleText, int startIndex)
+        {
+            var beginIndex = styleText.IndexOf("url(", startIndex, StringComparison.OrdinalIgnoreCase);
+            if (beginIndex > 0)
+            {
+                var endIndex = styleText.IndexOf(")", beginIndex, StringComparison.OrdinalIgnoreCase);
+                if (endIndex > 0)
+                {
+                    var value = styleText.Substring(beginIndex, endIndex - beginIndex + 1);
+
+                    var partBegin = styleText.Substring(0, beginIndex);
+                    var partEnd = styleText.Substring(endIndex + 1, styleText.Length - endIndex - 1);
+
+                    return (hasChange: true, newIndex: endIndex + 1, styleTextNewValue: partBegin + EncodeValue(value) + partEnd);
+                }
+            }
+
+            return default;
+        }
+
+        static string EncodeValue(string value)
+        {
+            return UrlEncoder.Default.Encode(value);
+        }
     }
 
     sealed class ModifierCode
@@ -1464,9 +1465,9 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
         public HtmlNode htmlNode { get; init; }
 
         public string htmlNodeName { get; init; }
+        public List<ModifierCode> modifiers { get; init; }
 
         public Style style { get; init; }
-        public List<ModifierCode> modifiers { get; init; }
     }
 
     #region already calculated modifier
