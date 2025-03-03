@@ -17,7 +17,7 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
         return new FlexRow(WidthFull, HeightAuto)
         {
             new LeftMenu(),
-            new FlexColumn
+            new FlexColumn(WidthFull)
             {
                 new HeaderBar(),
                 new ChatApp()
@@ -29,7 +29,7 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
     {
         protected override Element render()
         {
-            return new div(Padding(24), MaxWidth(1536), MarginLeft(auto), MarginRight(auto), BoxSizingBorderBox)
+            return new div(Padding(24),  MarginLeft(auto), MarginRight(auto), WidthFull)
             {
                 new div(BoxSizingBorderBox)
                 {
@@ -75,7 +75,7 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
                 },
                 new div(Height(501), OverflowHidden, BoxSizingBorderBox)
                 {
-                    new FlexRow(Gap(20), WebkitBoxOrient("horizontal"), WebkitBoxDirection("normal"), Height(501), BoxSizingBorderBox)
+                    new FlexRow(Gap(20), WidthFull)
                     {
                         new FlexColumn(Width("25%"), BackgroundColor(rgb(255, 255, 255)), BorderColor(rgb(228, 231, 236)), BorderWidth(1), BorderRadius(16), WebkitBoxOrient("vertical"), WebkitBoxDirection("normal"), BorderStyle(solid))
                         {
@@ -225,7 +225,7 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
                                             {
                                                 new FlexRow(WebkitBoxPack("justify"), JustifyContentSpaceBetween, WebkitBoxAlign("start"), AlignItemsFlexStart, BoxSizingBorderBox)
                                                 {
-                                                    new div(BoxSizingBorderBox)
+                                                    new div(WhiteSpaceNoWrap)
                                                     {
                                                         new h5(Color(rgb(29, 41, 57)), FontWeight500, FontSize14, LineHeight20, Margin(0), BoxSizingBorderBox)
                                                         {
@@ -242,238 +242,6 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
                                                     }
                                                 }
                                             }
-                                        },
-                                        new FlexRow(Padding(12), BorderRadius(8), MarginTop(4), MarginBottom(0), Gap(12), AlignItemsCenter, CursorPointer, BoxSizingBorderBox)
-                                        {
-                                            new div(BorderRadius(9999), MaxWidth(48), WidthFull, Height(48), PositionRelative, BoxSizingBorderBox)
-                                            {
-                                                new img(Src("src/images/user/user-17.jpg"), Alt("profile"), ObjectPosition("50% 50%"), ObjectFitCover, BorderRadius(9999), OverflowHidden, WidthFull, Height(48), MaxWidth("100%"), DisplayBlock, VerticalAlignMiddle, BoxSizingBorderBox),
-                                                new span(BackgroundColor(rgb(18, 183, 106)), BorderColor(rgb(255, 255, 255)), BorderWidth(1.5), BorderRadius(9999), Width("0.75rem"), Height(12), DisplayBlock, Right(0), Bottom(0), PositionAbsolute, BorderStyle(solid))
-                                            },
-                                            new div(WidthFull, BoxSizingBorderBox)
-                                            {
-                                                new FlexRow(WebkitBoxPack("justify"), JustifyContentSpaceBetween, WebkitBoxAlign("start"), AlignItemsFlexStart, BoxSizingBorderBox)
-                                                {
-                                                    new div(BoxSizingBorderBox)
-                                                    {
-                                                        new h5(Color(rgb(29, 41, 57)), FontWeight500, FontSize14, LineHeight20, Margin(0), BoxSizingBorderBox)
-                                                        {
-                                                            "Lindsey Curtis"
-                                                        },
-                                                        new p(Color(rgb(102, 112, 133)), FontSize12, LineHeight18, MarginTop(2), Margin(2, 0, 0), BoxSizingBorderBox)
-                                                        {
-                                                            "Designer"
-                                                        }
-                                                    },
-                                                    new span(Color(rgb(152, 162, 179)), FontSize12, LineHeight18, BoxSizingBorderBox)
-                                                    {
-                                                        "30 mins"
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        new FlexRow(Padding(12), BorderRadius(8), MarginTop(4), MarginBottom(0), Gap(12), AlignItemsCenter, CursorPointer, BoxSizingBorderBox)
-                                        {
-                                            new div(BorderRadius(9999), MaxWidth(48), WidthFull, Height(48), PositionRelative, BoxSizingBorderBox)
-                                            {
-                                                new img(Src("src/images/user/user-19.jpg"), Alt("profile"), ObjectPosition("50% 50%"), ObjectFitCover, BorderRadius(9999), OverflowHidden, WidthFull, Height(48), MaxWidth("100%"), DisplayBlock, VerticalAlignMiddle, BoxSizingBorderBox),
-                                                new span(BackgroundColor(rgb(18, 183, 106)), BorderColor(rgb(255, 255, 255)), BorderWidth(1.5), BorderRadius(9999), Width("0.75rem"), Height(12), DisplayBlock, Right(0), Bottom(0), PositionAbsolute, BorderStyle(solid))
-                                            },
-                                            new div(WidthFull, BoxSizingBorderBox)
-                                            {
-                                                new FlexRow(WebkitBoxPack("justify"), JustifyContentSpaceBetween, WebkitBoxAlign("start"), AlignItemsFlexStart, BoxSizingBorderBox)
-                                                {
-                                                    new div(BoxSizingBorderBox)
-                                                    {
-                                                        new h5(Color(rgb(29, 41, 57)), FontWeight500, FontSize14, LineHeight20, Margin(0), BoxSizingBorderBox)
-                                                        {
-                                                            "Zain Geidt"
-                                                        },
-                                                        new p(Color(rgb(102, 112, 133)), FontSize12, LineHeight18, MarginTop(2), Margin(2, 0, 0), BoxSizingBorderBox)
-                                                        {
-                                                            "Content Writer"
-                                                        }
-                                                    },
-                                                    new span(Color(rgb(152, 162, 179)), FontSize12, LineHeight18, BoxSizingBorderBox)
-                                                    {
-                                                        "45 mins"
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        new FlexRow(Padding(12), BorderRadius(8), MarginTop(4), MarginBottom(0), Gap(12), AlignItemsCenter, CursorPointer, BoxSizingBorderBox)
-                                        {
-                                            new div(BorderRadius(9999), MaxWidth(48), WidthFull, Height(48), PositionRelative, BoxSizingBorderBox)
-                                            {
-                                                new img(Src("src/images/user/user-05.jpg"), Alt("profile"), ObjectPosition("50% 50%"), ObjectFitCover, BorderRadius(9999), OverflowHidden, WidthFull, Height(48), MaxWidth("100%"), DisplayBlock, VerticalAlignMiddle, BoxSizingBorderBox),
-                                                new span(BackgroundColor(rgb(247, 144, 9)), BorderColor(rgb(255, 255, 255)), BorderWidth(1.5), BorderRadius(9999), Width("0.75rem"), Height(12), DisplayBlock, Right(0), Bottom(0), PositionAbsolute, BorderStyle(solid))
-                                            },
-                                            new div(WidthFull, BoxSizingBorderBox)
-                                            {
-                                                new FlexRow(WebkitBoxPack("justify"), JustifyContentSpaceBetween, WebkitBoxAlign("start"), AlignItemsFlexStart, BoxSizingBorderBox)
-                                                {
-                                                    new div(BoxSizingBorderBox)
-                                                    {
-                                                        new h5(Color(rgb(29, 41, 57)), FontWeight500, FontSize14, LineHeight20, Margin(0), BoxSizingBorderBox)
-                                                        {
-                                                            "Carla George"
-                                                        },
-                                                        new p(Color(rgb(102, 112, 133)), FontSize12, LineHeight18, MarginTop(2), Margin(2, 0, 0), BoxSizingBorderBox)
-                                                        {
-                                                            "Front-end Developer"
-                                                        }
-                                                    },
-                                                    new span(Color(rgb(152, 162, 179)), FontSize12, LineHeight18, BoxSizingBorderBox)
-                                                    {
-                                                        "2 days"
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        new FlexRow(Padding(12), BorderRadius(8), MarginTop(4), MarginBottom(0), Gap(12), AlignItemsCenter, CursorPointer, BoxSizingBorderBox)
-                                        {
-                                            new div(BorderRadius(9999), MaxWidth(48), WidthFull, Height(48), PositionRelative, BoxSizingBorderBox)
-                                            {
-                                                new img(Src("src/images/user/user-20.jpg"), Alt("profile"), ObjectPosition("50% 50%"), ObjectFitCover, BorderRadius(9999), OverflowHidden, WidthFull, Height(48), MaxWidth("100%"), DisplayBlock, VerticalAlignMiddle, BoxSizingBorderBox),
-                                                new span(BackgroundColor(rgb(18, 183, 106)), BorderColor(rgb(255, 255, 255)), BorderWidth(1.5), BorderRadius(9999), Width("0.75rem"), Height(12), DisplayBlock, Right(0), Bottom(0), PositionAbsolute, BorderStyle(solid))
-                                            },
-                                            new div(WidthFull, BoxSizingBorderBox)
-                                            {
-                                                new FlexRow(WebkitBoxPack("justify"), JustifyContentSpaceBetween, WebkitBoxAlign("start"), AlignItemsFlexStart, BoxSizingBorderBox)
-                                                {
-                                                    new div(BoxSizingBorderBox)
-                                                    {
-                                                        new h5(Color(rgb(29, 41, 57)), FontWeight500, FontSize14, LineHeight20, Margin(0), BoxSizingBorderBox)
-                                                        {
-                                                            "Abram Schleifer"
-                                                        },
-                                                        new p(Color(rgb(102, 112, 133)), FontSize12, LineHeight18, MarginTop(2), Margin(2, 0, 0), BoxSizingBorderBox)
-                                                        {
-                                                            "Digital Marketer"
-                                                        }
-                                                    },
-                                                    new span(Color(rgb(152, 162, 179)), FontSize12, LineHeight18, BoxSizingBorderBox)
-                                                    {
-                                                        "1 hour"
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        new FlexRow(Padding(12), BorderRadius(8), MarginTop(4), MarginBottom(0), Gap(12), AlignItemsCenter, CursorPointer, BoxSizingBorderBox)
-                                        {
-                                            new div(BorderRadius(9999), MaxWidth(48), WidthFull, Height(48), PositionRelative, BoxSizingBorderBox)
-                                            {
-                                                new img(Src("src/images/user/user-34.jpg"), Alt("profile"), ObjectPosition("50% 50%"), ObjectFitCover, BorderRadius(9999), OverflowHidden, WidthFull, Height(48), MaxWidth("100%"), DisplayBlock, VerticalAlignMiddle, BoxSizingBorderBox),
-                                                new span(BackgroundColor(rgb(18, 183, 106)), BorderColor(rgb(255, 255, 255)), BorderWidth(1.5), BorderRadius(9999), Width("0.75rem"), Height(12), DisplayBlock, Right(0), Bottom(0), PositionAbsolute, BorderStyle(solid))
-                                            },
-                                            new div(WidthFull, BoxSizingBorderBox)
-                                            {
-                                                new FlexRow(WebkitBoxPack("justify"), JustifyContentSpaceBetween, WebkitBoxAlign("start"), AlignItemsFlexStart, BoxSizingBorderBox)
-                                                {
-                                                    new div(BoxSizingBorderBox)
-                                                    {
-                                                        new h5(Color(rgb(29, 41, 57)), FontWeight500, FontSize14, LineHeight20, Margin(0), BoxSizingBorderBox)
-                                                        {
-                                                            "Lincoln Donin"
-                                                        },
-                                                        new p(Color(rgb(102, 112, 133)), FontSize12, LineHeight18, MarginTop(2), Margin(2, 0, 0), BoxSizingBorderBox)
-                                                        {
-                                                            "Project ManagerProduct Designer"
-                                                        }
-                                                    },
-                                                    new span(Color(rgb(152, 162, 179)), FontSize12, LineHeight18, BoxSizingBorderBox)
-                                                    {
-                                                        "3 days"
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        new FlexRow(Padding(12), BorderRadius(8), MarginTop(4), MarginBottom(0), Gap(12), AlignItemsCenter, CursorPointer, BoxSizingBorderBox)
-                                        {
-                                            new div(BorderRadius(9999), MaxWidth(48), WidthFull, Height(48), PositionRelative, BoxSizingBorderBox)
-                                            {
-                                                new img(Src("src/images/user/user-35.jpg"), Alt("profile"), ObjectPosition("50% 50%"), ObjectFitCover, BorderRadius(9999), OverflowHidden, WidthFull, Height(48), MaxWidth("100%"), DisplayBlock, VerticalAlignMiddle, BoxSizingBorderBox),
-                                                new span(BackgroundColor(rgb(18, 183, 106)), BorderColor(rgb(255, 255, 255)), BorderWidth(1.5), BorderRadius(9999), Width("0.75rem"), Height(12), DisplayBlock, Right(0), Bottom(0), PositionAbsolute, BorderStyle(solid))
-                                            },
-                                            new div(WidthFull, BoxSizingBorderBox)
-                                            {
-                                                new FlexRow(WebkitBoxPack("justify"), JustifyContentSpaceBetween, WebkitBoxAlign("start"), AlignItemsFlexStart, BoxSizingBorderBox)
-                                                {
-                                                    new div(BoxSizingBorderBox)
-                                                    {
-                                                        new h5(Color(rgb(29, 41, 57)), FontWeight500, FontSize14, LineHeight20, Margin(0), BoxSizingBorderBox)
-                                                        {
-                                                            "Erin Geidthem"
-                                                        },
-                                                        new p(Color(rgb(102, 112, 133)), FontSize12, LineHeight18, MarginTop(2), Margin(2, 0, 0), BoxSizingBorderBox)
-                                                        {
-                                                            "Copyrighter"
-                                                        }
-                                                    },
-                                                    new span(Color(rgb(152, 162, 179)), FontSize12, LineHeight18, BoxSizingBorderBox)
-                                                    {
-                                                        "5 days"
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        new FlexRow(Padding(12), BorderRadius(8), MarginTop(4), MarginBottom(0), Gap(12), AlignItemsCenter, CursorPointer, BoxSizingBorderBox)
-                                        {
-                                            new div(BorderRadius(9999), MaxWidth(48), WidthFull, Height(48), PositionRelative, BoxSizingBorderBox)
-                                            {
-                                                new img(Src("src/images/user/user-36.jpg"), Alt("profile"), ObjectPosition("50% 50%"), ObjectFitCover, BorderRadius(9999), OverflowHidden, WidthFull, Height(48), MaxWidth("100%"), DisplayBlock, VerticalAlignMiddle, BoxSizingBorderBox),
-                                                new span(BackgroundColor(rgb(240, 68, 56)), BorderColor(rgb(255, 255, 255)), BorderWidth(1.5), BorderRadius(9999), Width("0.75rem"), Height(12), DisplayBlock, Right(0), Bottom(0), PositionAbsolute, BorderStyle(solid))
-                                            },
-                                            new div(WidthFull, BoxSizingBorderBox)
-                                            {
-                                                new FlexRow(WebkitBoxPack("justify"), JustifyContentSpaceBetween, WebkitBoxAlign("start"), AlignItemsFlexStart, BoxSizingBorderBox)
-                                                {
-                                                    new div(BoxSizingBorderBox)
-                                                    {
-                                                        new h5(Color(rgb(29, 41, 57)), FontWeight500, FontSize14, LineHeight20, Margin(0), BoxSizingBorderBox)
-                                                        {
-                                                            "Alena Baptista"
-                                                        },
-                                                        new p(Color(rgb(102, 112, 133)), FontSize12, LineHeight18, MarginTop(2), Margin(2, 0, 0), BoxSizingBorderBox)
-                                                        {
-                                                            "SEO Expert"
-                                                        }
-                                                    },
-                                                    new span(Color(rgb(152, 162, 179)), FontSize12, LineHeight18, BoxSizingBorderBox)
-                                                    {
-                                                        "2 hours"
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        new FlexRow(Padding(12), BorderRadius(8), MarginTop(4), MarginBottom(0), Gap(12), AlignItemsCenter, CursorPointer, BoxSizingBorderBox)
-                                        {
-                                            new div(BorderRadius(9999), MaxWidth(48), WidthFull, Height(48), PositionRelative, BoxSizingBorderBox)
-                                            {
-                                                new img(Src("src/images/user/user-37.jpg"), Alt("profile"), ObjectPosition("50% 50%"), ObjectFitCover, BorderRadius(9999), OverflowHidden, WidthFull, Height(48), MaxWidth("100%"), DisplayBlock, VerticalAlignMiddle, BoxSizingBorderBox),
-                                                new span(BackgroundColor(rgb(18, 183, 106)), BorderColor(rgb(255, 255, 255)), BorderWidth(1.5), BorderRadius(9999), Width("0.75rem"), Height(12), DisplayBlock, Right(0), Bottom(0), PositionAbsolute, BorderStyle(solid))
-                                            },
-                                            new div(WidthFull, BoxSizingBorderBox)
-                                            {
-                                                new FlexRow(WebkitBoxPack("justify"), JustifyContentSpaceBetween, WebkitBoxAlign("start"), AlignItemsFlexStart, BoxSizingBorderBox)
-                                                {
-                                                    new div(BoxSizingBorderBox)
-                                                    {
-                                                        new h5(Color(rgb(29, 41, 57)), FontWeight500, FontSize14, LineHeight20, Margin(0), BoxSizingBorderBox)
-                                                        {
-                                                            "Wilium vamos"
-                                                        },
-                                                        new p(Color(rgb(102, 112, 133)), FontSize12, LineHeight18, MarginTop(2), Margin(2, 0, 0), BoxSizingBorderBox)
-                                                        {
-                                                            "Content Writer"
-                                                        }
-                                                    },
-                                                    new span(Color(rgb(152, 162, 179)), FontSize12, LineHeight18, BoxSizingBorderBox)
-                                                    {
-                                                        "5 days"
-                                                    }
-                                                }
-                                            }
                                         }
                                     }
                                 }
@@ -487,7 +255,7 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
                                 {
                                     new div(BorderRadius(9999), MaxWidth(48), WidthFull, Height(48), PositionRelative, BoxSizingBorderBox)
                                     {
-                                        new img(Src("src/images/user/user-17.jpg"), Alt("profile"), ObjectPosition("50% 50%"), ObjectFitCover, BorderRadius(9999), OverflowHidden, WidthFull, Height(48), MaxWidth("100%"), DisplayBlock, VerticalAlignMiddle, BoxSizingBorderBox),
+                                        new img(Src(DummySrc(48)), Alt("profile"), ObjectPosition("50% 50%"), ObjectFitCover, BorderRadius(9999), OverflowHidden, WidthFull, Height(48), MaxWidth("100%"), DisplayBlock, VerticalAlignMiddle, BoxSizingBorderBox),
                                         new span(BackgroundColor(rgb(18, 183, 106)), BorderColor(rgb(255, 255, 255)), BorderWidth(1.5), BorderRadius(9999), Width("0.75rem"), Height(12), DisplayBlock, Right(0), Bottom(0), PositionAbsolute, BorderStyle(solid))
                                     },
                                     new h5(Color(rgb(102, 112, 133)), FontWeight500, FontSize14, LineHeight20, Margin(0), BoxSizingBorderBox)
@@ -497,7 +265,7 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
                                 },
                                 new FlexRow(Gap(12), AlignItemsCenter, BoxSizingBorderBox)
                                 {
-                                    new button(Color(rgb(52, 64, 84)), CursorPointer, Appearance("button"), BackgroundColor("rgba(0, 0, 0, 0)"), BackgroundImage(none), TextTransform(none), FontFamily("Outfit, sans-serif"), FontSize16, FontWeight400, LineHeight24, LetterSpacingNormal, Margin(0), Padding(0), BoxSizingBorderBox)
+                                    new button( CursorPointer, Appearance("button"), BackgroundColor("rgba(0, 0, 0, 0)"), BackgroundImage(none), TextTransform(none), FontFamily("Outfit, sans-serif"), FontSize16, FontWeight400, LineHeight24, LetterSpacingNormal, Margin(0), Padding(0), BoxSizingBorderBox)
                                     {
                                         new svg(ViewBox(0, 0, 24, 24), Fill(none), svg.Size(24), Stroke(rgb(52, 64, 84)), DisplayBlock, VerticalAlignMiddle, BoxSizingBorderBox, TouchAction(none))
                                         {
@@ -1102,7 +870,7 @@ sealed class BasicDashboardDemo : Component<BasicDashboardDemoState>
                 SvgIcon.ArrowDown
             };
             
-            return new aside(Width(290), BackgroundColor(rgb(255, 255, 255)), BorderColor(rgb(228, 231, 236)), BorderRightWidth(1 * px), OverflowYHidden, Height100vh, DisplayFlexColumn, BorderWidth(0, 1, 0, 0), BorderStyle(solid), PaddingLeftRight(20))
+            return new aside(Width(250), BackgroundColor(rgb(255, 255, 255)), BorderColor(rgb(228, 231, 236)), BorderRightWidth(1 * px), OverflowYHidden, DisplayFlexColumn, BorderWidth(0, 1, 0, 0), BorderStyle(solid), PaddingLeftRight(20))
             {
                 new span(PaddingY(32), FontSize24, FontWeight700)
                 {
