@@ -154,21 +154,9 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
         return x.EndsWith("px", StringComparison.OrdinalIgnoreCase);
     }
 
-    static bool IsGlobalDeclaredStringVariable(string value)
-    {
-        if (value == none ||
-            value == auto ||
-            value == inset ||
-            value == inherit ||
-            value == transparent ||
-            value == solid ||
-            value == dotted)
-        {
-            return true;
-        }
-
-        return false;
-    }
+    static readonly IReadOnlyList<(string Name, string Value)> GlobalDeclaredStringFields = typeof(Mixin).GetFields(BindingFlags.Static | BindingFlags.Public).Where(f => f.FieldType == typeof(string)).Select(f=>(f.Name, (string)f.GetValue(null))).ToList();
+    
+    
 
     static IReadOnlyList<HtmlAttribute> RemoveAll(this HtmlAttributeCollection htmlAttributeCollection, Func<HtmlAttribute, bool> match)
     {
@@ -222,15 +210,31 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
 
         return data;
     }
-    
-    static string getStringParameter(string prm)
+
+    static string TryGetGlobalDeclaredStringConstValue(string value)
     {
-        if (IsGlobalDeclaredStringVariable(prm))
+        if (value == none ||
+            value == auto ||
+            value == inset ||
+            value == inherit ||
+            value == transparent ||
+            value == solid ||
+            value == dotted)
         {
-            return prm;
+            return value;
         }
 
-        return '"' + prm + '"';
+        var item = GlobalDeclaredStringFields.FirstOrDefault(x => x.Value.Equals(value, StringComparison.OrdinalIgnoreCase));
+        if (item.Name is not null)
+        {
+            return item.Name;
+        }
+        
+        return null;
+    }
+    static string getStringParameter(string prm)
+    {
+        return TryGetGlobalDeclaredStringConstValue(prm) ?? '"' + prm + '"';
     }
 
     class AgilityPackageOverride
@@ -488,12 +492,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
 
                     static string toLine(KeyValuePair<string, string> kv)
                     {
-                        if (IsGlobalDeclaredStringVariable(kv.Value))
-                        {
-                            return kv.Key + " = " + kv.Value + ",";
-                        }
-
-                        return kv.Key + " = \"" + kv.Value + "\",";
+                        return kv.Key + " = " + getStringParameter(kv.Value) + ",";
                     }
                 }
 
@@ -518,12 +517,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
                         }
                     }
 
-                    if (IsGlobalDeclaredStringVariable(attribute.Value))
-                    {
-                        return [$"{propertyInfo.Name} = {attribute.Value}"];
-                    }
-
-                    return [$"{propertyInfo.Name} = {(attribute.Value?.Contains(Environment.NewLine) is true ? "@" : null)}\"{attribute.Value}\""];
+                    return [$"{propertyInfo.Name} = {getStringParameter(attribute.Value)}"];
                 }
 
                 if (canBeExportInOneLine(data))
@@ -826,7 +820,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
                 
                 if (data.style.color.HasValue())
                 {
-                    color = ", " + '"' +data.style.color + '"';
+                    color = ", " + getStringParameter(data.style.color);
 
                     data.style.color = null;
                 }
@@ -1316,9 +1310,9 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
                 return success($"{CamelCase(name)}({value})");
             }
 
-            if (IsGlobalDeclaredStringVariable(value))
+            if (TryGetGlobalDeclaredStringConstValue(value) is not null)
             {
-                return success($"{CamelCase(name)}({value})");
+                return success($"{CamelCase(name)}({TryGetGlobalDeclaredStringConstValue(value)})");
             }
 
             if (typeof(Mixin).GetMethod(CamelCase(name), [typeof(int)]) is not null &&
