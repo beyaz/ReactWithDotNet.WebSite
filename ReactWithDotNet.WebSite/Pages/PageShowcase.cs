@@ -92,7 +92,7 @@ sealed class PageShowcase : Component<PageShowcase.State>
                     FontSize15,
                     BorderBottom(1, solid, rgba(5, 5, 5, 0.1))
                 },
-                new FlexRow(WidthFull, Padding(10))
+                new FlexRow(WidthFull, Padding(10), JustifyContentCenter, FlexWrap, MD(FlexNoWrap))
                 {
                     LeftMenu,
 
@@ -224,7 +224,7 @@ sealed class PageShowcase : Component<PageShowcase.State>
                         size     = "small",
                         value    = (!state.IsSourceCodeVisible).ToString(),
                         @checked = state.IsSourceCodeVisible,
-                        onChange = _ =>
+                        onChange = (_,_) =>
                         {
                             state = state with { IsSourceCodeVisible = !state.IsSourceCodeVisible };
 
