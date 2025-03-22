@@ -186,20 +186,122 @@ class StyleEditor : Component<StyleEditor.State>
     {
         return new FlexRow(AlignItemsCenter, FlexWrap, Border(1, solid, Gray300), BorderRadius(4), Padding(5, 10), Gap(4), Background(White))
         {
-            new FlexRowCentered(BorderRadius(16), Padding(4, 8), Background(Gray100), Gap(4))
-            {
-                "padding: 7"
-            },
-            new FlexRow
-            {
-                "abc2"
-            },
-            new PropertyEditor_old()
+            new PropertyEditor(),
+            new PropertyEditor(),
+            new PropertyEditor(),
+            new PropertyEditor(),
+            new PropertyEditor(),
+            new PropertyEditor(),
+            
         };
     }
 
     internal class State
     {
+        public bool FocusKey { get; set; }
+        public bool FocusValue { get; set; }
+        public string InitialValue { get; init; }
+
+        public string Key { get; set; }
+
+        public int? SelectedSuggestionOffset { get; set; }
+
+        public bool ShowSuggestions { get; set; }
+
+        public string Value { get; set; }
+    }
+}
+
+
+sealed class PropertyEditor : Component<PropertyEditor.State>
+{
+    protected override Element render()
+    {
+
+        // return new input { type = "text", value = state.PropertyValue, style = { WidthFull } };
+        
+        if (state.IsEditMode is false)
+        {
+            return new FlexRowCentered(Color(Gray600), WidthFitContent, BorderRadius(16), Border(1,solid, Gray300), Padding(4, 8), Background(Gray100), Gap(4))
+            {
+                new span(FontWeight600) { state.PropertyName },
+                new span { ":" },
+                new span() { state.PropertyValue },
+                
+                OnMouseEnter(OnMouseEnterHandler)
+            };
+        }
+
+        return new FlexRowCentered(Color(Gray600), WidthFitContent, BorderRadius(16), Border(1,solid, Gray300), Padding(4, 8), Background(Gray100), Gap(4))
+        {
+            new span(FontWeight600) { state.PropertyName },
+            new span { ":" },
+            
+            new MagicInput{ Value = state.PropertyValue, Suggestions = ["a","b"]},
+            
+            new span(FontWeight600) { "Condition:" },
+            new span { ":" },
+            new MagicInput{ Value = state.PropertyValue, Suggestions = ["a","b"]},
+            
+            // new span() { state.PropertyValue },
+                
+            OnMouseEnter(OnMouseEnterHandler),
+            OnMouseLeave(OnMouseLeaveHandler),
+                
+            //PositionRelative,
+            //new FlexRowCentered(Size(24), PositionAbsolute, Padding(4), Top(16), Right(-16))
+            //{
+            //    Color(Gray600),
+            //    Hover(Color(Gray700)),
+            //    Background(White),
+            //    BorderRadius(24),
+            //    Border(1, solid, Gray300),
+            //    Hover(BorderColor(Gray500)),
+            //    new IconClose()
+            //},
+            
+            //new FlexRowCentered(Size(24),Padding(4),  PositionAbsolute, Top(16), Left(16))
+            //{
+            //    Color(Gray600),
+            //    Hover(Color(Gray700)),
+            //    Background(White),
+            //    BorderRadius(24),
+            //    Border(1, solid, Gray300),
+            //    Hover(BorderColor(Gray500)),
+            //    new IconChecked()
+            //}
+        };
+    }
+
+    Task OnMouseLeaveHandler(MouseEvent e)
+    {
+        state.IsEditMode = false;
+        
+        return Task.CompletedTask;
+    }
+
+    Task OnMouseEnterHandler(MouseEvent e)
+    {
+        state.IsEditMode = true;
+        
+        
+        return Task.CompletedTask;
+    }
+
+    internal class State
+    {
+        public bool IsEditMode { get; set; }
+        
+        public string PropertyName { get; set; } = "display";
+
+        public string PropertyValue { get; set; } = "flex";
+
+        public bool IsDeleteButtonVisible { get; set; }
+        
+        
+        
+        
+        
         public bool FocusKey { get; set; }
         public bool FocusValue { get; set; }
         public string InitialValue { get; init; }
@@ -289,6 +391,21 @@ class IconClose : PureComponent
     }
 }
 
+class IconChecked : PureComponent
+{
+    protected override Element render()
+    {
+        return new svg(Fill("currentColor"), ViewBox(0, 0, 14, 14))
+        {
+            new path
+            {
+                d    = "M4.86199 11.5948C4.78717 11.5923 4.71366 11.5745 4.64596 11.5426C4.57826 11.5107 4.51779 11.4652 4.46827 11.4091L0.753985 7.69483C0.683167 7.64891 0.623706 7.58751 0.580092 7.51525C0.536478 7.44299 0.509851 7.36177 0.502221 7.27771C0.49459 7.19366 0.506156 7.10897 0.536046 7.03004C0.565935 6.95111 0.613367 6.88 0.674759 6.82208C0.736151 6.76416 0.8099 6.72095 0.890436 6.69571C0.970973 6.67046 1.05619 6.66385 1.13966 6.67635C1.22313 6.68886 1.30266 6.72017 1.37226 6.76792C1.44186 6.81567 1.4997 6.8786 1.54141 6.95197L4.86199 10.2503L12.6397 2.49483C12.7444 2.42694 12.8689 2.39617 12.9932 2.40745C13.1174 2.41873 13.2343 2.47141 13.3251 2.55705C13.4159 2.64268 13.4753 2.75632 13.4938 2.87973C13.5123 3.00315 13.4888 3.1292 13.4271 3.23768L5.2557 11.4091C5.20618 11.4652 5.14571 11.5107 5.07801 11.5426C5.01031 11.5745 4.9368 11.5923 4.86199 11.5948Z",
+                fill = "currentColor"
+            }
+        };
+    }
+}
+
 sealed class MagicInput : Component<MagicInput.State>
 {
     public bool Focus { get; init; }
@@ -319,7 +436,7 @@ sealed class MagicInput : Component<MagicInput.State>
 
     protected override Element render()
     {
-        return new FlexColumn(WidthFull)
+        return new FlexColumn(WidthAuto)
         {
             new style
             {
@@ -335,6 +452,7 @@ sealed class MagicInput : Component<MagicInput.State>
                 valueBindDebounceHandler = OnTypingFinished,
                 onBlur                   = OnBlur,
                 onKeyDown                = OnKeyDown,
+                onClick = OnClick,
                 style =
                 {
                     //Background(White),
@@ -345,14 +463,25 @@ sealed class MagicInput : Component<MagicInput.State>
                     BorderNone,
                     Appearance(none),
                     PaddingTopBottom(4),
-                    FlexGrow(1), FontFamily("Arial"), FontSize12,
+                    
+                    //FlexGrow(1), 
+                    FontFamily("Arial"), 
+                    //FontSize12,
                     Color(rgb(0, 6, 36)),
-                    LetterSpacing(0.3)
+                    LetterSpacing(0.3),
+                    Width(Value.Length * 8 + 4)
                 },
                 autoFocus = Focus
             },
             ViewSuggestions
         };
+    }
+
+    Task OnClick(MouseEvent e)
+    {
+        state.ShowSuggestions = !state.ShowSuggestions;
+        
+        return Task.CompletedTask;
     }
 
     IReadOnlyList<string> GetCurrentSuggestions()
