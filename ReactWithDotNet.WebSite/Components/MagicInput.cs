@@ -325,7 +325,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
             
             return new FlexRowCentered(Color(Gray600), WidthFitContent, BorderRadius(16), Border(1,solid, Gray300), Padding(4, 8), Background(White), Gap(4))
             {
-                new MagicInput { Suggestions = suggestions, Value = null, OnChange = OnFirstValueChange, Focus = true}
+                new MagicInput { Suggestions = suggestions, Value = null, OnChange = OnFirstValueChange}
             };
         }
         
@@ -450,66 +450,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
     }
 }
 
-class PropertyEditor_old : Component<PropertyEditor_old.State>
-{
-    protected override Task constructor()
-    {
-        state = new()
-        {
-            FocusKey = true
-        };
 
-        return Task.CompletedTask;
-    }
-
-    protected override Element render()
-    {
-        return new FlexRow(PositionRelative)
-        {
-            new MagicInput { Suggestions = ["gap", "padding", "padding-top", "padding-bottom"], Focus = state.FocusKey, Value = state.Key, OnChange = OnKeyChanged },
-            new span { ":" },
-            // new MagicInput{ Focus = state.FocusValue},
-            new FlexRowCentered(Size(24), PositionAbsolute, Top(-16), Right(-16))
-            {
-                Color(Gray600),
-                Hover(Color(Gray700)),
-                Background(White),
-                BorderRadius(24),
-                Border(1, solid, Gray300),
-                Hover(BorderColor(Gray500)),
-                new IconClose()
-            },
-
-            new span { "Key:" + state.Key },
-            new span { "Val:" + state.Value }
-        };
-    }
-
-    Task OnKeyChanged(string newValue)
-    {
-        state.Key = newValue;
-
-        state.FocusKey   = false;
-        state.FocusValue = true;
-
-        return Task.CompletedTask;
-    }
-
-    internal class State
-    {
-        public bool FocusKey { get; set; }
-        public bool FocusValue { get; set; }
-        public string InitialValue { get; init; }
-
-        public string Key { get; set; }
-
-        public int? SelectedSuggestionOffset { get; set; }
-
-        public bool ShowSuggestions { get; set; }
-
-        public string Value { get; set; }
-    }
-}
 
 class IconClose : PureComponent
 {
@@ -542,7 +483,6 @@ class IconChecked : PureComponent
 
 sealed class MagicInput : Component<MagicInput.State>
 {
-    public bool Focus { get; init; }
 
     [CustomEvent]
     public Func<string, Task> OnChange { get; init; }
@@ -605,7 +545,7 @@ sealed class MagicInput : Component<MagicInput.State>
                     //LetterSpacing(0.3),
                     Width(Value.HasValue() ? Value.Length * 8 + 4 : 70)
                 },
-                autoFocus = Focus
+                autoFocus = true
             },
             ViewSuggestions
         };
