@@ -451,8 +451,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
 }
 
 
-
-class IconClose : PureComponent
+sealed class IconClose : PureComponent
 {
     protected override Element render()
     {
@@ -466,7 +465,7 @@ class IconClose : PureComponent
     }
 }
 
-class IconChecked : PureComponent
+sealed class IconChecked : PureComponent
 {
     protected override Element render()
     {
@@ -512,12 +511,6 @@ sealed class MagicInput : Component<MagicInput.State>
     {
         return new FlexColumn(WidthAuto)
         {
-            new style
-            {
-                """
-                input:focus { outline:none; }
-                """
-            },
             new input
             {
                 type                     = "text",
