@@ -509,7 +509,7 @@ sealed class MagicInput : Component<MagicInput.State>
 
     protected override Element render()
     {
-        return new FlexColumn(WidthAuto)
+        return new FlexColumn
         {
             new input
             {
