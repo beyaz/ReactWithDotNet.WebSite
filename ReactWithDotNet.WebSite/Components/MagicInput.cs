@@ -522,21 +522,13 @@ sealed class MagicInput : Component<MagicInput.State>
                 onClick = OnClick,
                 style =
                 {
-                    //Background(White),
-                    //Border(Solid(0.1, "#bcc4e3")),
-                    //BorderRadius(3),
-                    //PaddingLeft(3),
                     OutlineNone,
                     BorderNone,
                     Appearance(none),
                     PaddingTopBottom(4),
-                    
-                    //FlexGrow(1), 
-                    // FontFamily("Arial"), 
                     FontSize14,
                     Color(rgb(0, 6, 36)),
-                    //LetterSpacing(0.3),
-                    Width(Value.HasValue() ? Value.Length * 8 + 4 : 70)
+                    Width(Value.HasValue() ? Value.Length * 8 + 8 : 70)
                 },
                 autoFocus = true
             },
