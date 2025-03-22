@@ -1,25 +1,20 @@
 ﻿namespace ReactWithDotNet.WebSite.Components;
 
-class PropertyEditor : Component<PropertyEditor.State>
+class StyleEditor : Component<StyleEditor.State>
 {
     protected override Element render()
     {
-        return new FlexRow(PositionRelative, Border(1,solid,Red))
+        return new FlexRow(AlignItemsCenter, FlexWrap, Border(1, solid, Gray300), BorderRadius(4), Padding(5,10), Gap(4), Background(White))
         {
-            
-            new MagicInput(),
-            new span{":"},
-            new MagicInput(),
-            new FlexRowCentered(Size(24), PositionAbsolute, Top(-16), Right(-16))
+            new FlexRowCentered(BorderRadius(16), Padding(4,8), Background(Gray100), Gap(4))
             {
-                Color(Gray600),
-                Hover(Color(Gray700)),
-                Background(White),
-                BorderRadius(24),
-                Border(1, solid, Gray300),
-                Hover(BorderColor(Gray500)),
-                new IconClose()
-            }
+                "padding: 7"
+            },
+            new FlexRow
+            {
+                "abc2"
+            },
+            new PropertyEditor()
         };
     }
 
@@ -32,29 +27,101 @@ class PropertyEditor : Component<PropertyEditor.State>
         public bool ShowSuggestions { get; set; }
 
         public string Value { get; set; }
-    }
 
-    class IconClose : PureComponent
-    {
-        protected override Element render()
-        {
-            return new svg(Fill("currentColor"), ViewBox(0, 0, 18, 18))
-            {
-                new path
-                {
-                    d = "M8.44 9.5L6 7.06A.75.75 0 1 1 7.06 6L9.5 8.44 11.94 6A.75.75 0 0 1 13 7.06L10.56 9.5 13 11.94A.75.75 0 0 1 11.94 13L9.5 10.56 7.06 13A.75.75 0 0 1 6 11.94L8.44 9.5z"
-                }
-            };
-        }
+        public string Key { get; set; }
+
+        public bool FocusKey { get; set; }
+        public bool FocusValue { get; set; }
     }
 }
 
+class PropertyEditor : Component<PropertyEditor.State>
+{
+    protected override Element render()
+    {
+        return new FlexRow(PositionRelative)
+        {
+            new MagicInput{ Suggestions = ["gap","padding", "padding-top","padding-bottom"],Focus = state.FocusKey, Value = state.Key, OnChange = OnKeyChanged},
+            new span{":"},
+            // new MagicInput{ Focus = state.FocusValue},
+            new FlexRowCentered(Size(24), PositionAbsolute, Top(-16), Right(-16))
+            {
+                Color(Gray600),
+                Hover(Color(Gray700)),
+                Background(White),
+                BorderRadius(24),
+                Border(1, solid, Gray300),
+                Hover(BorderColor(Gray500)),
+                new IconClose()
+            },
+            
+            new span{ "Key:" +state.Key},
+            new span{ "Val:" +state.Value},
+        };
+    }
+
+    
+    protected override Task constructor()
+    {
+        state = new()
+        {
+            FocusKey = true
+        };
+        
+        return Task.CompletedTask;
+    }
+
+    Task OnKeyChanged(string newValue)
+    {
+        state.Key = newValue;
+        
+        state.FocusKey = false;
+        state.FocusValue = true;
+
+        return Task.CompletedTask;
+    }
+
+    internal class State
+    {
+        public string InitialValue { get; init; }
+
+        public int? SelectedSuggestionOffset { get; set; }
+
+        public bool ShowSuggestions { get; set; }
+
+        public string Value { get; set; }
+
+        public string Key { get; set; }
+
+        public bool FocusKey { get; set; }
+        public bool FocusValue { get; set; }
+    }
+
+   
+}
+class IconClose : PureComponent
+{
+    protected override Element render()
+    {
+        return new svg(Fill("currentColor"), ViewBox(0, 0, 18, 18))
+        {
+            new path
+            {
+                d = "M8.44 9.5L6 7.06A.75.75 0 1 1 7.06 6L9.5 8.44 11.94 6A.75.75 0 0 1 13 7.06L10.56 9.5 13 11.94A.75.75 0 0 1 11.94 13L9.5 10.56 7.06 13A.75.75 0 0 1 6 11.94L8.44 9.5z"
+            }
+        };
+    }
+}
 sealed class MagicInput : Component<MagicInput.State>
 {
     [CustomEvent]
     public Func<string, Task> OnChange { get; init; }
 
     public string Value { get; init; }
+
+    public bool Focus { get; init; }
+
+    public IReadOnlyList<string> Suggestions { get; init; }
 
     protected override Task constructor()
     {
@@ -93,23 +160,27 @@ sealed class MagicInput : Component<MagicInput.State>
                 onKeyDown                = OnKeyDown,
                 style =
                 {
-                    Background(White),
-                    Border(Solid(0.1, "#bcc4e3")),
-                    BorderRadius(3),
-                    PaddingLeft(3),
+                    //Background(White),
+                    //Border(Solid(0.1, "#bcc4e3")),
+                    //BorderRadius(3),
+                    //PaddingLeft(3),
+                    OutlineNone,
+                    BorderNone,
+                    Appearance(none),
                     PaddingTopBottom(4),
                     FlexGrow(1), FontFamily("Arial"), FontSize12,
                     Color(rgb(0, 6, 36)),
                     LetterSpacing(0.3)
                 },
-                autoFocus = true
+                autoFocus = Focus
             },
-            Suggestions
+            ViewSuggestions
         };
     }
 
     IReadOnlyList<string> GetCurrentSuggestions()
     {
+        return Suggestions;
         if (state.Value == "4")
         {
             return ["4","8","12","16"];
@@ -211,16 +282,14 @@ sealed class MagicInput : Component<MagicInput.State>
         return Task.CompletedTask;
     }
 
-    Element Suggestions()
+    Element ViewSuggestions()
     {
         if (state.ShowSuggestions is false)
         {
             return null;
         }
-
-        var suggestionItemList = GetCurrentSuggestions();
-
-        if (suggestionItemList.Count == 0)
+        
+        if (Suggestions.Count == 0)
         {
             return null;
         }
@@ -229,7 +298,7 @@ sealed class MagicInput : Component<MagicInput.State>
         {
             new FlexColumn(PositionAbsolute, SizeFull, HeightAuto, Background("white"), BoxShadow(0, 6, 6, 0, rgba(22, 45, 61, .06)), Padding(5), BorderRadius(5))
             {
-                suggestionItemList.Select(ToOption)
+                Suggestions.Select(ToOption)
             }
         };
 
