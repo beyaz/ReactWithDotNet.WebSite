@@ -541,7 +541,6 @@ sealed class MagicInput : Component<MagicInput.State>
                 valueBind                = () => state.Value,
                 valueBindDebounceTimeout = 700,
                 valueBindDebounceHandler = OnTypingFinished,
-                //onBlur                   = OnBlur,
                 onKeyDown = OnKeyDown,
                 onClick   = OnInputClicked,
                 style =
@@ -553,7 +552,8 @@ sealed class MagicInput : Component<MagicInput.State>
                     PaddingTopBottom(4),
                     FontSize14,
                     Color(rgb(0, 6, 36)),
-                    Width(Value.HasValue() ? Value.Length * 8 + 8 : 70)
+                    Width(state.Value.HasValue() ? state.Value.Length * 8 + 8 : 70),
+                    MinWidth(30)
                 },
                 autoFocus = true
             },
@@ -572,14 +572,7 @@ sealed class MagicInput : Component<MagicInput.State>
             FilteredSuggestions = Suggestions ?? []
         };
     }
-
-    Task OnBlur(FocusEvent e)
-    {
-        state.ShowSuggestions = false;
-
-        return Task.CompletedTask;
-    }
-
+    
     Task OnInputClicked(MouseEvent e)
     {
         state.ShowSuggestions = !state.ShowSuggestions;
@@ -725,6 +718,8 @@ sealed class MagicInput : Component<MagicInput.State>
                 Color(rgb(0, 6, 36)),
                 WhiteSpaceNoWrap,
                 CursorDefault,
+                
+                Hover(Background(Gray100)),
 
                 index == state.SelectedSuggestionOffset ? Color("#495cef") + Background("#e7eaff") : null
             };
@@ -734,6 +729,7 @@ sealed class MagicInput : Component<MagicInput.State>
     internal class State
     {
         public IReadOnlyList<string> FilteredSuggestions { get; set; }
+        
         public string InitialValue { get; init; }
 
         public int? SelectedSuggestionOffset { get; set; }
