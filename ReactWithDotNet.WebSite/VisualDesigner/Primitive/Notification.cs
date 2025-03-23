@@ -1,7 +1,7 @@
-﻿global using static ApiInspector.WebUI.Components.NotificationHelper;
+﻿
 using static System.Threading.Tasks.Task;
 
-namespace ApiInspector.WebUI.Components;
+namespace ReactWithDotNet.VisualDesigner.Primitive;
 
 sealed class NotificationMessage
 {
