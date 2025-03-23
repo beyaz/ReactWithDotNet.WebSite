@@ -22,6 +22,8 @@ sealed record VisualElementModel
     public List<PropertyModel> Properties { get; set; }
     
     public string Text { get; set; }
+    
+    internal bool HasChild => Children?.Count > 0;
 }
 
 class Demo : Component
@@ -35,8 +37,20 @@ class Demo : Component
                 Tag = "div",
                 Children =
                 [
-                    new VisualElementModel { Tag = "label", Text = "Abc" },
-                    new VisualElementModel { Tag = "span", Text  = "Abc2" }
+                    new() { Tag = "label", Text = "Abc1" },
+                    new() { Tag = "span", Text  = "Abc2" },
+                    new() { Tag = "ul", Text    = "Abc3" },
+
+                    new()
+                    {
+                        Tag = "div",
+                        Children =
+                        [
+                            new() { Tag = "label", Text = "Abc1" },
+                            new() { Tag = "span", Text  = "Abc2" },
+                            new() { Tag = "ul", Text    = "Abc3" }
+                        ]
+                    }
                 ]
             }
         };
@@ -55,9 +69,12 @@ sealed class VisualElementTreeViewer : Component<VisualElementTreeViewer.State>
     
     protected override Element render()
     {
-        return new FlexColumn
+        var nodes = state.Model.Children;
+
+        return new div(MarginLeftRight(3), OverflowYScroll, CursorPointer, Padding(5), Border(Solid(1, rgb(217, 217, 217))), BorderRadius(3))
         {
-            "Element Tree"
+            state.ErrorMessage.HasValue() ? new pre { state.ErrorMessage } : AsTreeView(nodes, 0),
+            WidthFull, HeightFull
         };
     }
     
@@ -70,11 +87,91 @@ sealed class VisualElementTreeViewer : Component<VisualElementTreeViewer.State>
         };
     }
     
+    Element AsTreeItem(VisualElementModel node, int indent)
+    {
+        return AsTreeItem(node, indent, SelectedMethodTreeNodeKey, OnTreeItemClicked);
+    }
+    
+    Element AsTreeView(IReadOnlyList<VisualElementModel> nodes, int indent)
+    {
+        return new Fragment
+        {
+            nodes.Select(toItem)
+        };
+
+        Element toItem(VisualElementModel node)
+        {
+            if (node.HasChild)
+            {
+                var parent = AsTreeItem(node, indent +1);
+                var chldrn = AsTreeView(node.Children, indent+2);
+
+                return new Fragment
+                {
+                    parent + OnClick(OnTreeItemClicked),
+                    chldrn
+                };
+            }
+
+            return AsTreeItem(node, indent);
+        }
+    }
+
+    public string SelectedMethodTreeNodeKey { get; set; }
+    
+    Task OnTreeItemClicked(MouseEvent e)
+    {
+        DispatchEvent(SelectionChanged, [e.currentTarget.id]);
+
+        return Task.CompletedTask;
+    }
+    
+    [CustomEvent]
+    public Func<string, Task> SelectionChanged { get; set; }
+    
+    static Element AsTreeItem(VisualElementModel node, int indent, string SelectedMethodTreeNodeKey, MouseEventHandler OnTreeItemClicked)
+    {
+        return new FlexRow(AlignItemsCenter, PaddingLeft(indent * 16))
+        {
+            new div { Text(node.Tag), MarginLeft(5), FontSize13 },
+
+            //Id(node.MethodReference.MetadataToken),
+
+            arrangeBackground
+        };
+
+        void arrangeBackground(HtmlElement el)
+        {
+            // var isSelected = HasMatch(node, SelectedMethodTreeNodeKey);
+
+            var isSelected = false;
+            
+            if (isSelected)
+            {
+                el += BackgroundImage(linear_gradient(90, rgb(136, 195, 242), rgb(242, 246, 249))) + BorderRadius(3);
+            }
+            else
+            {
+                el += Hover(BackgroundImage(linear_gradient(90, rgb(190, 220, 244), rgb(242, 246, 249))) + BorderRadius(3));
+            }
+
+            el.onClick = OnTreeItemClicked;
+        }
+    }
+    
     internal class State
     {
         public VisualElementModel Model { get; init; }
         
         public VisualElementModel InitialModel { get; init; }
+        
+        
+        public string ErrorMessage { get; set; }
+
+        public string MethodFilter { get; set; }
+
+
+        public string SelectedMethodTreeNodeKey { get; set; }
     }
 }
 
