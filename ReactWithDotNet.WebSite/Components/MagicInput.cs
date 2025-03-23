@@ -25,38 +25,56 @@ sealed record VisualElementModel
     internal bool HasChild => Children?.Count > 0;
 }
 
-class Demo : Component
+class Demo : Component<Demo.State>
 {
+    internal class State
+    {
+        public string SelectedPath { get; set; }
+    }
+    
     protected override Element render()
     {
-        return new VisualElementTreeViewer
+        return new FlexColumn
         {
-            Model = new()
+            new span{ state.SelectedPath},
+            new VisualElementTreeViewer
             {
-                Tag = "div",
-                Children =
-                [
-                    new() { Tag = "label", Text = "Abc1" },
-                    new() { Tag = "span", Text  = "Abc2" },
-                    new() { Tag = "ul", Text    = "Abc3" },
+                SelectionChanged = SelectionChanged,
+                SelectedPath = state.SelectedPath,
+                Model = new()
+                {
+                    Tag = "div",
+                    Children =
+                    [
+                        new() { Tag = "label", Text = "Abc1" },
+                        new() { Tag = "span", Text  = "Abc2" },
+                        new() { Tag = "ul", Text    = "Abc3" },
 
-                    new()
-                    {
-                        Tag = "div",
-                        Children =
-                        [
-                            new() { Tag = "label", Text = "Abc1" },
-                            new() { Tag = "span", Text  = "Abc2" },
-                            new()
-                            {
-                                Tag  = "ul",
-                                Text = "Abc3"
-                            }
-                        ]
-                    }
-                ]
+                        new()
+                        {
+                            Tag = "div",
+                            Children =
+                            [
+                                new() { Tag = "label", Text = "Abc1" },
+                                new() { Tag = "span", Text  = "Abc2" },
+                                new()
+                                {
+                                    Tag  = "ul",
+                                    Text = "Abc3"
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
         };
+    }
+
+    Task SelectionChanged(string selectedPath)
+    {
+        state.SelectedPath = selectedPath;
+        
+        return Task.CompletedTask;
     }
 }
 
@@ -78,7 +96,7 @@ sealed class VisualElementTreeViewer : Component<VisualElementTreeViewer.State>
 
     protected override Element render()
     {
-        return new div(MarginLeftRight(3), OverflowYScroll, CursorPointer, Padding(5), Border(Solid(1, rgb(217, 217, 217))), BorderRadius(3))
+        return new div(CursorPointer, Padding(5), Border(Solid(1, rgb(217, 217, 217))), BorderRadius(3))
         {
             ToVisual(state.Model, 0, "0"),
             WidthFull, HeightFull
