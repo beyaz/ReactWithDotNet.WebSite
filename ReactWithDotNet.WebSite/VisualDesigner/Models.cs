@@ -16,7 +16,6 @@ sealed record PropertyModel
     public string Value { get; set; }
 }
 
-
 sealed record VisualElementModel
 {
     public List<VisualElementModel> Children { get; set; }
@@ -24,7 +23,7 @@ sealed record VisualElementModel
     public List<PropertyModel> Properties { get; set; }
 
     public List<PropertyModel> StyleAttributes { get; set; }
-    
+
     public string Tag { get; set; }
 
     public string Text { get; set; }
@@ -34,12 +33,12 @@ sealed record VisualElementModel
 
 sealed class ComponentModel
 {
-    public VisualElementModel RootElement { get; set; }
-    
     public string Name { get; set; }
 
     public string PropsAsJson { get; set; }
-    
+
+    public VisualElementModel RootElement { get; set; }
+
     public string StateAsJson { get; set; }
 }
 
@@ -47,9 +46,9 @@ sealed class ProjectModel
 {
     public List<ComponentModel> Components { get; set; } = [];
 
-    public string OutputDirectoryPath { get; set; }
-    
     public string Name { get; set; }
+
+    public string OutputDirectoryPath { get; set; }
 }
 
 sealed class ApplicationModel
