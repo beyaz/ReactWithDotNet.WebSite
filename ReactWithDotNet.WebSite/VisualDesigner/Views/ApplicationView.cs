@@ -48,16 +48,16 @@ sealed class ApplicationView: Component<ApplicationView.State>
     {
         return new FlexRow
         {
-            new FlexRow(AlignItemsCenter, Gap(5))
-            {
-                new h3 { "React Visual Designer" }
-            },
+            new h3 { "React Visual Designer" },
 
-            new FlexRow(Gap(20))
-            {
-                //GetEnvironment,
-                //new LogoutButton()
-            },
+           new FlexRowCentered(Gap(24))
+           {
+               PartMediaSizeButtons,
+            
+               PartScale
+           },
+            
+            new LogoutButton(),
 
             new Style
             {
@@ -79,7 +79,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
                 PartLeftPanel,
                 new FlexColumn(AlignItemsCenter, FlexGrow(1), Padding(7), MarginLeft(40), ScaleStyle)
                 {
-                    createHorizontalRuler() + Width(state.ScreenWidth) + MarginTop(5),
+                    createHorizontalRuler() + Width(state.ScreenWidth) + MarginTop(12),
                     PartPreview
                 },
                 
@@ -278,20 +278,20 @@ sealed class ApplicationView: Component<ApplicationView.State>
         return new FlexColumn(AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"))
         {
             componentSelector,
-            new FlexRow(WidthFull)
+            new FlexRow(WidthFull, PaddingLeftRight(4), JustifyContentSpaceBetween)
             {
-                new FlexRowCentered()
+                new FlexRowCentered(Size(18))
                 {
-                    "Visual Tree"
+                    new IconLayers()
                 },
-                new FlexRowCentered()
+                new FlexRowCentered(Size(18))
                 {
-                    "Definition"
+                    new IconSettings()
                 },
-                new FlexRowCentered()
+                new FlexRowCentered(Size(18))
                 {
-                    "Export"
-                }
+                    new IconExport()
+                },
             },
             
             new VisualElementTreeView
@@ -327,15 +327,109 @@ sealed class ApplicationView: Component<ApplicationView.State>
             
         };
     }
+
+    static Element createLabel(string text)
+    {
+        return new small(Text(text), Color(rgb(73, 86, 193)), FontWeight600, UserSelect(none), WhiteSpaceNoWrap);
+    }
+    
+    Element PartScale()
+    {
+        return new FlexRow(WidthFull, PaddingLeftRight(3), AlignItemsCenter, Gap(5))
+        {
+            new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
+            {
+                OnClick(async _ =>
+                {
+                    if (state.Scale <= 20)
+                    {
+                        return;
+                    }
+
+                    state.Scale -= 10;
+
+                    await SaveState();
+                }),
+                new IconMinus()
+            },
+            
+            $"%{state.Scale}",
+            new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
+            {
+                OnClick(async _ =>
+                {
+                    if (state.Scale >= 100)
+                    {
+                        return;
+                    }
+
+                    state.Scale += 10;
+
+                    await SaveState();
+                }),
+                new IconPlus()
+            }
+        };
+    }
+    Element PartMediaSizeButtons()
+    {
+        return new FlexRow(JustifyContentSpaceAround, AlignItemsCenter, Gap(16))
+        {
+            new[] { "M", "SM", "MD", "LG", "XL", "XXL" }.Select(x => new FlexRowCentered
+            {
+                x,
+                FontSize16,
+                FontWeight300,
+                CursorDefault,
+                PaddingTopBottom(3),
+                FlexGrow(1),
+
+                Data("value", x),
+                OnClick(OnCommonSizeClicked),
+                Hover(Color("#2196f3")),
+
+                (x == "M" && state.ScreenWidth == 320) ||
+                (x == "SM" && state.ScreenWidth == 640) ||
+                (x == "MD" && state.ScreenWidth == 768) ||
+                (x == "LG" && state.ScreenWidth == 1024) ||
+                (x == "XL" && state.ScreenWidth == 1280) ||
+                (x == "XXL" && state.ScreenWidth == 1536)
+                    ? FontWeight500 + Color("#2196f3")
+                    : null
+            })
+        };
+    }
+    
+    async Task OnCommonSizeClicked(MouseEvent e)
+    {
+        state.ScreenWidth = e.currentTarget.data["value"] switch
+        {
+            "M"   => 320,
+            "SM"  => 640,
+            "MD"  => 768,
+            "LG"  => 1024,
+            "XL"  => 1280,
+            "XXL" => 1536,
+            _     => throw new ArgumentOutOfRangeException()
+        };
+        
+
+        await SaveState();
+    }
+    
+    async Task SaveState()
+    {
+        await Task.Delay(111);
+    }
     
     
     internal class State
     {
-        public int ScreenWidth { get; init; } = 400;
+        public int ScreenWidth { get; set; } = 400;
         
         public int ScreenHeight { get; init; } = 400;
     
-        public int Scale { get; init; } = 100;
+        public int Scale { get; set; } = 100;
         
         public ProjectModel Model { get; set; } = new()
         {
