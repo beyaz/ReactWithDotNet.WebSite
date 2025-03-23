@@ -533,7 +533,7 @@ sealed class MagicInput : Component<MagicInput.State>
 
     protected override Element render()
     {
-        return new FlexColumn
+        return new FlexColumnCentered
         {
             new input
             {
