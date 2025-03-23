@@ -1,5 +1,4 @@
-﻿using static System.Net.WebRequestMethods;
-using static ReactWithDotNet.WebSite.Components2.Extensions;
+﻿using static ReactWithDotNet.WebSite.Components2.Extensions;
 
 namespace ReactWithDotNet.WebSite.Components2;
 
@@ -20,35 +19,6 @@ sealed record PropertyInfo
 
 static class Extensions
 {
-
-    public static double CalculateTextWidth(string text)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return 50;
-        }
-
-        int textLegth = text.Length;
-        
-        if (textLegth == 1)
-        {
-            textLegth = 2;
-        }
-
-        return textLegth * 7.5;
-    }
-    
-    public static Element EditorFont()
-    {
-        return new Fragment
-        {
-            new link { href = "https://fonts.googleapis.com", rel                                                                           = "preconnect" },
-           
-            new link { href = "https://fonts.gstatic.com", rel                                                                              = "preconnect", crossOrigin = "true" },
-           
-            new link { href = "https://fonts.googleapis.com/css2?family=Wix+Madefor+Text:ital,wght@0,400..800;1,400..800&display=swap", rel = "stylesheet" }
-        };
-    }
     public static IReadOnlyList<PropertyInfo> StyleProperties = new List<PropertyInfo>
     {
         new()
@@ -218,6 +188,35 @@ static class Extensions
         }
     };
 
+    public static double CalculateTextWidth(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return 50;
+        }
+
+        var textLegth = text.Length;
+
+        if (textLegth == 1)
+        {
+            textLegth = 2;
+        }
+
+        return textLegth * 7.5;
+    }
+
+    public static Element EditorFont()
+    {
+        return new Fragment
+        {
+            new link { href = "https://fonts.googleapis.com", rel = "preconnect" },
+
+            new link { href = "https://fonts.gstatic.com", rel = "preconnect", crossOrigin = "true" },
+
+            new link { href = "https://fonts.googleapis.com/css2?family=Wix+Madefor+Text:ital,wght@0,400..800;1,400..800&display=swap", rel = "stylesheet" }
+        };
+    }
+
     public static bool HasValue(this string value)
     {
         return !string.IsNullOrWhiteSpace(value);
@@ -374,18 +373,46 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
 
         {
             List<string> suggestions = [];
-            foreach (var propertyInfo in PropertySuggestions)
             {
-                if (propertyInfo.Name != state.Model.Name)
+                foreach (var propertyInfo in PropertySuggestions)
                 {
-                    continue;
-                }
+                    if (propertyInfo.Name != state.Model.Name)
+                    {
+                        continue;
+                    }
 
-                foreach (var suggestion in propertyInfo.Suggestions)
-                {
-                    suggestions.Add(suggestion);
+                    foreach (var suggestion in propertyInfo.Suggestions)
+                    {
+                        suggestions.Add(suggestion);
+                    }
                 }
             }
+
+            var closeIcon = new FlexRowCentered(Size(24), PositionAbsolute, Padding(4), Top(0), Right(0))
+            {
+                Color(Gray600),
+                Hover(Color(Gray700)),
+                Background(White),
+                BorderTopRightRadius(16),
+                BorderBottomLeftRadius(8),
+
+                BorderLeft(1, solid, Gray300),
+                BorderBottom(1, solid, Gray300),
+
+                Hover(BorderColor(Gray500), Background(Gray300)),
+                new IconClose()
+            };
+
+            var isActiveIcon = new FlexRowCentered(Size(24), Padding(4), PositionAbsolute, Top(-4), Left(-16))
+            {
+                Color(Gray600),
+                Hover(Color(Gray700)),
+                Background(White),
+                BorderRadius(24),
+                Border(1, solid, Gray300),
+                Hover(BorderColor(Gray500)),
+                new IconChecked()
+            };
 
             return new FlexRowCentered(Color(Gray600), WidthFitContent, BorderRadius(16), Border(1, solid, Gray300), Padding(4, 8), Background(White), Gap(4))
             {
@@ -410,40 +437,20 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
                     }
                 },
 
-                // new span() { state.PropertyValue },
-
-                OnMouseEnter(OnMouseEnterHandler),
                 OnMouseLeave(OnMouseLeaveHandler),
 
                 PositionRelative,
-                new FlexRowCentered(Size(24), PositionAbsolute, Padding(4), Top(0), Right(0))
-                {
-                    Color(Gray600),
-                    Hover(Color(Gray700)),
-                    Background(White),
-                    BorderTopRightRadius(16),
-                    BorderBottomLeftRadius(8),
-
-                    //Border(1, solid, Gray300),
-                    BorderLeft(1, solid, Gray300),
-                    BorderBottom(1, solid, Gray300),
-
-                    Hover(BorderColor(Gray500), Background(Gray300)),
-                    new IconClose()
-                },
-
-                new FlexRowCentered(Size(24), Padding(4), PositionAbsolute, Top(-4), Left(-16))
-                {
-                    Color(Gray600),
-                    Hover(Color(Gray700)),
-                    Background(White),
-                    BorderRadius(24),
-                    Border(1, solid, Gray300),
-                    Hover(BorderColor(Gray500)),
-                    new IconChecked()
-                }
+                closeIcon,
+                isActiveIcon
             };
         }
+    }
+
+    Task CloseEditMode()
+    {
+        state.IsEditMode = false;
+
+        return Task.CompletedTask;
     }
 
     void InitializeState()
@@ -491,14 +498,6 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
 
         return Task.CompletedTask;
     }
-    
-    Task CloseEditMode()
-    {
-        state.IsEditMode = false;
-
-        return Task.CompletedTask;
-    }
-    
 
     Task OnPropertyValueChanged(string newValue)
     {
@@ -516,7 +515,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
         public bool IsDeleteButtonVisible { get; set; }
 
         public bool IsEditMode { get; set; }
-        
+
         public PropertyValue Model { get; set; }
     }
 }
@@ -586,8 +585,8 @@ sealed class MagicInput : Component<MagicInput.State>
                 valueBind                = () => state.Value,
                 valueBindDebounceTimeout = 700,
                 valueBindDebounceHandler = OnTypingFinished,
-                onKeyDown = OnKeyDown,
-                onClick   = OnInputClicked,
+                onKeyDown                = OnKeyDown,
+                onClick                  = OnInputClicked,
                 style =
                 {
                     OutlineNone,
@@ -618,7 +617,7 @@ sealed class MagicInput : Component<MagicInput.State>
             FilteredSuggestions = Suggestions ?? []
         };
     }
-    
+
     Task OnInputClicked(MouseEvent e)
     {
         state.ShowSuggestions = !state.ShowSuggestions;
@@ -764,7 +763,7 @@ sealed class MagicInput : Component<MagicInput.State>
                 Color(rgb(0, 6, 36)),
                 WhiteSpaceNoWrap,
                 CursorDefault,
-                
+
                 Hover(Background(Gray100)),
 
                 index == state.SelectedSuggestionOffset ? Color("#495cef") + Background("#e7eaff") : null
@@ -775,7 +774,7 @@ sealed class MagicInput : Component<MagicInput.State>
     internal class State
     {
         public IReadOnlyList<string> FilteredSuggestions { get; set; }
-        
+
         public string InitialValue { get; init; }
 
         public int? SelectedSuggestionOffset { get; set; }
