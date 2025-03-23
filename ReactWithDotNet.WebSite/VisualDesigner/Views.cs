@@ -2,62 +2,6 @@
 
 namespace ReactWithDotNet.VisualDesigner;
 
-
-
-
-class DemoVisualElementTreeViewer : Component<DemoVisualElementTreeViewer.State>
-{
-    internal class State
-    {
-        public string SelectedPath { get; set; }
-    }
-    
-    protected override Element render()
-    {
-        return new FlexColumn
-        {
-            new span{ state.SelectedPath},
-            new VisualElementTreeView
-            {
-                SelectionChanged = SelectionChanged,
-                SelectedPath = state.SelectedPath,
-                Model = new()
-                {
-                    Tag = "div",
-                    Children =
-                    [
-                        new() { Tag = "label", Text = "Abc1" },
-                        new() { Tag = "span", Text  = "Abc2" },
-                        new() { Tag = "ul", Text    = "Abc3" },
-
-                        new()
-                        {
-                            Tag = "div",
-                            Children =
-                            [
-                                new() { Tag = "label", Text = "Abc1" },
-                                new() { Tag = "span", Text  = "Abc2" },
-                                new()
-                                {
-                                    Tag  = "ul",
-                                    Text = "Abc3"
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        };
-    }
-
-    Task SelectionChanged(string selectedPath)
-    {
-        state.SelectedPath = selectedPath;
-        
-        return Task.CompletedTask;
-    }
-}
-
 sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 {
     public VisualElementModel Model { get; init; }
@@ -137,250 +81,14 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
         public VisualElementModel InitialModel { get; init; }
 
         public string InitialSelectedPath { get; set; }
-        
+
         public VisualElementModel Model { get; init; }
 
         public string SelectedPath { get; set; }
     }
 }
 
-
-
-static class Extensions
-{
-    public static IReadOnlyList<PropertyInfo> StyleProperties = new List<PropertyInfo>
-    {
-        new()
-        {
-            Name        = "width",
-            Suggestions = ["auto", "fit-content", "max-content", "min-content", "inherit", "initial", "unset", "100%", "75%", "50%", "25%"]
-        },
-        new()
-        {
-            Name        = "height",
-            Suggestions = ["auto", "fit-content", "max-content", "min-content", "inherit", "initial", "unset", "100%", "50px", "calc(100vh - 10px)"]
-        },
-        new()
-        {
-            Name        = "max-width",
-            Suggestions = ["none", "fit-content", "max-content", "min-content", "inherit", "initial", "unset", "100%", "500px"]
-        },
-        new()
-        {
-            Name        = "max-height",
-            Suggestions = ["none", "fit-content", "max-content", "min-content", "inherit", "initial", "unset", "100vh", "400px"]
-        },
-        new()
-        {
-            Name        = "min-width",
-            Suggestions = ["0", "fit-content", "max-content", "min-content", "inherit", "initial", "unset", "200px"]
-        },
-        new()
-        {
-            Name        = "min-height",
-            Suggestions = ["0", "fit-content", "max-content", "min-content", "inherit", "initial", "unset", "150px"]
-        },
-        new()
-        {
-            Name        = "display",
-            Suggestions = ["block", "inline", "inline-block", "flex", "grid", "none", "contents", "table", "table-row", "table-cell", "inherit", "initial", "unset"]
-        },
-        new()
-        {
-            Name        = "position",
-            Suggestions = ["static", "relative", "absolute", "fixed", "sticky", "inherit", "initial", "unset"]
-        },
-        new()
-        {
-            Name        = "top",
-            Suggestions = ["auto", "inherit", "initial", "unset", "50px", "10%"]
-        },
-        new()
-        {
-            Name        = "bottom",
-            Suggestions = ["auto", "inherit", "initial", "unset", "20px", "5%"]
-        },
-        new()
-        {
-            Name        = "left",
-            Suggestions = ["auto", "inherit", "initial", "unset", "30px", "10%"]
-        },
-        new()
-        {
-            Name        = "right",
-            Suggestions = ["auto", "inherit", "initial", "unset", "40px", "15%"]
-        },
-        new()
-        {
-            Name        = "z-index",
-            Suggestions = ["auto", "inherit", "initial", "unset", "10", "1000"]
-        },
-        new()
-        {
-            Name        = "flex-direction",
-            Suggestions = ["row", "row-reverse", "column", "column-reverse", "inherit", "initial", "unset"]
-        },
-        new()
-        {
-            Name        = "justify-content",
-            Suggestions = ["flex-start", "flex-end", "center", "space-between", "space-around", "space-evenly", "inherit", "initial", "unset"]
-        },
-        new()
-        {
-            Name        = "align-items",
-            Suggestions = ["stretch", "flex-start", "flex-end", "center", "baseline", "inherit", "initial", "unset"]
-        },
-        new()
-        {
-            Name        = "gap",
-            Suggestions = ["normal", "inherit", "initial", "unset", "10px", "1rem"]
-        },
-        new()
-        {
-            Name        = "overflow",
-            Suggestions = ["visible", "hidden", "scroll", "auto", "clip", "inherit", "initial", "unset"]
-        },
-        new()
-        {
-            Name        = "visibility",
-            Suggestions = ["visible", "hidden", "collapse", "inherit", "initial", "unset"]
-        },
-        new()
-        {
-            Name        = "opacity",
-            Suggestions = ["0", "0.1", "0.5", "1", "inherit", "initial", "unset"]
-        },
-        new()
-        {
-            Name        = "cursor",
-            Suggestions = ["auto", "default", "pointer", "wait", "text", "move", "not-allowed", "crosshair", "inherit", "initial", "unset"]
-        },
-        new()
-        {
-            Name        = "background",
-            Suggestions = ["none", "inherit", "initial", "unset", "red", "url('image.jpg')", "linear-gradient(to right, red, blue)"]
-        },
-        new()
-        {
-            Name        = "border",
-            Suggestions = ["none", "inherit", "initial", "unset", "1px solid black", "2px dashed red"]
-        },
-        new()
-        {
-            Name        = "border-radius",
-            Suggestions = ["0", "inherit", "initial", "unset", "10px", "50%"]
-        },
-        new()
-        {
-            Name        = "box-shadow",
-            Suggestions = ["none", "inherit", "initial", "unset", "2px 2px 5px gray"]
-        },
-        new()
-        {
-            Name        = "color",
-            Suggestions = ["inherit", "initial", "unset", "black", "red", "blue", "#ff0000"]
-        },
-        new()
-        {
-            Name        = "font-size",
-            Suggestions = ["small", "medium", "large", "inherit", "initial", "unset", "16px", "1.2rem"]
-        },
-        new()
-        {
-            Name        = "font-weight",
-            Suggestions = ["normal", "bold", "bolder", "lighter", "100", "200", "300", "inherit", "initial", "unset"]
-        },
-        new()
-        {
-            Name        = "line-height",
-            Suggestions = ["normal", "inherit", "initial", "unset", "1.5", "2"]
-        },
-        new()
-        {
-            Name        = "text-align",
-            Suggestions = ["left", "right", "center", "justify", "inherit", "initial", "unset"]
-        },
-        new()
-        {
-            Name        = "text-decoration",
-            Suggestions = ["none", "underline", "overline", "line-through", "inherit", "initial", "unset"]
-        },
-        new()
-        {
-            Name        = "white-space",
-            Suggestions = ["normal", "nowrap", "pre", "pre-wrap", "pre-line", "inherit", "initial", "unset"]
-        },
-        new()
-        {
-            Name        = "pointer-events",
-            Suggestions = ["auto", "none", "inherit", "initial", "unset"]
-        }
-    };
-
-    public static double CalculateTextWidth(string text)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return 50;
-        }
-
-        var textLegth = text.Length;
-
-        if (textLegth == 1)
-        {
-            textLegth = 2;
-        }
-
-        return textLegth * 7.8;
-    }
-
-    public static Element EditorFont()
-    {
-        return new Fragment
-        {
-            new link { href = "https://fonts.googleapis.com", rel = "preconnect" },
-
-            new link { href = "https://fonts.gstatic.com", rel = "preconnect", crossOrigin = "true" },
-
-            new link { href = "https://fonts.googleapis.com/css2?family=Wix+Madefor+Text:ital,wght@0,400..800;1,400..800&display=swap", rel = "stylesheet" }
-        };
-    }
-
-    public static bool HasValue(this string value)
-    {
-        return !string.IsNullOrWhiteSpace(value);
-    }
-
-    public static PropertyModel TryParsePropertyValue(string nameValueCombined)
-    {
-        if (string.IsNullOrWhiteSpace(nameValueCombined))
-        {
-            return null;
-        }
-
-        var colonIndex = nameValueCombined.IndexOf(':');
-        if (colonIndex < 0)
-        {
-            return new()
-            {
-                Name  = nameValueCombined,
-                Value = null
-            };
-        }
-
-        var name = nameValueCombined[..colonIndex];
-
-        var value = nameValueCombined[(colonIndex + 1)..];
-
-        return new()
-        {
-            Name  = name,
-            Value = value
-        };
-    }
-}
-
-class StyleEditor : Component<StyleEditor.State>
+sealed class StyleEditor : Component<StyleEditor.State>
 {
     public IReadOnlyList<PropertyModel> Value { get; init; } = [new() { Name = "gap", Value = "5" }];
 
@@ -649,3 +357,55 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
     }
 }
 
+sealed class DemoVisualElementTreeViewer : Component<DemoVisualElementTreeViewer.State>
+{
+    protected override Element render()
+    {
+        return new FlexColumn
+        {
+            new span { state.SelectedPath },
+            new VisualElementTreeView
+            {
+                SelectionChanged = SelectionChanged,
+                SelectedPath     = state.SelectedPath,
+                Model = new()
+                {
+                    Tag = "div",
+                    Children =
+                    [
+                        new() { Tag = "label", Text = "Abc1" },
+                        new() { Tag = "span", Text  = "Abc2" },
+                        new() { Tag = "ul", Text    = "Abc3" },
+
+                        new()
+                        {
+                            Tag = "div",
+                            Children =
+                            [
+                                new() { Tag = "label", Text = "Abc1" },
+                                new() { Tag = "span", Text  = "Abc2" },
+                                new()
+                                {
+                                    Tag  = "ul",
+                                    Text = "Abc3"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        };
+    }
+
+    Task SelectionChanged(string selectedPath)
+    {
+        state.SelectedPath = selectedPath;
+
+        return Task.CompletedTask;
+    }
+
+    internal class State
+    {
+        public string SelectedPath { get; set; }
+    }
+}
