@@ -1,7 +1,4 @@
-﻿
-using static ReactWithDotNet.WebSite.Components.RenderPreview;
-
-namespace ReactWithDotNet.VisualDesigner.Views;
+﻿namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationView: Component<ApplicationView.State>
 {
@@ -9,52 +6,13 @@ sealed class ApplicationView: Component<ApplicationView.State>
     {
         return new FlexRow(Padding(10), SizeFull, Background(Theme.BackgroundColor))
         {
+            EditorFontLinks,
+            EditorFont(),
             new FlexColumn
             {
                 applicationTopPanel,
 
                 MainContent,
-                new ProjectView
-                {
-                    Model = new()
-                    {
-                        Name = "Demo Project",
-                        Components =
-                        [
-                            new ComponentModel
-                            {
-                                Name        = "LoginIcon",
-                                PropsAsJson = "{'isActive': true}",
-                                StateAsJson = "{'user': { 'name': 'Tom', 'year': 41 }}",
-                                RootElement = new()
-                                {
-                                    Tag = "div",
-                                    Children =
-                                    [
-                                        new() { Tag = "label", Text = "Abc1" },
-                                        new() { Tag = "span", Text  = "Abc2" },
-                                        new() { Tag = "ul", Text    = "Abc3" },
-
-                                        new()
-                                        {
-                                            Tag = "div",
-                                            Children =
-                                            [
-                                                new() { Tag = "label", Text = "Abc1" },
-                                                new() { Tag = "span", Text  = "Abc2" },
-                                                new()
-                                                {
-                                                    Tag  = "ul",
-                                                    Text = "Abc3"
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                },
                 
                 new Style
                 {
@@ -103,11 +61,18 @@ sealed class ApplicationView: Component<ApplicationView.State>
             {
                 PartLeftPanel,
                 new div { "preview" },
-                new div { "Props" }
+                PartRightPanel
             }
         };
     }
-    
+
+    Element PartRightPanel()
+    {
+        return new FlexColumn(AlignItemsCenter)
+        {
+            new StyleEditor()
+        };
+    }
     Element PartLeftPanel()
     {
         var componentSelector = new MagicInput();
@@ -130,6 +95,37 @@ sealed class ApplicationView: Component<ApplicationView.State>
                     "Export"
                 }
             },
+            
+            new VisualElementTreeView
+            {
+                //SelectionChanged = SelectionChanged,
+                //SelectedPath     = state.SelectedPath,
+                Model = new()
+                {
+                    Tag = "div",
+                    Children =
+                    [
+                        new() { Tag = "label", Text = "Abc1" },
+                        new() { Tag = "span", Text  = "Abc2" },
+                        new() { Tag = "ul", Text    = "Abc3" },
+
+                        new()
+                        {
+                            Tag = "div",
+                            Children =
+                            [
+                                new() { Tag = "label", Text = "Abc1" },
+                                new() { Tag = "span", Text  = "Abc2" },
+                                new()
+                                {
+                                    Tag  = "ul",
+                                    Text = "Abc3"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
             
         };
     }

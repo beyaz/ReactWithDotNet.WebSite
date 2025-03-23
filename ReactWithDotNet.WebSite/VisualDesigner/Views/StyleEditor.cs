@@ -20,8 +20,7 @@ sealed class StyleEditor : Component<StyleEditor.State>
     {
         return new FlexRow(AlignItemsCenter, FlexWrap, Border(1, solid, Gray300), BorderRadius(4), Padding(5, 10), Gap(16), Background(White))
         {
-            EditorFontLinks,
-            EditorFont(),
+            
             
             state.Value.Select(x => new PropertyEditor
             {
