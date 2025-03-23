@@ -278,7 +278,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
         return new FlexColumn(AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"))
         {
             componentSelector,
-            new FlexRow(WidthFull, PaddingLeftRight(4), JustifyContentSpaceBetween)
+            new FlexRow(WidthFull, Padding(4), JustifyContentSpaceBetween)
             {
                 new FlexRowCentered(Size(18))
                 {
@@ -296,8 +296,8 @@ sealed class ApplicationView: Component<ApplicationView.State>
             
             new VisualElementTreeView
             {
-                //SelectionChanged = SelectionChanged,
-                //SelectedPath     = state.SelectedPath,
+                SelectionChanged = OnVisualElementTreeSelected,
+                SelectedPath     = state.SelectedVisualElementTreePath,
                 Model = new()
                 {
                     Tag = "div",
@@ -326,6 +326,13 @@ sealed class ApplicationView: Component<ApplicationView.State>
             }
             
         };
+    }
+
+    Task OnVisualElementTreeSelected(string treePath)
+    {
+        state.SelectedVisualElementTreePath = treePath;
+
+        return Task.CompletedTask;
     }
 
     static Element createLabel(string text)
@@ -425,6 +432,8 @@ sealed class ApplicationView: Component<ApplicationView.State>
     
     internal class State
     {
+        public string SelectedVisualElementTreePath { get; set; }
+        
         public int ScreenWidth { get; set; } = 400;
         
         public int ScreenHeight { get; init; } = 400;
@@ -469,5 +478,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
                 }
             ]
         };
+
+       
     }
 }

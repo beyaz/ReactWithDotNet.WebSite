@@ -38,7 +38,9 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 
     Task OnTreeItemClicked(MouseEvent e)
     {
-        DispatchEvent(SelectionChanged, [e.currentTarget.id]);
+        state.SelectedPath = e.currentTarget.id;
+        
+        DispatchEvent(SelectionChanged, [state.SelectedPath]);
 
         return Task.CompletedTask;
     }
