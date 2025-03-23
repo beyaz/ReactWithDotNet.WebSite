@@ -227,7 +227,7 @@ class StyleEditor : Component<StyleEditor.State>
     
     protected override Element render()
     {
-        return new FlexRow(AlignItemsCenter, FlexWrap, Border(1, solid, Gray300), BorderRadius(4), Padding(5, 10), Gap(4), Background(White))
+        return new FlexRow(AlignItemsCenter, FlexWrap, Border(1, solid, Gray300), BorderRadius(4), Padding(5, 10), Gap(16), Background(White))
         {
             state.Value.Select(x => new PropertyEditor
             {
@@ -290,7 +290,8 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
         state = new()
         {
             Model        = Model ?? new PropertyValue(),
-            InitialModel = Model
+            InitialModel = Model,
+            
         };
     }
     
@@ -331,11 +332,18 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
         
         if (state.IsEditMode is false)
         {
-            return new FlexRowCentered(Color(Gray600), WidthFitContent, BorderRadius(16), Border(1,solid, Gray300), Padding(4, 8), Background(Gray100), Gap(4))
+            return new FlexRowCentered(Color(Gray600), WidthFitContent, BorderRadius(16), Border(1,solid, Gray300), Padding(4, 8), Gap(4))
             {
                 new span(FontWeight600) { state.Model.Name },
                 new span { ":" },
-                new span() { state.Model.Value },
+                new span { state.Model.Value },
+                
+                When(state.Model.Condition.HasValue(), ()=>new FlexRowCentered(Gap(4))
+                {
+                    new span(FontWeight600) { "condition: " },
+                    new span { state.Model.Condition }
+                }),
+                
                 
                 OnMouseEnter(OnMouseEnterHandler)
             };
@@ -357,41 +365,59 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
             
             return new FlexRowCentered(Color(Gray600), WidthFitContent, BorderRadius(16), Border(1,solid, Gray300), Padding(4, 8), Background(White), Gap(4))
             {
-                new span(FontWeight600) { state.Model.Name },
+                new FlexRowCentered
+                {
+                    new span(FontWeight600) { state.Model.Name },
             
-                new span { ":" },
+                    new span { ":" },
             
-                new MagicInput{ Value = state.Model.Value, Suggestions = suggestions, OnChange = OnPropertyValueChanged},
+                    new MagicInput{ Value = state.Model.Value, Suggestions = suggestions, OnChange = OnPropertyValueChanged},
+
+                },
+                
+                new FlexRowCentered(Gap(4))
+                {
+                    new span(FontWeight600) { "Condition: " },
             
+                    new MagicInput{ Value = state.Model.Condition, 
+                        Suggestions = ["state.IsEndUser", "prop.HasNewValue", "prop.IsNewRecord"], 
+                        OnChange = OnConditionChanged},
+
+                },
             
             
                 // new span() { state.PropertyValue },
                 
                 OnMouseEnter(OnMouseEnterHandler),
                 OnMouseLeave(OnMouseLeaveHandler),
-                
-                //PositionRelative,
-                //new FlexRowCentered(Size(24), PositionAbsolute, Padding(4), Top(16), Right(-16))
-                //{
-                //    Color(Gray600),
-                //    Hover(Color(Gray700)),
-                //    Background(White),
-                //    BorderRadius(24),
-                //    Border(1, solid, Gray300),
-                //    Hover(BorderColor(Gray500)),
-                //    new IconClose()
-                //},
-            
-                //new FlexRowCentered(Size(24),Padding(4),  PositionAbsolute, Top(16), Left(16))
-                //{
-                //    Color(Gray600),
-                //    Hover(Color(Gray700)),
-                //    Background(White),
-                //    BorderRadius(24),
-                //    Border(1, solid, Gray300),
-                //    Hover(BorderColor(Gray500)),
-                //    new IconChecked()
-                //}
+
+                PositionRelative,
+                new FlexRowCentered(Size(24), PositionAbsolute, Padding(4), Top(0), Right(0))
+                {
+                    Color(Gray600),
+                    Hover(Color(Gray700)),
+                    Background(White),
+                    BorderTopRightRadius(16),
+                    BorderBottomLeftRadius(8),
+                    
+                    //Border(1, solid, Gray300),
+                    BorderLeft(1, solid,Gray300),
+                    BorderBottom(1, solid,Gray300),
+                    
+                    Hover(BorderColor(Gray500), Background(Gray300)),
+                    new IconClose()
+                },
+
+                new FlexRowCentered(Size(24),Padding(4),  PositionAbsolute, Top(-4), Left(-16))
+                {
+                    Color(Gray600),
+                    Hover(Color(Gray700)),
+                    Background(White),
+                    BorderRadius(24),
+                    Border(1, solid, Gray300),
+                    Hover(BorderColor(Gray500)),
+                    new IconChecked()
+                }
             };
         }
         
@@ -400,6 +426,15 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
     Task OnPropertyValueChanged(string newValue)
     {
         state.Model.Value = newValue;
+        
+        DispatchEvent(OnChange, [state.Model]);
+        
+        return Task.CompletedTask;
+    }
+    
+    Task OnConditionChanged(string newValue)
+    {
+        state.Model.Condition = newValue;
         
         DispatchEvent(OnChange, [state.Model]);
         
@@ -519,7 +554,7 @@ sealed class MagicInput : Component<MagicInput.State>
                 valueBindDebounceHandler = OnTypingFinished,
                 onBlur                   = OnBlur,
                 onKeyDown                = OnKeyDown,
-                onClick = OnClick,
+                onClick = OnInputClicked,
                 style =
                 {
                     OutlineNone,
@@ -536,7 +571,7 @@ sealed class MagicInput : Component<MagicInput.State>
         };
     }
 
-    Task OnClick(MouseEvent e)
+    Task OnInputClicked(MouseEvent e)
     {
         state.ShowSuggestions = !state.ShowSuggestions;
         
@@ -548,7 +583,10 @@ sealed class MagicInput : Component<MagicInput.State>
         state = new()
         {
             InitialValue = Value,
-            Value        = Value
+            
+            Value        = Value,
+            
+            FilteredSuggestions = Suggestions ?? []
         };
     }
 
@@ -650,6 +688,22 @@ sealed class MagicInput : Component<MagicInput.State>
         return Task.CompletedTask;
     }
 
+    [StopPropagation]
+    Task OnSuggestionItemClicked(MouseEvent e)
+    {
+
+        state.ShowSuggestions          = false;
+        
+        state.SelectedSuggestionOffset = int.Parse(e.target.data["INDEX"]);
+        
+        state.Value = state.FilteredSuggestions[state.SelectedSuggestionOffset.Value];
+
+        DispatchEvent(OnChange, [state.Value]);
+        
+
+        return Task.CompletedTask;
+    }
+    
     Element ViewSuggestions()
     {
         if (state.ShowSuggestions is false)
@@ -674,12 +728,15 @@ sealed class MagicInput : Component<MagicInput.State>
 
         Element ToOption(string code, int index)
         {
-            return new div(BorderRadius(4))
+            return new div(BorderRadius(4), Mixin.OnClick(OnSuggestionItemClicked))
             {
+                Data("INDEX", index),
+                
                 code,
                 PaddingLeft(5),
                 Color(rgb(0, 6, 36)),
                 WhiteSpaceNoWrap,
+                CursorDefault,
 
                 index == state.SelectedSuggestionOffset ? Color("#495cef") + Background("#e7eaff") : null
             };
