@@ -2,6 +2,13 @@
 
 namespace ReactWithDotNet.WebSite.Components2;
 
+sealed record PropertyInfo
+{
+    public string Name { get; init; }
+
+    public IReadOnlyList<string> Suggestions { get; init; }
+}
+
 sealed record PropertyModel
 {
     public string Condition { get; set; }
@@ -10,6 +17,7 @@ sealed record PropertyModel
 
     public string Value { get; set; }
 }
+
 
 sealed record VisualElementModel
 {
@@ -25,7 +33,33 @@ sealed record VisualElementModel
     internal bool HasChild => Children?.Count > 0;
 }
 
-class Demo : Component<Demo.State>
+sealed class ComponentModel
+{
+    public VisualElementModel RootElement { get; set; }
+    
+    public string Name { get; set; }
+
+    public string PropsAsJson { get; set; }
+    
+    public string StateAsJson { get; set; }
+}
+
+sealed class ProjectModel
+{
+    public List<ComponentModel> Components { get; set; } = [];
+
+    public string OutputDirectoryPath { get; set; }
+    
+    public string Name { get; set; }
+}
+
+sealed class ApplicationModel
+{
+    public List<ProjectModel> Projects { get; set; } = [];
+}
+
+
+class DemoVisualElementTreeViewer : Component<DemoVisualElementTreeViewer.State>
 {
     internal class State
     {
@@ -164,12 +198,7 @@ sealed class VisualElementTreeViewer : Component<VisualElementTreeViewer.State>
     }
 }
 
-sealed record PropertyInfo
-{
-    public string Name { get; init; }
 
-    public IReadOnlyList<string> Suggestions { get; init; }
-}
 
 static class Extensions
 {
