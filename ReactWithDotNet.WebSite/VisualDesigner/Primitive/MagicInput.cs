@@ -9,6 +9,8 @@ sealed class MagicInput : Component<MagicInput.State>
 
     public string Value { get; init; }
 
+    public bool FitContent { get; init; }
+
     protected override Task constructor()
     {
         InitializeState();
@@ -46,7 +48,7 @@ sealed class MagicInput : Component<MagicInput.State>
                     PaddingTopBottom(4),
                     Color(rgb(0, 6, 36)),
                     Height(24),
-                    Width(CalculateTextWidth(state.Value)),
+                    FitContent ? Width(CalculateTextWidth(state.Value)) : WidthFull,
                     FontFamily("'Wix Madefor Text', sans-serif"),
                     FontSize14,
                     LetterSpacingNormal

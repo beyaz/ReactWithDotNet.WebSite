@@ -46,7 +46,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
 
             return new FlexRowCentered(Color(Gray600), WidthFitContent, BorderRadius(16), Border(1, solid, Gray300), Padding(4, 8), Background(White), Gap(4))
             {
-                new MagicInput { Suggestions = suggestions, Value = null, OnChange = OnFirstValueChange }
+                new MagicInput { FitContent  = true,  Suggestions = suggestions, Value = null, OnChange = OnFirstValueChange }
             };
         }
 
@@ -119,7 +119,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
 
                     new span { ":" },
 
-                    new MagicInput { Value = state.Model.Value, Suggestions = suggestions, OnChange = OnPropertyValueChanged }
+                    new MagicInput { FitContent  = true, Value = state.Model.Value, Suggestions = suggestions, OnChange = OnPropertyValueChanged }
                 },
 
                 new FlexRowCentered(Gap(4))
@@ -128,6 +128,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
 
                     new MagicInput
                     {
+                        FitContent  = true, 
                         Value       = state.Model.Condition,
                         Suggestions = ["state.IsEndUser", "prop.HasNewValue", "prop.IsNewRecord"],
                         OnChange    = OnConditionChanged

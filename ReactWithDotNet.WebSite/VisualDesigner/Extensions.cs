@@ -212,7 +212,7 @@ static class Extensions
         return
         [
             FontFamily("'Wix Madefor Text', sans-serif"),
-            FontSize(14),
+            FontSize(13),
             LetterSpacingNormal
         ];
     }
