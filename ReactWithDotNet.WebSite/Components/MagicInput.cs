@@ -1,4 +1,5 @@
-﻿using static ReactWithDotNet.WebSite.Components2.Extensions;
+﻿using System.Collections.Generic;
+using static ReactWithDotNet.WebSite.Components2.Extensions;
 
 namespace ReactWithDotNet.WebSite.Components2;
 
@@ -69,11 +70,9 @@ sealed class VisualElementTreeViewer : Component<VisualElementTreeViewer.State>
     
     protected override Element render()
     {
-        var nodes = state.Model.Children;
-
         return new div(MarginLeftRight(3), OverflowYScroll, CursorPointer, Padding(5), Border(Solid(1, rgb(217, 217, 217))), BorderRadius(3))
         {
-            state.ErrorMessage.HasValue() ? new pre { state.ErrorMessage } : AsTreeView(nodes, 0),
+            state.ErrorMessage.HasValue() ? [new pre { state.ErrorMessage }] : ToVisual(state.Model, 0, "0"),
             WidthFull, HeightFull
         };
     }
@@ -90,6 +89,48 @@ sealed class VisualElementTreeViewer : Component<VisualElementTreeViewer.State>
     Element AsTreeItem(VisualElementModel node, int indent)
     {
         return AsTreeItem(node, indent, SelectedMethodTreeNodeKey, OnTreeItemClicked);
+    }
+    
+    IReadOnlyList<Element> ToVisual(VisualElementModel node, int indent, string path)
+    {
+        var returnList = new List<Element>
+        {
+            new FlexRow(AlignItemsCenter, PaddingLeft(indent * 16), Id(path), OnClick(OnTreeItemClicked))
+            {
+                arrangeBackground,
+                new div { Text(node.Tag), MarginLeft(5), FontSize13 }
+            }
+        };
+
+        if (node.HasChild is false)
+        {
+            return returnList;
+        }
+
+        for (var i = 0; i < node.Children.Count; i++)
+        {
+            var child = node.Children[i];
+            
+            returnList.AddRange(ToVisual(child, indent + 1, $"{path},{i}"));
+        }
+
+        return returnList;
+        
+        void arrangeBackground(HtmlElement el)
+        {
+            var isSelected = state.SelectedMethodTreeNodeKey == path;
+            
+            if (isSelected)
+            {
+                el += BackgroundImage(linear_gradient(90, rgb(136, 195, 242), rgb(242, 246, 249))) + BorderRadius(3);
+            }
+            else
+            {
+                el += Hover(BackgroundImage(linear_gradient(90, rgb(190, 220, 244), rgb(242, 246, 249))) + BorderRadius(3));
+            }
+
+            el.onClick = OnTreeItemClicked;
+        }
     }
     
     Element AsTreeView(IReadOnlyList<VisualElementModel> nodes, int indent)
