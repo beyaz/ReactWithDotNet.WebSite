@@ -29,6 +29,8 @@ static class Page
     public static readonly PageRouteInfo Designer = new($"/{nameof(Designer)}", typeof(PageDesigner));
     public static readonly PageRouteInfo MadeBy = new($"/{nameof(MadeBy)}", typeof(PageMadeBy));
     
+    public static readonly PageRouteInfo VisualDesigner = new($"/{nameof(VisualDesigner)}", typeof(ApplicationView));
+    
     // i n t e r n a l
     public static readonly PageRouteInfo DemoPreview = new($"/{nameof(DemoPreview)}", typeof(DemoPreview));
     

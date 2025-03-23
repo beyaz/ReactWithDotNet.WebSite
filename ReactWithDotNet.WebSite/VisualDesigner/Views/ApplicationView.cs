@@ -77,7 +77,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
             children =
             {
                 PartLeftPanel,
-                new FlexColumn(AlignItemsCenter, FlexGrow(1), Padding(7), MarginLeft(40), ScaleStyle)
+                new FlexColumn(AlignItemsCenter, FlexGrow(1), Padding(7), MarginLeft(40), ScaleStyle, OverflowXAuto)
                 {
                     createHorizontalRuler() + Width(state.ScreenWidth) + MarginTop(12),
                     PartPreview
