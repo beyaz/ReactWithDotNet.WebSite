@@ -188,7 +188,7 @@ static class Extensions
         return textLegth * 7.8;
     }
 
-    public static Element EditorFont()
+    public static Element EditorFontLinks()
     {
         return new Fragment
         {
@@ -198,6 +198,16 @@ static class Extensions
 
             new link { href = "https://fonts.googleapis.com/css2?family=Wix+Madefor+Text:ital,wght@0,400..800;1,400..800&display=swap", rel = "stylesheet" }
         };
+    }
+    
+    public static StyleModifier[] EditorFont()
+    {
+        return
+        [
+            FontFamily("'Wix Madefor Text', sans-serif"),
+            FontSize(14),
+            LetterSpacingNormal
+        ];
     }
 
     public static bool HasValue(this string value)
