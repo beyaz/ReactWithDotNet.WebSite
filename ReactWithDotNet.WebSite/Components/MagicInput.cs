@@ -2,13 +2,83 @@
 
 namespace ReactWithDotNet.WebSite.Components2;
 
-sealed record PropertyValue
+sealed record PropertyModel
 {
     public string Condition { get; set; }
+    
     public string Name { get; set; }
 
     public string Value { get; set; }
 }
+
+sealed record VisualElementModel
+{
+    public string Tag { get; set; }
+
+    public List<VisualElementModel> Children { get; set; }
+    
+    public List<PropertyModel> StyleAttributes { get; set; }
+    
+    public List<PropertyModel> Properties { get; set; }
+    
+    public string Text { get; set; }
+}
+
+class Demo : Component
+{
+    protected override Element render()
+    {
+        return new VisualElementTreeViewer
+        {
+            Model = new()
+            {
+                Tag = "div",
+                Children =
+                [
+                    new VisualElementModel { Tag = "label", Text = "Abc" },
+                    new VisualElementModel { Tag = "span", Text  = "Abc2" }
+                ]
+            }
+        };
+    }
+}
+sealed class VisualElementTreeViewer : Component<VisualElementTreeViewer.State>
+{
+    public VisualElementModel Model { get; init; }
+    
+    protected override Task constructor()
+    {
+        InitializeState();
+        
+        return Task.CompletedTask;
+    }
+    
+    protected override Element render()
+    {
+        return new FlexColumn
+        {
+            "Element Tree"
+        };
+    }
+    
+    void InitializeState()
+    {
+        state = new()
+        {
+            InitialModel = Model,
+            Model = Model
+        };
+    }
+    
+    internal class State
+    {
+        public VisualElementModel Model { get; init; }
+        
+        public VisualElementModel InitialModel { get; init; }
+    }
+}
+
+
 
 sealed record PropertyInfo
 {
@@ -222,7 +292,7 @@ static class Extensions
         return !string.IsNullOrWhiteSpace(value);
     }
 
-    public static PropertyValue TryParsePropertyValue(string nameValueCombined)
+    public static PropertyModel TryParsePropertyValue(string nameValueCombined)
     {
         if (string.IsNullOrWhiteSpace(nameValueCombined))
         {
@@ -253,7 +323,7 @@ static class Extensions
 
 class StyleEditor : Component<StyleEditor.State>
 {
-    public IReadOnlyList<PropertyValue> Value { get; init; } = [new() { Name = "gap", Value = "5" }];
+    public IReadOnlyList<PropertyModel> Value { get; init; } = [new() { Name = "gap", Value = "5" }];
 
     protected override Task constructor()
     {
@@ -288,27 +358,27 @@ class StyleEditor : Component<StyleEditor.State>
         };
     }
 
-    Task OnAddNewItem(PropertyValue newValue)
+    Task OnAddNewItem(PropertyModel newModel)
     {
-        state.Value.Add(newValue);
+        state.Value.Add(newModel);
 
         return Task.CompletedTask;
     }
 
     internal class State
     {
-        public IReadOnlyList<PropertyValue> InitialValue { get; init; }
+        public IReadOnlyList<PropertyModel> InitialValue { get; init; }
 
-        public List<PropertyValue> Value { get; init; }
+        public List<PropertyModel> Value { get; init; }
     }
 }
 
 sealed class PropertyEditor : Component<PropertyEditor.State>
 {
-    public PropertyValue Model { get; init; }
+    public PropertyModel Model { get; init; }
 
     [CustomEvent]
-    public Func<PropertyValue, Task> OnChange { get; init; }
+    public Func<PropertyModel, Task> OnChange { get; init; }
 
     public IReadOnlyList<PropertyInfo> PropertySuggestions { get; init; } = StyleProperties;
 
@@ -457,7 +527,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
     {
         state = new()
         {
-            Model        = Model ?? new PropertyValue(),
+            Model        = Model ?? new PropertyModel(),
             InitialModel = Model
         };
     }
@@ -510,13 +580,13 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
 
     internal class State
     {
-        public PropertyValue InitialModel { get; init; }
+        public PropertyModel InitialModel { get; init; }
 
         public bool IsDeleteButtonVisible { get; set; }
 
         public bool IsEditMode { get; set; }
 
-        public PropertyValue Model { get; set; }
+        public PropertyModel Model { get; set; }
     }
 }
 
