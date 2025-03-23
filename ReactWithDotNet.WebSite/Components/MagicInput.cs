@@ -487,10 +487,18 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
 
     Task OnMouseLeaveHandler(MouseEvent e)
     {
+        Client.GotoMethod(700, CloseEditMode);
+
+        return Task.CompletedTask;
+    }
+    
+    Task CloseEditMode()
+    {
         state.IsEditMode = false;
 
         return Task.CompletedTask;
     }
+    
 
     Task OnPropertyValueChanged(string newValue)
     {
@@ -508,6 +516,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
         public bool IsDeleteButtonVisible { get; set; }
 
         public bool IsEditMode { get; set; }
+        
         public PropertyValue Model { get; set; }
     }
 }
