@@ -1,4 +1,6 @@
 ﻿
+using static ReactWithDotNet.WebSite.Components.RenderPreview;
+
 namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationView: Component<ApplicationView.State>
@@ -11,6 +13,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
             {
                 applicationTopPanel,
 
+                MainContent,
                 new ProjectView
                 {
                     Model = new()
@@ -91,10 +94,86 @@ sealed class ApplicationView: Component<ApplicationView.State>
         };
     }
 
+    Element MainContent()
+    {
+        return new SplitRow
+        {
+            sizes = [20, 60, 20],
+            children =
+            {
+                PartLeftPanel,
+                new div { "preview" },
+                new div { "Props" }
+            }
+        };
+    }
+    
+    Element PartLeftPanel()
+    {
+        var componentSelector = new MagicInput();
+
+        return new FlexColumn(AlignItemsCenter)
+        {
+            componentSelector,
+            new FlexRow(WidthFull)
+            {
+                new FlexRowCentered()
+                {
+                    "Visual Tree"
+                },
+                new FlexRowCentered()
+                {
+                    "Definition"
+                },
+                new FlexRowCentered()
+                {
+                    "Export"
+                }
+            },
+            
+        };
+    }
+    
+    
     internal class State
     {
-        public IReadOnlyList<PropertyModel> InitialValue { get; init; }
+        public ProjectModel Model { get; set; } = new()
+        {
+            Name = "Demo Project",
+            Components =
+            [
+                new ComponentModel
+                {
+                    Name        = "LoginIcon",
+                    PropsAsJson = "{'isActive': true}",
+                    StateAsJson = "{'user': { 'name': 'Tom', 'year': 41 }}",
+                    RootElement = new()
+                    {
+                        Tag = "div",
+                        Children =
+                        [
+                            new() { Tag = "label", Text = "Abc1" },
+                            new() { Tag = "span", Text  = "Abc2" },
+                            new() { Tag = "ul", Text    = "Abc3" },
 
-        public List<PropertyModel> Value { get; init; }
+                            new()
+                            {
+                                Tag = "div",
+                                Children =
+                                [
+                                    new() { Tag = "label", Text = "Abc1" },
+                                    new() { Tag = "span", Text  = "Abc2" },
+                                    new()
+                                    {
+                                        Tag  = "ul",
+                                        Text = "Abc3"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        };
     }
 }
