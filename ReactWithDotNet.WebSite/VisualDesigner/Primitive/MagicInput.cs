@@ -30,7 +30,7 @@ sealed class MagicInput : Component<MagicInput.State>
 
     protected override Element render()
     {
-        return new FlexColumnCentered
+        return new FlexColumnCentered(FitContent is false ? WidthFull : null)
         {
             new input
             {
@@ -49,9 +49,8 @@ sealed class MagicInput : Component<MagicInput.State>
                     Color(rgb(0, 6, 36)),
                     Height(24),
                     FitContent ? Width(CalculateTextWidth(state.Value)) : WidthFull,
-                    FontFamily("'Wix Madefor Text', sans-serif"),
-                    FontSize14,
-                    LetterSpacingNormal
+                    
+                    EditorFont()
                 },
                 autoFocus = true
             },

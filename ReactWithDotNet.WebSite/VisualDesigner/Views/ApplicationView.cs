@@ -271,26 +271,51 @@ sealed class ApplicationView: Component<ApplicationView.State>
             new StyleEditor()
         };
     }
+    
+    Task OnElementTreeTabClicked(MouseEvent e)
+    {
+        state.LeftPanelSelectedTabName = LeftPanelSelectedTabNames.ElementTree;
+        
+        return Task.CompletedTask;
+    }
+    Task OnSettingsTabClicked(MouseEvent e)
+    {
+        state.LeftPanelSelectedTabName = LeftPanelSelectedTabNames.Settings;
+        
+        return Task.CompletedTask;
+    }
+    Task OnSaveTabClicked(MouseEvent e)
+    {
+        state.LeftPanelSelectedTabName = LeftPanelSelectedTabNames.Save;
+        
+        return Task.CompletedTask;
+    }
+    
     Element PartLeftPanel()
     {
-        var componentSelector = new MagicInput();
+        var componentSelector = new MagicInput
+        {
+            Suggestions = ["abc", "abc3"]
+            
+        };
 
-        return new FlexColumn(AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"))
+        return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"))
         {
             componentSelector,
-            new FlexRow(WidthFull, Padding(4), JustifyContentSpaceBetween)
+            new FlexRow(WidthFull, AlignItemsCenter, Padding(8,4), JustifyContentSpaceAround, BorderBottom(1, dotted, "#d9d9d9"), BorderTop(1, dotted, "#d9d9d9"))
             {
-                new FlexRowCentered(Size(18))
+                Color(Gray300),
+                new FlexRowCentered(Size(18), OnClick(OnElementTreeTabClicked))
                 {
-                    new IconLayers()
+                    new IconLayers() + (state.LeftPanelSelectedTabName == LeftPanelSelectedTabNames.ElementTree ? Color(Blue300): null)
                 },
-                new FlexRowCentered(Size(18))
+                new FlexRowCentered(Size(24),OnClick(OnSettingsTabClicked))
                 {
-                    new IconSettings()
+                    new IconSettings() + (state.LeftPanelSelectedTabName == LeftPanelSelectedTabNames.Settings ? Color(Blue300): null)
                 },
-                new FlexRowCentered(Size(18))
+                new FlexRowCentered(Size(24), OnClick(OnSaveTabClicked))
                 {
-                    new IconExport()
+                    new IconSave() + (state.LeftPanelSelectedTabName == LeftPanelSelectedTabNames.Save ? Color(Blue300): null)
                 },
             },
             
@@ -327,6 +352,8 @@ sealed class ApplicationView: Component<ApplicationView.State>
             
         };
     }
+
+    
 
     Task OnVisualElementTreeSelected(string treePath)
     {
@@ -428,10 +455,18 @@ sealed class ApplicationView: Component<ApplicationView.State>
     {
         await Task.Delay(111);
     }
-    
-    
+
+
+    class LeftPanelSelectedTabNames
+    {
+        public const string ElementTree = "ElementTree";
+        public const string Settings = "Settings";
+        public const string Save = "Save";
+    }
     internal class State
     {
+        public string LeftPanelSelectedTabName { get; set; } = LeftPanelSelectedTabNames.ElementTree;
+
         public string SelectedVisualElementTreePath { get; set; }
         
         public int ScreenWidth { get; set; } = 400;

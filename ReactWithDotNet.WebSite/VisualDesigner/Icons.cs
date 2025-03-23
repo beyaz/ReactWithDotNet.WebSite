@@ -55,7 +55,7 @@ sealed class IconLayers : PureComponent
 {
     protected override Element render()
     {
-        return new svg( svg.FocusableFalse, ViewBox(0, 0, 16, 16))
+        return new svg( svg.FocusableFalse, Fill("currentColor"), ViewBox(0, 0, 16, 16))
         {
             new path
             {
@@ -111,14 +111,15 @@ sealed class IconSave : PureComponent
 {
     protected override Element render()
     {
-        return new svg(ViewBox(0, 0, 24, 24), Fill(none), svg.Size(24), Stroke("currentColor"), StrokeWidth("2"), StrokeLinecap("round"), StrokeLinejoin("round"))
+        return new svg(ViewBox(0, 0, 24, 24), svg.Size(24),    StrokeWidth("2"), StrokeLinecap("round"), StrokeLinejoin("round"))
         {
             new path
             {
-                d = "M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+                d      = "M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z",
+                stroke = "currentColor"
             },
-            new polyline(polyline.Points("17 21 17 13 7 13 7 21")),
-            new polyline(polyline.Points("7 3 7 8 15 8"))
+            new polyline{ points = "17 21 17 13 7 13 7 21"},
+            new polyline{ points = "7 3 7 8 15 8"}
         };
     }
 }

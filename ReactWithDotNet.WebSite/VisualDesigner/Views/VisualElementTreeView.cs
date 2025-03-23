@@ -18,7 +18,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 
     protected override Element render()
     {
-        return new div(CursorPointer, Padding(5), Border(Solid(1, rgb(217, 217, 217))), BorderRadius(3))
+        return new div(CursorPointer, Padding(5))
         {
             ToVisual(state.Model, 0, "0"),
             WidthFull, HeightFull
