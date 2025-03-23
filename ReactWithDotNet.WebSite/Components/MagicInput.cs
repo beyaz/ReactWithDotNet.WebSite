@@ -105,12 +105,17 @@ sealed class VisualElementTreeViewer : Component<VisualElementTreeViewer.State>
 
     IReadOnlyList<Element> ToVisual(VisualElementModel node, int indent, string path)
     {
+        var isSelected = state.SelectedPath == path;
+
         var returnList = new List<Element>
         {
             new FlexRow(AlignItemsCenter, PaddingLeft(indent * 16), Id(path), OnClick(OnTreeItemClicked))
             {
-                arrangeBackground,
-                new div { Text(node.Tag), MarginLeft(5), FontSize13 }
+                new div { Text(node.Tag), MarginLeft(5), FontSize13 },
+
+                isSelected ? BackgroundImage(linear_gradient(90, rgb(136, 195, 242), rgb(242, 246, 249))) + BorderRadius(3) : null,
+
+                !isSelected ? Hover(BackgroundImage(linear_gradient(90, rgb(190, 220, 244), rgb(242, 246, 249))) + BorderRadius(3)) : null
             }
         };
 
@@ -127,22 +132,6 @@ sealed class VisualElementTreeViewer : Component<VisualElementTreeViewer.State>
         }
 
         return returnList;
-
-        void arrangeBackground(HtmlElement el)
-        {
-            var isSelected = state.SelectedPath == path;
-
-            if (isSelected)
-            {
-                el += BackgroundImage(linear_gradient(90, rgb(136, 195, 242), rgb(242, 246, 249))) + BorderRadius(3);
-            }
-            else
-            {
-                el += Hover(BackgroundImage(linear_gradient(90, rgb(190, 220, 244), rgb(242, 246, 249))) + BorderRadius(3));
-            }
-
-            el.onClick = OnTreeItemClicked;
-        }
     }
 
     internal class State
@@ -150,6 +139,7 @@ sealed class VisualElementTreeViewer : Component<VisualElementTreeViewer.State>
         public VisualElementModel InitialModel { get; init; }
 
         public string InitialSelectedPath { get; set; }
+        
         public VisualElementModel Model { get; init; }
 
         public string SelectedPath { get; set; }
