@@ -494,7 +494,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
 
     Task OnMouseLeaveHandler(MouseEvent e)
     {
-        Client.GotoMethod(700, CloseEditMode);
+        Client.GotoMethod(1000, CloseEditMode);
 
         return Task.CompletedTask;
     }
