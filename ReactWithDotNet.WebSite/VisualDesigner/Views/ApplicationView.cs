@@ -331,9 +331,9 @@ sealed class ApplicationView: Component<ApplicationView.State>
     
     internal class State
     {
-        public int ScreenWidth { get; init; } = 900;
+        public int ScreenWidth { get; init; } = 400;
         
-        public int ScreenHeight { get; init; } = 100;
+        public int ScreenHeight { get; init; } = 400;
     
         public int Scale { get; init; } = 100;
         
