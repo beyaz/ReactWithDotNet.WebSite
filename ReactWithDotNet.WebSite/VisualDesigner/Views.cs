@@ -17,7 +17,7 @@ class DemoVisualElementTreeViewer : Component<DemoVisualElementTreeViewer.State>
         return new FlexColumn
         {
             new span{ state.SelectedPath},
-            new VisualElementTreeViewer
+            new VisualElementTreeView
             {
                 SelectionChanged = SelectionChanged,
                 SelectedPath = state.SelectedPath,
@@ -58,7 +58,7 @@ class DemoVisualElementTreeViewer : Component<DemoVisualElementTreeViewer.State>
     }
 }
 
-sealed class VisualElementTreeViewer : Component<VisualElementTreeViewer.State>
+sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 {
     public VisualElementModel Model { get; init; }
 
