@@ -1,4 +1,7 @@
-﻿namespace ReactWithDotNet.WebSite.Components2;
+﻿using static System.Net.WebRequestMethods;
+using static ReactWithDotNet.WebSite.Components2.Extensions;
+
+namespace ReactWithDotNet.WebSite.Components2;
 
 sealed record PropertyValue
 {
@@ -17,6 +20,35 @@ sealed record PropertyInfo
 
 static class Extensions
 {
+
+    public static double CalculateTextWidth(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return 50;
+        }
+
+        int textLegth = text.Length;
+        
+        if (textLegth == 1)
+        {
+            textLegth = 2;
+        }
+
+        return textLegth * 7.5;
+    }
+    
+    public static Element EditorFont()
+    {
+        return new Fragment
+        {
+            new link { href = "https://fonts.googleapis.com", rel                                                                           = "preconnect" },
+           
+            new link { href = "https://fonts.gstatic.com", rel                                                                              = "preconnect", crossOrigin = "true" },
+           
+            new link { href = "https://fonts.googleapis.com/css2?family=Wix+Madefor+Text:ital,wght@0,400..800;1,400..800&display=swap", rel = "stylesheet" }
+        };
+    }
     public static IReadOnlyList<PropertyInfo> StyleProperties = new List<PropertyInfo>
     {
         new()
@@ -240,14 +272,18 @@ class StyleEditor : Component<StyleEditor.State>
     {
         return new FlexRow(AlignItemsCenter, FlexWrap, Border(1, solid, Gray300), BorderRadius(4), Padding(5, 10), Gap(16), Background(White))
         {
+            EditorFont,
+            FontFamily("'Wix Madefor Text', sans-serif"),
+            FontSize(14),
+            LetterSpacingNormal,
             state.Value.Select(x => new PropertyEditor
             {
                 Model               = x,
-                PropertySuggestions = Extensions.StyleProperties
+                PropertySuggestions = StyleProperties
             }),
             new PropertyEditor
             {
-                PropertySuggestions = Extensions.StyleProperties,
+                PropertySuggestions = StyleProperties,
                 OnChange            = OnAddNewItem
             }
         };
@@ -275,7 +311,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
     [CustomEvent]
     public Func<PropertyValue, Task> OnChange { get; init; }
 
-    public IReadOnlyList<PropertyInfo> PropertySuggestions { get; init; } = Extensions.StyleProperties;
+    public IReadOnlyList<PropertyInfo> PropertySuggestions { get; init; } = StyleProperties;
 
     protected override Task constructor()
     {
@@ -324,11 +360,11 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
             {
                 new span(FontWeight600) { state.Model.Name },
                 new span { ":" },
-                new span { state.Model.Value },
+                new span(Width(CalculateTextWidth(state.Model.Value)), LetterSpacingNormal) { state.Model.Value },
 
                 When(state.Model.Condition.HasValue(), () => new FlexRowCentered(Gap(4))
                 {
-                    new span(FontWeight600) { "condition: " },
+                    new span(FontWeight600) { "on:" },
                     new span { state.Model.Condition }
                 }),
 
@@ -353,7 +389,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
 
             return new FlexRowCentered(Color(Gray600), WidthFitContent, BorderRadius(16), Border(1, solid, Gray300), Padding(4, 8), Background(White), Gap(4))
             {
-                new FlexRowCentered
+                new FlexRowCentered(Gap(4))
                 {
                     new span(FontWeight600) { state.Model.Name },
 
@@ -364,7 +400,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
 
                 new FlexRowCentered(Gap(4))
                 {
-                    new span(FontWeight600) { "Condition: " },
+                    new span(FontWeight600) { "on: " },
 
                     new MagicInput
                     {
@@ -430,7 +466,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
 
     Task OnFirstValueChange(string newValue)
     {
-        var model = state.Model = Extensions.TryParsePropertyValue(newValue);
+        var model = state.Model = TryParsePropertyValue(newValue);
 
         if (model is null || model.Value is null)
         {
@@ -545,15 +581,16 @@ sealed class MagicInput : Component<MagicInput.State>
                 onClick   = OnInputClicked,
                 style =
                 {
-                    When(state.ShowSuggestions, Zindex(-1)),
                     OutlineNone,
                     BorderNone,
                     Appearance(none),
                     PaddingTopBottom(4),
-                    FontSize14,
                     Color(rgb(0, 6, 36)),
-                    Width(state.Value.HasValue() ? state.Value.Length * 8 + 8 : 70),
-                    MinWidth(30)
+                    Height(24),
+                    Width(CalculateTextWidth(state.Value)),
+                    FontFamily("'Wix Madefor Text', sans-serif"),
+                    FontSize14,
+                    LetterSpacingNormal
                 },
                 autoFocus = true
             },
