@@ -28,10 +28,36 @@ sealed class ProjectView : Component<ProjectView.State>
             sizes = [20, 60, 20],
             children =
             {
-                new div { "Left" },
+                PartLeftPanel,
                 new div { "preview" },
                 new div { "Props" }
             }
+        };
+    }
+
+    Element PartLeftPanel()
+    {
+        var componentSelector = new MagicInput();
+
+        return new FlexColumn(AlignItemsCenter)
+        {
+            componentSelector,
+            new FlexRow(WidthFull)
+            {
+                new FlexRowCentered()
+                {
+                    "Visual Tree"
+                },
+                new FlexRowCentered()
+                {
+                    "Definition"
+                },
+                new FlexRowCentered()
+                {
+                    "Export"
+                }
+            },
+            
         };
     }
 

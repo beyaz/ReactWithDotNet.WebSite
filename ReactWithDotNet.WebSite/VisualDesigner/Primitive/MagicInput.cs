@@ -5,7 +5,7 @@ sealed class MagicInput : Component<MagicInput.State>
     [CustomEvent]
     public Func<string, Task> OnChange { get; init; }
 
-    public IReadOnlyList<string> Suggestions { get; init; }
+    public IReadOnlyList<string> Suggestions { get; init; } = [];
 
     public string Value { get; init; }
 
