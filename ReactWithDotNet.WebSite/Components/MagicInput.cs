@@ -427,7 +427,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
 
                 new FlexRowCentered(Gap(4))
                 {
-                    new span(FontWeight600) { "on: " },
+                    new span(FontWeight600) { "on:" },
 
                     new MagicInput
                     {
