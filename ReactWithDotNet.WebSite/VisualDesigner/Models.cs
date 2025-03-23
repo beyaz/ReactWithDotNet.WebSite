@@ -24,6 +24,7 @@ sealed record VisualElementModel
     public List<PropertyModel> Properties { get; set; }
 
     public List<PropertyModel> StyleAttributes { get; set; }
+    
     public string Tag { get; set; }
 
     public string Text { get; set; }
