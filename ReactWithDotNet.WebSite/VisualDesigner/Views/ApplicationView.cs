@@ -10,16 +10,46 @@ sealed class ApplicationView: Component<ApplicationView.State>
             new FlexColumn
             {
                 applicationTopPanel,
-                // createContent,
 
-                new SplitRow
+                new ProjectView
                 {
-                    sizes = [20, 60, 20],
-                    children =
+                    Model = new()
                     {
-                        new div{"Left"},
-                        new div{"preview"},
-                        new div{"Props"}
+                        Name = "Demo Project",
+                        Components =
+                        [
+                            new ComponentModel
+                            {
+                                Name        = "LoginIcon",
+                                PropsAsJson = "{'isActive': true}",
+                                StateAsJson = "{'user': { 'name': 'Tom', 'year': 41 }}",
+                                RootElement = new()
+                                {
+                                    Tag = "div",
+                                    Children =
+                                    [
+                                        new() { Tag = "label", Text = "Abc1" },
+                                        new() { Tag = "span", Text  = "Abc2" },
+                                        new() { Tag = "ul", Text    = "Abc3" },
+
+                                        new()
+                                        {
+                                            Tag = "div",
+                                            Children =
+                                            [
+                                                new() { Tag = "label", Text = "Abc1" },
+                                                new() { Tag = "span", Text  = "Abc2" },
+                                                new()
+                                                {
+                                                    Tag  = "ul",
+                                                    Text = "Abc3"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
                     }
                 },
                 
