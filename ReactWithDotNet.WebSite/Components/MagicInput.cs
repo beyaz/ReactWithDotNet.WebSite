@@ -202,7 +202,7 @@ static class Extensions
             textLegth = 2;
         }
 
-        return textLegth * 7.5;
+        return textLegth * 7.8;
     }
 
     public static Element EditorFont()
