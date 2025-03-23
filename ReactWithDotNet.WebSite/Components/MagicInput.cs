@@ -546,17 +546,19 @@ sealed class MagicInput : Component<MagicInput.State>
     {
         return new FlexColumn
         {
+            
             new input
             {
                 type                     = "text",
                 valueBind                = () => state.Value,
                 valueBindDebounceTimeout = 700,
                 valueBindDebounceHandler = OnTypingFinished,
-                onBlur                   = OnBlur,
+                //onBlur                   = OnBlur,
                 onKeyDown                = OnKeyDown,
                 onClick = OnInputClicked,
                 style =
                 {
+                    When(state.ShowSuggestions, Zindex(-1)),
                     OutlineNone,
                     BorderNone,
                     Appearance(none),
@@ -720,15 +722,17 @@ sealed class MagicInput : Component<MagicInput.State>
 
         return new FlexColumn(PositionRelative, SizeFull)
         {
+            Zindex3,
             new FlexColumn(PositionAbsolute, Top(4), HeightAuto, Background(White), BoxShadow(0, 6, 6, 0, rgba(22, 45, 61, .06)), Padding(5), BorderRadius(5))
             {
+                Zindex4,   
                 suggestions.Select(ToOption)
             }
         };
 
         Element ToOption(string code, int index)
         {
-            return new div(BorderRadius(4), Mixin.OnClick(OnSuggestionItemClicked))
+            return new div(BorderRadius(4), OnClick(OnSuggestionItemClicked))
             {
                 Data("INDEX", index),
                 
