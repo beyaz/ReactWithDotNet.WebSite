@@ -68,7 +68,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
 
     Element PartRightPanel()
     {
-        return new FlexColumn(AlignItemsCenter)
+        return new FlexColumn(AlignItemsCenter,BorderLeft(1, dotted, "#d9d9d9"))
         {
             new StyleEditor()
         };
@@ -77,7 +77,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
     {
         var componentSelector = new MagicInput();
 
-        return new FlexColumn(AlignItemsCenter)
+        return new FlexColumn(AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"))
         {
             componentSelector,
             new FlexRow(WidthFull)
