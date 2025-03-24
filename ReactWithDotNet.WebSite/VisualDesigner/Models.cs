@@ -9,46 +9,62 @@ sealed record PropertyInfo
 
 sealed record PropertyModel
 {
-    public string Condition { get; set; }
-
+    // @formatter:off
+    
     public string Name { get; set; }
 
     public string Value { get; set; }
+    
+    public string Condition { get; set; }
+    
+    // @formatter:on
 }
 
 sealed record VisualElementModel
 {
+    // @formatter:off
+    
+    public string Tag { get; set; }
+    
+    public List<PropertyModel> StyleAttributes { get; set; }
+    
+    public List<PropertyModel> Properties { get; set; }
+    
+    public string Text { get; set; }
+    
     public List<VisualElementModel> Children { get; set; }
 
-    public List<PropertyModel> Properties { get; set; }
-
-    public List<PropertyModel> StyleAttributes { get; set; }
-
-    public string Tag { get; set; }
-
-    public string Text { get; set; }
-
     internal bool HasChild => Children?.Count > 0;
+    
+    // @formatter:on
 }
 
 sealed class ComponentModel
 {
+    // @formatter:off
+    
     public string Name { get; set; }
 
     public string PropsAsJson { get; set; }
 
-    public VisualElementModel RootElement { get; set; }
-
     public string StateAsJson { get; set; }
+    
+    public VisualElementModel RootElement { get; set; }
+    
+    // @formatter:on
 }
 
 sealed class ProjectModel
 {
-    public List<ComponentModel> Components { get; set; } = [];
-
+    // @formatter:off
+    
     public string Name { get; set; }
-
+    
+    public List<ComponentModel> Components { get; set; } = [];
+    
     public string OutputDirectoryPath { get; set; }
+    
+    // @formatter:on
 }
 
 sealed class ApplicationModel
