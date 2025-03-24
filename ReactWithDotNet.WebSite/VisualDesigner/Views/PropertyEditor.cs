@@ -52,11 +52,14 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
 
         if (state.IsEditMode is false)
         {
-            return new FlexRowCentered(Color(Gray600), WidthFitContent, BorderRadius(16), Border(1, solid, Gray300), Padding(4, 8), Gap(4))
+            return new FlexColumn(Color(Gray600), WidthFitContent, BorderRadius(16), Border(1, solid, Gray300), Padding(4, 8), Gap(4))
             {
-                new span(FontWeight600) { state.Model.Name },
-                new span { ":" },
-                new span(Width(CalculateTextWidth(state.Model.Value)), LetterSpacingNormal) { state.Model.Value },
+                new FlexRow(AlignItemsCenter, Gap(4))
+                {
+                    new span(FontWeight600) { state.Model.Name },
+                    new span { ":" },
+                    new span(Width(CalculateTextWidth(state.Model.Value)), LetterSpacingNormal) { state.Model.Value },
+                },
 
                 When(state.Model.Condition.HasValue(), () => new FlexRowCentered(Gap(4))
                 {
@@ -68,6 +71,7 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
             };
         }
 
+        // Edit Mode ON
         {
             List<string> suggestions = [];
             {
@@ -111,24 +115,23 @@ sealed class PropertyEditor : Component<PropertyEditor.State>
                 new IconChecked()
             };
 
-            return new FlexRowCentered(Color(Gray600), WidthFitContent, BorderRadius(16), Border(1, solid, Gray300), Padding(4, 8), Background(White), Gap(4))
+            return new FlexColumn(WidthFull, Color(Gray600), BorderRadius(16), Border(1, solid, Gray300), Padding(4, 8), Background(White), Gap(4))
             {
-                new FlexRowCentered(Gap(4))
+                new FlexRow(AlignItemsCenter, Gap(4))
                 {
                     new span(FontWeight600) { state.Model.Name },
 
                     new span { ":" },
 
-                    new MagicInput { FitContent  = true, Value = state.Model.Value, Suggestions = suggestions, OnChange = OnPropertyValueChanged }
+                    new MagicInput { Value = state.Model.Value, Suggestions = suggestions, OnChange = OnPropertyValueChanged }
                 },
 
-                new FlexRowCentered(Gap(4))
+                new FlexRow(AlignItemsCenter, Gap(4))
                 {
                     new span(FontWeight600) { "on:" },
 
                     new MagicInput
                     {
-                        FitContent  = true, 
                         Value       = state.Model.Condition,
                         Suggestions = ["state.IsEndUser", "prop.HasNewValue", "prop.IsNewRecord"],
                         OnChange    = OnConditionChanged
