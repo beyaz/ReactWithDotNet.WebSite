@@ -266,9 +266,40 @@ sealed class ApplicationView: Component<ApplicationView.State>
     
     Element PartRightPanel()
     {
-        return new FlexColumn(AlignItemsCenter,BorderLeft(1, dotted, "#d9d9d9"))
+        return new FlexColumn(AlignItemsCenter, Gap(16), BorderLeft(1, dotted, "#d9d9d9"), OverflowYAuto)
         {
-            new StyleEditor()
+            new FlexColumn(WidthFull)
+            {
+                new label{"Style"},
+                new StyleEditor()
+            },
+            
+            new FlexColumn(WidthFull)
+            {
+                new label{"UserName"},
+                new StyleEditor()
+            },
+            new FlexColumn(WidthFull)
+            {
+                new label{"UserName"},
+                new StyleEditor()
+            },
+            new FlexColumn(WidthFull)
+            {
+                new label{"UserName"},
+                new StyleEditor()
+            },
+            new FlexColumn(WidthFull)
+            {
+                new label{"UserName"},
+                new StyleEditor()
+            },
+            new FlexColumn(WidthFull)
+            {
+                new label{"UserName"},
+                new StyleEditor()
+            }
+            
         };
     }
     
@@ -305,17 +336,18 @@ sealed class ApplicationView: Component<ApplicationView.State>
             new FlexRow(WidthFull, AlignItemsCenter, Padding(8,4), JustifyContentSpaceAround, BorderBottom(1, dotted, "#d9d9d9"), BorderTop(1, dotted, "#d9d9d9"))
             {
                 Color(Gray300),
-                new FlexRowCentered(Size(18), OnClick(OnElementTreeTabClicked))
+                
+                new FlexRowCentered(WidthFull, OnClick(OnElementTreeTabClicked))
                 {
-                    new IconLayers() + (state.LeftPanelSelectedTabName == LeftPanelSelectedTabNames.ElementTree ? Color(Blue300): null)
+                    new IconLayers() +Size(18)+ (state.LeftPanelSelectedTabName == LeftPanelSelectedTabNames.ElementTree ? Color(Blue300): null)
                 },
-                new FlexRowCentered(Size(24),OnClick(OnSettingsTabClicked))
+                new FlexRowCentered(WidthFull,OnClick(OnSettingsTabClicked))
                 {
-                    new IconSettings() + (state.LeftPanelSelectedTabName == LeftPanelSelectedTabNames.Settings ? Color(Blue300): null)
+                    new IconSettings() + Size(24) + (state.LeftPanelSelectedTabName == LeftPanelSelectedTabNames.Settings ? Color(Blue300): null)
                 },
-                new FlexRowCentered(Size(24), OnClick(OnSaveTabClicked))
+                new FlexRowCentered(WidthFull, OnClick(OnSaveTabClicked))
                 {
-                    new IconSave() + (state.LeftPanelSelectedTabName == LeftPanelSelectedTabNames.Save ? Color(Blue300): null)
+                    new IconSave() + Size(24) + (state.LeftPanelSelectedTabName == LeftPanelSelectedTabNames.Save ? Color(Blue300): null)
                 },
             },
             

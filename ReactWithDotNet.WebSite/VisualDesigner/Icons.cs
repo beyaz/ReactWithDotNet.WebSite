@@ -111,15 +111,20 @@ sealed class IconSave : PureComponent
 {
     protected override Element render()
     {
-        return new svg(ViewBox(0, 0, 24, 24), svg.Size(24),    StrokeWidth("2"), StrokeLinecap("round"), StrokeLinejoin("round"))
+        return new svg(ViewBox(0, 0, 24, 24), Fill(none), svg.Size(24), Stroke("currentColor"), StrokeWidth("2"), StrokeLinecap("round"), StrokeLinejoin("round"))
         {
             new path
             {
-                d      = "M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z",
-                stroke = "currentColor"
+                d = "M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10l4 4v12a2 2 0 0 1-2 2z"
             },
-            new polyline{ points = "17 21 17 13 7 13 7 21"},
-            new polyline{ points = "7 3 7 8 15 8"}
+            new path
+            {
+                d = "M9 21V12h6v9"
+            },
+            new path
+            {
+                d = "M9 3h6v5H9z"
+            }
         };
     }
 }

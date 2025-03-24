@@ -200,7 +200,7 @@ sealed class MagicInput : Component<MagicInput.State>
             new FlexColumn(PositionAbsolute, Top(4), HeightAuto, Background(White), BoxShadow(0, 6, 6, 0, rgba(22, 45, 61, .06)), Padding(5), BorderRadius(5))
             {
                 Zindex4,
-                suggestions.Select(ToOption)
+                suggestions.Take(5).Select(ToOption)
             }
         };
 

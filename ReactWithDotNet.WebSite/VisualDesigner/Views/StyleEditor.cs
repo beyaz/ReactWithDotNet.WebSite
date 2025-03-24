@@ -18,10 +18,8 @@ sealed class StyleEditor : Component<StyleEditor.State>
 
     protected override Element render()
     {
-        return new FlexRow(AlignItemsCenter, FlexWrap, Border(1, solid, Gray300), BorderRadius(4), Padding(5, 10), Gap(16), Background(White))
+        return new FlexColumn(WidthFull,  Padding(8, 16), Gap(16), Background(White))
         {
-            
-            
             state.Value.Select(x => new PropertyEditor
             {
                 Model               = x,
