@@ -1,19 +1,26 @@
-﻿using System.Web;
-using Microsoft.Net.Http.Headers;
-
+﻿
 namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationView: Component<ApplicationView.State>
 {
     protected override Task constructor()
     {
-        
+        state = new()
+        {
+            ScreenWidth              = 400,
+            ScreenHeight             = 400,
+            Scale                    = 100,
+            LeftPanelSelectedTabName = LeftPanelSelectedTabNames.ElementTree,
+            Model = Dummy.ProjectModel
+        };
         
         return Task.CompletedTask;
     }
 
     public static string UrlPath => "/$";
     internal static string UrlPathOfComponentPreview => $"{UrlPath}?preview=true";
+    
+    
     
     
     
@@ -329,8 +336,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
     {
         var componentSelector = new MagicInput
         {
-            Suggestions = ["abc", "abc3"]
-            
+            Suggestions = state.Model.Components.Select(x => x.Name).ToList()
         };
 
         return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"))
@@ -500,55 +506,16 @@ sealed class ApplicationView: Component<ApplicationView.State>
     }
     internal class State
     {
-        public string LeftPanelSelectedTabName { get; set; } = LeftPanelSelectedTabNames.ElementTree;
+        public string LeftPanelSelectedTabName { get; set; } 
 
         public string SelectedVisualElementTreePath { get; set; }
         
-        public int ScreenWidth { get; set; } = 400;
+        public int ScreenWidth { get; set; } 
         
-        public int ScreenHeight { get; init; } = 400;
+        public int ScreenHeight { get; init; } 
     
-        public int Scale { get; set; } = 100;
+        public int Scale { get; set; }
         
-        public ProjectModel Model { get; set; } = new()
-        {
-            Name = "Demo Project",
-            Components =
-            [
-                new ComponentModel
-                {
-                    Name        = "LoginIcon",
-                    PropsAsJson = "{'isActive': true}",
-                    StateAsJson = "{'user': { 'name': 'Tom', 'year': 41 }}",
-                    RootElement = new()
-                    {
-                        Tag = "div",
-                        Children =
-                        [
-                            new() { Tag = "label", Text = "Abc1" },
-                            new() { Tag = "span", Text  = "Abc2" },
-                            new() { Tag = "ul", Text    = "Abc3" },
-
-                            new()
-                            {
-                                Tag = "div",
-                                Children =
-                                [
-                                    new() { Tag = "label", Text = "Abc1" },
-                                    new() { Tag = "span", Text  = "Abc2" },
-                                    new()
-                                    {
-                                        Tag  = "ul",
-                                        Text = "Abc3"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        };
-
-       
+        public ProjectModel Model { get; set; }
     }
 }
