@@ -1,4 +1,6 @@
 ﻿
+using static ReactWithDotNet.WebSite.Components.RenderPreview;
+
 namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationView: Component<ApplicationView.State>
@@ -11,7 +13,8 @@ sealed class ApplicationView: Component<ApplicationView.State>
             ScreenHeight             = 400,
             Scale                    = 100,
             LeftPanelSelectedTabName = LeftPanelSelectedTabNames.ElementTree,
-            Project = Dummy.ProjectModel
+            Project = Dummy.ProjectModel,
+            SelectedVisualElementTreePath = null
         };
 
         if (state.SelectedComponentName is null && state.Project.Components.Count > 0)
@@ -282,8 +285,34 @@ sealed class ApplicationView: Component<ApplicationView.State>
     
     Element PartRightPanel()
     {
+        Element tag = null;
+        if (state.SelectedVisualElementTreePath.HasValue())
+        {
+            var tagSuggestions = new List<string>(TagNameList);
+
+            tagSuggestions.AddRange(state.Project.Components.Where(c => c.Name != state.SelectedComponentName).Select(x => x.Name));
+
+            var visualElementModel = FindTreeNodeByTreePath(state.Project.Components.First(x=>x.Name == state.SelectedComponentName).RootElement, state.SelectedVisualElementTreePath);
+
+            tag = new FlexColumn(WidthFull)
+            {
+                new label { "Tag" },
+                new MagicInput { Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = newTag =>
+                {
+                    var visualElementModel2 = FindTreeNodeByTreePath(state.Project.Components.First(x=>x.Name == state.SelectedComponentName).RootElement, state.SelectedVisualElementTreePath);
+                    
+                    visualElementModel2.Tag = newTag;
+
+                    return Task.CompletedTask;
+                }}
+            };
+        }
+        
+
         return new FlexColumn(AlignItemsCenter, Gap(16), BorderLeft(1, dotted, "#d9d9d9"), OverflowYAuto)
         {
+            tag,
+            
             new FlexColumn(WidthFull)
             {
                 new label{"Style"},
