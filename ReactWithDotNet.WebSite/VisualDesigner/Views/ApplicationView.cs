@@ -409,7 +409,6 @@ sealed class ApplicationView: Component<ApplicationView.State>
                 SelectionChanged = OnVisualElementTreeSelected,
                 SelectedPath     = state.SelectedVisualElementTreePath,
                 Model = state.Project.Components.FirstOrDefault(x=>x.Name == state.SelectedComponentName)?.RootElement,
-                Name = state.SelectedComponentName
             }
             
         };

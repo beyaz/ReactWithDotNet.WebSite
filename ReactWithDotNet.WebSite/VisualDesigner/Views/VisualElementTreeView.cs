@@ -1,66 +1,35 @@
 ﻿namespace ReactWithDotNet.VisualDesigner.Views;
 
-sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
+sealed class VisualElementTreeView : Component
 {
     public VisualElementModel Model { get; init; }
-
-    public string Name { get; init; }
 
     public string SelectedPath { get; init; }
 
     [CustomEvent]
     public Func<string, Task> SelectionChanged { get; init; }
 
-    protected override Task constructor()
-    {
-        InitializeState();
-
-        return Task.CompletedTask;
-    }
-
-    protected override Task OverrideStateFromPropsBeforeRender()
-    {
-        if (Name != state.InitialName)
-        {
-            InitializeState();
-        }
-
-        return Task.CompletedTask;
-    }
-
     protected override Element render()
     {
         return new div(CursorPointer, Padding(5))
         {
-            ToVisual(state.Model, 0, "0"),
+            ToVisual(Model, 0, "0"),
             WidthFull, HeightFull
-        };
-    }
-
-    void InitializeState()
-    {
-        state = new()
-        {
-            Model               = Model,
-            SelectedPath        = SelectedPath,
-            InitialModel        = Model,
-            InitialSelectedPath = SelectedPath,
-            InitialName         = Name
         };
     }
 
     Task OnTreeItemClicked(MouseEvent e)
     {
-        state.SelectedPath = e.currentTarget.id;
+        var selectedPath = e.currentTarget.id;
 
-        DispatchEvent(SelectionChanged, [state.SelectedPath]);
+        DispatchEvent(SelectionChanged, [selectedPath]);
 
         return Task.CompletedTask;
     }
 
     IReadOnlyList<Element> ToVisual(VisualElementModel node, int indent, string path)
     {
-        var isSelected = state.SelectedPath == path;
+        var isSelected = SelectedPath == path;
 
         var returnList = new List<Element>
         {
@@ -87,18 +56,5 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
         }
 
         return returnList;
-    }
-
-    internal class State
-    {
-        public VisualElementModel InitialModel { get; init; }
-
-        public string InitialName { get; init; }
-
-        public string InitialSelectedPath { get; set; }
-
-        public VisualElementModel Model { get; init; }
-
-        public string SelectedPath { get; set; }
     }
 }
