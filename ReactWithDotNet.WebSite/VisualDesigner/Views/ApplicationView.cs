@@ -319,21 +319,12 @@ sealed class ApplicationView: Component<ApplicationView.State>
                 new StyleEditor()
             },
             
-            new FlexColumn(WidthFull)
+            new PropertyEditor
             {
-                new label{"UserName"},
-                new StyleEditor()
+                Model               = new PropertyModel{ Name = "gap", Value = "5", Condition = "xx"},
+                PropertySuggestions = StyleProperties
             },
-            new FlexColumn(WidthFull)
-            {
-                new label{"UserName"},
-                new StyleEditor()
-            },
-            new FlexColumn(WidthFull)
-            {
-                new label{"UserName"},
-                new StyleEditor()
-            },
+            
             new FlexColumn(WidthFull)
             {
                 new label{"UserName"},

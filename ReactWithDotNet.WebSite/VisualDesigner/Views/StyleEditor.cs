@@ -2,25 +2,16 @@
 
 sealed class StyleEditor : Component<StyleEditor.State>
 {
+    [CustomEvent]
+    public Func<IReadOnlyList<PropertyModel>, Task> OnChange { get; init; }
+
     public IReadOnlyList<PropertyModel> Value { get; init; } = [new() { Name = "gap", Value = "5" }];
-
-    protected override Task constructor()
-    {
-        state = new()
-        {
-            InitialValue = Value ?? [],
-
-            Value = (Value ?? []).ToList()
-        };
-
-        return Task.CompletedTask;
-    }
 
     protected override Element render()
     {
-        return new FlexColumn(WidthFull,  Padding(8, 16), Gap(16), Background(White))
+        return new FlexColumn(WidthFull, Padding(8, 16), Gap(16), Background(White))
         {
-            state.Value.Select(x => new PropertyEditor
+            Value.Select(x => new PropertyEditor
             {
                 Model               = x,
                 PropertySuggestions = StyleProperties
@@ -35,15 +26,17 @@ sealed class StyleEditor : Component<StyleEditor.State>
 
     Task OnAddNewItem(PropertyModel newModel)
     {
-        state.Value.Add(newModel);
+        var newValue = new List<PropertyModel> { newModel };
+
+        newValue.AddRange(Value);
+
+        DispatchEvent(OnChange, [newValue]);
 
         return Task.CompletedTask;
     }
 
     internal class State
     {
-        public IReadOnlyList<PropertyModel> InitialValue { get; init; }
-
-        public List<PropertyModel> Value { get; init; }
+        public int? SelectedItemIndex { get; set; }
     }
 }
