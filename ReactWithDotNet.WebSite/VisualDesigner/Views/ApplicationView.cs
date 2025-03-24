@@ -347,6 +347,9 @@ sealed class ApplicationView: Component<ApplicationView.State>
             OnChange = async componentName =>
             {
                 state.SelectedComponentName = componentName;
+                
+                state.SelectedVisualElementTreePath = null;
+                
                 await SaveState();
             }
         };
@@ -376,7 +379,8 @@ sealed class ApplicationView: Component<ApplicationView.State>
             {
                 SelectionChanged = OnVisualElementTreeSelected,
                 SelectedPath     = state.SelectedVisualElementTreePath,
-                Model = state.Project.Components.FirstOrDefault(x=>x.Name == state.SelectedComponentName)?.RootElement
+                Model = state.Project.Components.FirstOrDefault(x=>x.Name == state.SelectedComponentName)?.RootElement,
+                Name = state.SelectedComponentName
             }
             
         };

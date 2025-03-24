@@ -4,14 +4,26 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 {
     public VisualElementModel Model { get; init; }
 
+    public string Name { get; init; }
+
     public string SelectedPath { get; init; }
 
     [CustomEvent]
-    public Func<string, Task> SelectionChanged { get; set; }
+    public Func<string, Task> SelectionChanged { get; init; }
 
     protected override Task constructor()
     {
         InitializeState();
+
+        return Task.CompletedTask;
+    }
+
+    protected override Task OverrideStateFromPropsBeforeRender()
+    {
+        if (Name != state.InitialName)
+        {
+            InitializeState();
+        }
 
         return Task.CompletedTask;
     }
@@ -32,14 +44,15 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
             Model               = Model,
             SelectedPath        = SelectedPath,
             InitialModel        = Model,
-            InitialSelectedPath = SelectedPath
+            InitialSelectedPath = SelectedPath,
+            InitialName         = Name
         };
     }
 
     Task OnTreeItemClicked(MouseEvent e)
     {
         state.SelectedPath = e.currentTarget.id;
-        
+
         DispatchEvent(SelectionChanged, [state.SelectedPath]);
 
         return Task.CompletedTask;
@@ -79,6 +92,8 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
     internal class State
     {
         public VisualElementModel InitialModel { get; init; }
+
+        public string InitialName { get; init; }
 
         public string InitialSelectedPath { get; set; }
 
