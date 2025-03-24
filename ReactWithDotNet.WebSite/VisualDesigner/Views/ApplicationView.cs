@@ -29,7 +29,10 @@ sealed class ApplicationView: Component<ApplicationView.State>
             {
                 applicationTopPanel,
 
-                MainContent,
+                new FlexRow(Flex(1,1,0), OverflowYAuto)
+                {
+                    MainContent
+                },
                 
                 new Style
                 {
