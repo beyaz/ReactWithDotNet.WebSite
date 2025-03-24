@@ -11,8 +11,14 @@ sealed class ApplicationView: Component<ApplicationView.State>
             ScreenHeight             = 400,
             Scale                    = 100,
             LeftPanelSelectedTabName = LeftPanelSelectedTabNames.ElementTree,
-            Model = Dummy.ProjectModel
+            Project = Dummy.ProjectModel
         };
+
+        if (state.SelectedComponentName is null && state.Project.Components.Count > 0)
+        {
+            state.SelectedComponentName = state.Project.Components[0].Name;
+        }
+        
         
         return Task.CompletedTask;
     }
@@ -336,7 +342,13 @@ sealed class ApplicationView: Component<ApplicationView.State>
     {
         var componentSelector = new MagicInput
         {
-            Suggestions = state.Model.Components.Select(x => x.Name).ToList()
+            Suggestions = state.Project.Components.Select(x => x.Name).ToList(),
+            Value = state.SelectedComponentName,
+            OnChange = async componentName =>
+            {
+                state.SelectedComponentName = componentName;
+                await SaveState();
+            }
         };
 
         return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"))
@@ -364,31 +376,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
             {
                 SelectionChanged = OnVisualElementTreeSelected,
                 SelectedPath     = state.SelectedVisualElementTreePath,
-                Model = new()
-                {
-                    Tag = "div",
-                    Children =
-                    [
-                        new() { Tag = "label", Text = "Abc1" },
-                        new() { Tag = "span", Text  = "Abc2" },
-                        new() { Tag = "ul", Text    = "Abc3" },
-
-                        new()
-                        {
-                            Tag = "div",
-                            Children =
-                            [
-                                new() { Tag = "label", Text = "Abc1" },
-                                new() { Tag = "span", Text  = "Abc2" },
-                                new()
-                                {
-                                    Tag  = "ul",
-                                    Text = "Abc3"
-                                }
-                            ]
-                        }
-                    ]
-                }
+                Model = state.Project.Components.FirstOrDefault(x=>x.Name == state.SelectedComponentName)?.RootElement
             }
             
         };
@@ -516,6 +504,8 @@ sealed class ApplicationView: Component<ApplicationView.State>
     
         public int Scale { get; set; }
         
-        public ProjectModel Model { get; set; }
+        public ProjectModel Project { get; set; }
+
+        public string SelectedComponentName { get; set; }
     }
 }
