@@ -38,6 +38,31 @@ static class Dummy
                         }
                     ]
                 }
+            },
+            
+            new ComponentModel
+            {
+                Name        = "SiteTitle",
+                PropsAsJson = "{'isActive': true}",
+                StateAsJson = "{'user': { 'name': 'Tom', 'year': 41 }}",
+                RootElement = new()
+                {
+                    Tag = "div",
+                    Children =
+                    [
+                        new()
+                        {
+                            Tag             = "span", 
+                            Text            = "Abc2",
+                            
+                            StyleAttributes = [
+                                new PropertyModel { Name = "gap", Value = "4" },
+                                new PropertyModel { Name = "width", Value = "fit-content" }
+                            ]
+                        },
+                        
+                    ]
+                }
             }
         ]
     };
