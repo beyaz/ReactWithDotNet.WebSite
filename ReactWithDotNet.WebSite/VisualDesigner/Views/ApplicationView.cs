@@ -376,7 +376,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
                 new span { "S T Y L E", WhiteSpaceNoWrap, UserSelect(none) },
                 new div{ Height(1), WidthFull, Background(Gray200)},
                  
-                new FlexRowCentered(Size(28))
+                new FlexRowCentered(Size(28), OnClick(OnAddNewStyleGroupClicked))
                 {
                     new IconPlus()
                 }
@@ -432,7 +432,31 @@ sealed class ApplicationView: Component<ApplicationView.State>
             
         };
     }
-    
+
+    Task OnAddNewStyleGroupClicked(MouseEvent e)
+    {
+        var styleGroups = SelectedVisualElement.StyleGroups ??= [];
+
+        if (styleGroups.Count == 0)
+        {
+            styleGroups.Add(new ()
+            {
+                Condition = "*",
+                Items = [new PropertyModel()]
+            });
+            
+            return Task.CompletedTask;
+        }
+        
+        styleGroups.Add(new ()
+        {
+            Condition = "MD",
+            Items     = [new PropertyModel()]
+        });
+        
+        return Task.CompletedTask;
+    }
+
     Task OnElementTreeTabClicked(MouseEvent e)
     {
         state.LeftPanelSelectedTabName = LeftPanelSelectedTabNames.ElementTree;
