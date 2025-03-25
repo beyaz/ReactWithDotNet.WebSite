@@ -295,9 +295,19 @@ sealed class ApplicationView: Component<ApplicationView.State>
     {
         get
         {
-            
+            return ["MD", "XXL", "state.user.isActive", "MD: state.user.isActive", "XXL: state.user.isActive"];
         }
     }
+    
+    IReadOnlyList<string> StyleAttributeNameSuggestions
+    {
+        get
+        {
+            return StyleProperties.Select(x => x.Name).ToList();
+        }
+    }
+    
+    
     
     Element PartRightPanel()
     {
@@ -326,7 +336,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
         var condition = new FlexRow(WidthFull, Gap(4))
         {
             new label { "Condition:", FontWeightBold },
-            new MagicInput { Value = visualElementModel.Condition, Suggestions = tagSuggestions, OnChange = newCondition =>
+            new MagicInput { Value = visualElementModel.Condition, Suggestions = BooleanSuggestions, OnChange = newCondition =>
             {
                 SelectedVisualElement.Condition = newCondition;
 
@@ -366,7 +376,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
                         {
                             new FlexRow(JustifyContentFlexEnd, Width(3, 10))
                             {
-                                new MagicInput{ Value = property.Name, IsBold = true, IsTextAlignRight = true, Suggestions = StyleProperties.Select(x=>x.Name).ToList()}
+                                new MagicInput{ Value = property.Name, IsBold = true, IsTextAlignRight = true, Suggestions = StyleAttributeNameSuggestions}
                             },
                             " : ",
                             new FlexRow(Width(7, 10))
@@ -374,22 +384,22 @@ sealed class ApplicationView: Component<ApplicationView.State>
                                 new MagicInput{ Value = property.Value}
                             }
                         };
-                    }),
-                    
-                    new FlexRow(Gap(4))
-                    {
-                        new FlexRow(JustifyContentFlexEnd, Width(3, 10))
-                        {
-                            new MagicInput{  Placeholder = "", IsTextAlignRight = true, Suggestions = StyleProperties.Select(x=>x.Name).ToList()}
-                        },
-                        " : ",
-                        new FlexRow(Width(7, 10))
-                        {
-                            new MagicInput{ Placeholder = ""}
-                        }
-                    }
+                    })
                 };
-            })
+            }),
+            
+            new FlexRow(Gap(4))
+            {
+                new FlexRow(JustifyContentFlexEnd, Width(3, 10))
+                {
+                    new MagicInput{ Value = string.Empty, IsBold = true, IsTextAlignRight = true, Suggestions = StyleAttributeNameSuggestions}
+                },
+                " : ",
+                new FlexRow(Width(7, 10))
+                {
+                    new MagicInput{ Placeholder = ""}
+                }
+            }
             
         };
     }
