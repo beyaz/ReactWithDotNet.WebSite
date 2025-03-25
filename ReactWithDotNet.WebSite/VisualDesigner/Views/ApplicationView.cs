@@ -356,7 +356,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
         
         
 
-        return new FlexColumn( BorderLeft(1, dotted, "#d9d9d9"), OverflowYAuto, Background(White), PositionRelative)
+        return new FlexColumn( BorderLeft(1, dotted, "#d9d9d9"), OverflowYAuto, Background(White))
         {
             new FlexColumn(WidthFull, Padding(4))
             {
@@ -367,16 +367,22 @@ sealed class ApplicationView: Component<ApplicationView.State>
             
             new FlexRow(WidthFull,AlignItemsCenter, Gap(4))
             {
+                new FlexRowCentered(Size(28), Color(Gray100))
+                {
+                    new IconMinus()
+                },
+                
                 new div{ Height(1), WidthFull, Background(Gray200)},
                 new span { "S T Y L E", WhiteSpaceNoWrap, UserSelect(none) },
                 new div{ Height(1), WidthFull, Background(Gray200)},
+                 
+                new FlexRowCentered(Size(28))
+                {
+                    new IconPlus()
+                }
+                
             },
             
-            new FlexRowCentered(PositionAbsolute, TopRight(4))
-            {
-                new IconMinus(),
-                new IconPlus()
-            },
             
             visualElementModel.StyleGroups?.Select(styleGroup =>
             {
@@ -385,7 +391,12 @@ sealed class ApplicationView: Component<ApplicationView.State>
                     new FlexRow(WidthFull, AlignItemsCenter, Gap(4))
                     {
                         new div { Height(1), Width(32), Background(Gray200) },
-                        new span { styleGroup.Condition ?? "All", WhiteSpaceNoWrap }
+                        new span { styleGroup.Condition ?? "All", WhiteSpaceNoWrap },
+                        new FlexRowCentered(Gap(8))
+                        {
+                            new IconPlus(),
+                            new IconMinus()
+                        }
                     },
                     
                     styleGroup.Items.Select((property , index)=>
