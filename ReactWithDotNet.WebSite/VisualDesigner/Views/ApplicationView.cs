@@ -290,6 +290,14 @@ sealed class ApplicationView: Component<ApplicationView.State>
             return  FindTreeNodeByTreePath(state.Project.Components.First(x=>x.Name == state.SelectedComponentName).RootElement, state.SelectedVisualElementTreePath);
         }
     }
+
+    IReadOnlyList<string> BooleanSuggestions
+    {
+        get
+        {
+            
+        }
+    }
     
     Element PartRightPanel()
     {
