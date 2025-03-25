@@ -1,4 +1,6 @@
 ﻿
+using System;
+using System.Reflection;
 using static ReactWithDotNet.WebSite.Components.RenderPreview;
 
 namespace ReactWithDotNet.VisualDesigner.Views;
@@ -306,8 +308,13 @@ sealed class ApplicationView: Component<ApplicationView.State>
             return StyleProperties.Select(x => x.Name).ToList();
         }
     }
-    
-    
+
+
+
+    Task OnInputChanged(string senderName, string newValue)
+    {
+        return Task.CompletedTask;
+    }
     
     Element PartRightPanel()
     {
@@ -325,7 +332,11 @@ sealed class ApplicationView: Component<ApplicationView.State>
         var tag = new FlexRow(WidthFull, Gap(4))
         {
             new label { "Tag:", FontWeightBold },
-            new MagicInput { Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = newTag =>
+            new MagicInput 
+            {
+                Name = SenderName.Tag,
+                
+                Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = newTag =>
             {
                 SelectedVisualElement.Tag = newTag;
 
@@ -336,7 +347,11 @@ sealed class ApplicationView: Component<ApplicationView.State>
         var condition = new FlexRow(WidthFull, Gap(4))
         {
             new label { "Condition:", FontWeightBold },
-            new MagicInput { Value = visualElementModel.Condition, Suggestions = BooleanSuggestions, OnChange = newCondition =>
+            new MagicInput { 
+                
+                
+                Name = SenderName.Tag,
+                Value = visualElementModel.Condition, Suggestions = BooleanSuggestions, OnChange = newCondition =>
             {
                 SelectedVisualElement.Condition = newCondition;
 
@@ -370,18 +385,18 @@ sealed class ApplicationView: Component<ApplicationView.State>
                         new span { styleGroup.Condition ?? "All", WhiteSpaceNoWrap }
                     },
                     
-                    styleGroup.Items.Select(property =>
+                    styleGroup.Items.Select((property , index)=>
                     {
                         return new FlexRow(Gap(4))
                         {
                             new FlexRow(JustifyContentFlexEnd, Width(3, 10))
                             {
-                                new MagicInput{ Value = property.Name, IsBold = true, IsTextAlignRight = true, Suggestions = StyleAttributeNameSuggestions}
+                                new MagicInput{ Name = index.ToString() ,Value = property.Name, IsBold = true, IsTextAlignRight = true, Suggestions = StyleAttributeNameSuggestions}
                             },
                             " : ",
                             new FlexRow(Width(7, 10))
                             {
-                                new MagicInput{ Value = property.Value}
+                                new MagicInput{ Name = index.ToString(), Value = property.Value}
                             }
                         };
                     })
@@ -392,12 +407,12 @@ sealed class ApplicationView: Component<ApplicationView.State>
             {
                 new FlexRow(JustifyContentFlexEnd, Width(3, 10))
                 {
-                    new MagicInput{ Value = string.Empty, IsBold = true, IsTextAlignRight = true, Suggestions = StyleAttributeNameSuggestions}
+                    new MagicInput{ Name = "lastItem", Value = string.Empty, IsBold = true, IsTextAlignRight = true, Suggestions = StyleAttributeNameSuggestions}
                 },
                 " : ",
                 new FlexRow(Width(7, 10))
                 {
-                    new MagicInput{ Placeholder = ""}
+                    new MagicInput{ Name = "last", Placeholder = ""}
                 }
             }
             
@@ -422,11 +437,19 @@ sealed class ApplicationView: Component<ApplicationView.State>
         
         return Task.CompletedTask;
     }
+
+    static class SenderName
+    {
+        public static readonly string  ComponentName = nameof(ComponentName);
+        public static readonly string  Tag = nameof(Tag);
+    }
     
     Element PartLeftPanel()
     {
         var componentSelector = new MagicInput
         {
+            Name = SenderName.ComponentName,
+            
             Suggestions = state.Project.Components.Select(x => x.Name).ToList(),
             Value = state.SelectedComponentName,
             OnChange = async componentName =>

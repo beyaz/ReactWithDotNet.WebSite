@@ -2,6 +2,8 @@
 
 sealed class MagicInput : Component<MagicInput.State>
 {
+    public required string Name { get; init; }
+    
     [CustomEvent]
     public Func<string, Task> OnChange { get; init; }
 
