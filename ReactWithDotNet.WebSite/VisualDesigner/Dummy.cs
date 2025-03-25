@@ -55,10 +55,14 @@ static class Dummy
                             Tag             = "span", 
                             Text            = "Abc2",
                             
-                            StyleAttributes = [
-                                new PropertyModel { Name = "gap", Value = "4" },
-                                new PropertyModel { Name = "width", Value = "fit-content" }
-                            ]
+                            StyleGroups = [new PropertyGroupModel()
+                                {
+                                    Condition = "hover",
+                                    Items = [
+                                        new PropertyModel { Name = "gap", Value   = "4" },
+                                        new PropertyModel { Name = "width", Value = "fit-content" }
+                                    ]
+                                }]
                         },
                         
                     ]

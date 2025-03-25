@@ -20,15 +20,26 @@ sealed record PropertyModel
     // @formatter:on
 }
 
+sealed record PropertyGroupModel
+{
+    // @formatter:off
+    
+    public string Condition { get; set; }
+
+    public List<PropertyModel> Items { get; set; }
+    
+    // @formatter:on
+}
+
 sealed record VisualElementModel
 {
     // @formatter:off
     
     public string Tag { get; set; }
     
-    public List<PropertyModel> StyleAttributes { get; set; }
+    public List<PropertyGroupModel> StyleGroups { get; set; } = [];
     
-    public List<PropertyModel> Properties { get; set; }
+    public List<PropertyModel> PropertyGroups { get; set; }= [];
     
     public string Text { get; set; }
     
