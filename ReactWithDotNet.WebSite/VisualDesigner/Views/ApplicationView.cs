@@ -10,14 +10,14 @@ sealed class ApplicationView: Component<ApplicationView.State>
             ScreenWidth              = 400,
             ScreenHeight             = 400,
             Scale                    = 100,
-            LeftPanelSelectedTabName = LeftPanelSelectedTabNames.ElementTree,
+            LeftPanelCurrentTabName = LeftPanelSelectedTabNames.ElementTree,
             Project = Dummy.ProjectModel,
-            SelectedVisualElementTreePath = null
+            CurrentVisualElementTreePath = null
         };
 
-        if (state.SelectedComponentName is null && state.Project.Components.Count > 0)
+        if (state.CurrentComponentName is null && state.Project.Components.Count > 0)
         {
-            state.SelectedComponentName = state.Project.Components[0].Name;
+            state.CurrentComponentName = state.Project.Components[0].Name;
         }
         
         
@@ -281,11 +281,11 @@ sealed class ApplicationView: Component<ApplicationView.State>
         }
     }
 
-    VisualElementModel SelectedVisualElement
+    VisualElementModel CurrentVisualElement
     {
         get
         {
-            return  FindTreeNodeByTreePath(state.Project.Components.First(x=>x.Name == state.SelectedComponentName).RootElement, state.SelectedVisualElementTreePath);
+            return  FindTreeNodeByTreePath(state.Project.Components.First(x=>x.Name == state.CurrentComponentName).RootElement, state.CurrentVisualElementTreePath);
         }
     }
 
@@ -325,19 +325,19 @@ sealed class ApplicationView: Component<ApplicationView.State>
     {
         if (senderName == SenderName.Tag)
         {
-            SelectedVisualElement.Tag = newValue;    
+            CurrentVisualElement.Tag = newValue;    
         }
         
         if (senderName == SenderName.Condition)
         {
-            SelectedVisualElement.Condition = newValue;    
+            CurrentVisualElement.Condition = newValue;    
         }
 
         if (senderName == SenderName.ComponentName)
         {
-            state.SelectedComponentName = newValue;
+            state.CurrentComponentName = newValue;
                 
-            state.SelectedVisualElementTreePath = null;
+            state.CurrentVisualElementTreePath = null;
         }
         
         
@@ -346,16 +346,16 @@ sealed class ApplicationView: Component<ApplicationView.State>
     
     Element PartRightPanel()
     {
-        if (!state.SelectedVisualElementTreePath.HasValue())
+        if (!state.CurrentVisualElementTreePath.HasValue())
         {
             return new div();
         }
         
         var tagSuggestions = new List<string>(TagNameList);
 
-        tagSuggestions.AddRange(state.Project.Components.Where(c => c.Name != state.SelectedComponentName).Select(x => x.Name));
+        tagSuggestions.AddRange(state.Project.Components.Where(c => c.Name != state.CurrentComponentName).Select(x => x.Name));
 
-        var visualElementModel = SelectedVisualElement;
+        var visualElementModel = CurrentVisualElement;
 
         var tag = new FlexRow(WidthFull, Gap(4))
         {
@@ -407,9 +407,9 @@ sealed class ApplicationView: Component<ApplicationView.State>
                     {
                         new FlexRowCentered(Size(28))
                         {
-                            When(state.SelectedStyleGroupCondition != styleGroup.Condition, Color(Gray100)),
+                            When(state.CurrentStyleGroupCondition != styleGroup.Condition, Color(Gray100)),
                             
-                            When(state.SelectedStyleGroupCondition == styleGroup.Condition,  OnClick(ActiveStyleGroupActivePropertyDeleteClicked)),
+                            When(state.CurrentStyleGroupCondition == styleGroup.Condition,  OnClick(ActiveStyleGroupActivePropertyDeleteClicked)),
                             
                             new IconMinus()
                         },
@@ -489,7 +489,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
     
     public Task OnStyleGroupSelected(string senderName)
     {
-        state.SelectedStyleGroupCondition = senderName;
+        state.CurrentStyleGroupCondition = senderName;
         
         return Task.CompletedTask;
     }
@@ -498,7 +498,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
     {
         get
         {
-            return SelectedVisualElement.StyleGroups.First(x => x.Condition == state.SelectedStyleGroupCondition);
+            return CurrentVisualElement.StyleGroups.First(x => x.Condition == state.CurrentStyleGroupCondition);
         }
     }
     
@@ -528,7 +528,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
     }
     Task OnAddNewStyleGroupClicked(MouseEvent e)
     {
-        var styleGroups = SelectedVisualElement.StyleGroups ??= [];
+        var styleGroups = CurrentVisualElement.StyleGroups ??= [];
 
         if (styleGroups.Count == 0)
         {
@@ -552,19 +552,19 @@ sealed class ApplicationView: Component<ApplicationView.State>
 
     Task OnElementTreeTabClicked(MouseEvent e)
     {
-        state.LeftPanelSelectedTabName = LeftPanelSelectedTabNames.ElementTree;
+        state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.ElementTree;
         
         return Task.CompletedTask;
     }
     Task OnSettingsTabClicked(MouseEvent e)
     {
-        state.LeftPanelSelectedTabName = LeftPanelSelectedTabNames.Settings;
+        state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.Settings;
         
         return Task.CompletedTask;
     }
     Task OnSaveTabClicked(MouseEvent e)
     {
-        state.LeftPanelSelectedTabName = LeftPanelSelectedTabNames.Save;
+        state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.Save;
         
         return Task.CompletedTask;
     }
@@ -583,7 +583,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
             Name = SenderName.ComponentName,
             
             Suggestions = state.Project.Components.Select(x => x.Name).ToList(),
-            Value = state.SelectedComponentName,
+            Value = state.CurrentComponentName,
             OnChange = OnInputChanged
         };
 
@@ -596,23 +596,23 @@ sealed class ApplicationView: Component<ApplicationView.State>
                 
                 new FlexRowCentered(WidthFull, OnClick(OnElementTreeTabClicked))
                 {
-                    new IconLayers() +Size(18)+ (state.LeftPanelSelectedTabName == LeftPanelSelectedTabNames.ElementTree ? Color(Blue300): null)
+                    new IconLayers() +Size(18)+ (state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.ElementTree ? Color(Blue300): null)
                 },
                 new FlexRowCentered(WidthFull,OnClick(OnSettingsTabClicked))
                 {
-                    new IconSettings() + Size(24) + (state.LeftPanelSelectedTabName == LeftPanelSelectedTabNames.Settings ? Color(Blue300): null)
+                    new IconSettings() + Size(24) + (state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.Settings ? Color(Blue300): null)
                 },
                 new FlexRowCentered(WidthFull, OnClick(OnSaveTabClicked))
                 {
-                    new IconSave() + Size(24) + (state.LeftPanelSelectedTabName == LeftPanelSelectedTabNames.Save ? Color(Blue300): null)
+                    new IconSave() + Size(24) + (state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.Save ? Color(Blue300): null)
                 },
             },
             
             new VisualElementTreeView
             {
                 SelectionChanged = OnVisualElementTreeSelected,
-                SelectedPath     = state.SelectedVisualElementTreePath,
-                Model = state.Project.Components.FirstOrDefault(x=>x.Name == state.SelectedComponentName)?.RootElement,
+                SelectedPath     = state.CurrentVisualElementTreePath,
+                Model = state.Project.Components.FirstOrDefault(x=>x.Name == state.CurrentComponentName)?.RootElement,
             }
             
         };
@@ -622,7 +622,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
 
     Task OnVisualElementTreeSelected(string treePath)
     {
-        state.SelectedVisualElementTreePath = treePath;
+        state.CurrentVisualElementTreePath = treePath;
 
         return Task.CompletedTask;
     }
@@ -727,9 +727,9 @@ sealed class ApplicationView: Component<ApplicationView.State>
     }
     internal class State
     {
-        public string LeftPanelSelectedTabName { get; set; } 
+        public string LeftPanelCurrentTabName { get; set; } 
 
-        public string SelectedVisualElementTreePath { get; set; }
+        public string CurrentVisualElementTreePath { get; set; }
         
         public int ScreenWidth { get; set; } 
         
@@ -739,9 +739,9 @@ sealed class ApplicationView: Component<ApplicationView.State>
         
         public ProjectModel Project { get; set; }
 
-        public string SelectedComponentName { get; set; }
+        public string CurrentComponentName { get; set; }
         
-        public string SelectedStyleGroupCondition { get; set; }
+        public string CurrentStyleGroupCondition { get; set; }
         
         public int? CurrentPropertyIndex { get; set; }
     }
