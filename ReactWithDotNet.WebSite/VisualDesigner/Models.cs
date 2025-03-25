@@ -47,6 +47,8 @@ sealed record VisualElementModel
 
     internal bool HasChild => Children?.Count > 0;
     
+    public string Condition { get; set; }
+    
     // @formatter:on
 }
 

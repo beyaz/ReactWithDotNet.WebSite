@@ -282,36 +282,58 @@ sealed class ApplicationView: Component<ApplicationView.State>
             };
         }
     }
+
+    VisualElementModel SelectedVisualElement
+    {
+        get
+        {
+            return  FindTreeNodeByTreePath(state.Project.Components.First(x=>x.Name == state.SelectedComponentName).RootElement, state.SelectedVisualElementTreePath);
+        }
+    }
     
     Element PartRightPanel()
     {
-        Element tag = null;
-        if (state.SelectedVisualElementTreePath.HasValue())
+        if (!state.SelectedVisualElementTreePath.HasValue())
         {
-            var tagSuggestions = new List<string>(TagNameList);
-
-            tagSuggestions.AddRange(state.Project.Components.Where(c => c.Name != state.SelectedComponentName).Select(x => x.Name));
-
-            var visualElementModel = FindTreeNodeByTreePath(state.Project.Components.First(x=>x.Name == state.SelectedComponentName).RootElement, state.SelectedVisualElementTreePath);
-
-            tag = new FlexColumn(WidthFull)
-            {
-                new label { "Tag" },
-                new MagicInput { Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = newTag =>
-                {
-                    var visualElementModel2 = FindTreeNodeByTreePath(state.Project.Components.First(x=>x.Name == state.SelectedComponentName).RootElement, state.SelectedVisualElementTreePath);
-                    
-                    visualElementModel2.Tag = newTag;
-
-                    return Task.CompletedTask;
-                }}
-            };
+            return new div();
         }
+        
+        var tagSuggestions = new List<string>(TagNameList);
+
+        tagSuggestions.AddRange(state.Project.Components.Where(c => c.Name != state.SelectedComponentName).Select(x => x.Name));
+
+        var visualElementModel = SelectedVisualElement;
+
+        var tag = new FlexRow(WidthFull, Gap(4))
+        {
+            new label { "Tag:", FontWeightBold },
+            new MagicInput { Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = newTag =>
+            {
+                SelectedVisualElement.Tag = newTag;
+
+                return Task.CompletedTask;
+            }}
+        };
+        
+        var condition = new FlexRow(WidthFull, Gap(4))
+        {
+            new label { "Condition:", FontWeightBold },
+            new MagicInput { Value = visualElementModel.Condition, Suggestions = tagSuggestions, OnChange = newCondition =>
+            {
+                SelectedVisualElement.Condition = newCondition;
+
+                return Task.CompletedTask;
+            }}
+        };
         
         
 
         return new FlexColumn( BorderLeft(1, dotted, "#d9d9d9"), OverflowYAuto, Background(White))
         {
+            tag,
+            
+            condition,
+            
             new FlexRow(WidthFull,AlignItemsCenter, Gap(4))
             {
                 new div{ Height(1), WidthFull, Background(Gray200)},
@@ -319,179 +341,47 @@ sealed class ApplicationView: Component<ApplicationView.State>
                 new div{ Height(1), WidthFull, Background(Gray200)},
             },
             
-            new FlexRow(WidthFull,AlignItemsCenter, Gap(4))
+            
+            visualElementModel.StyleGroups?.Select(styleGroup =>
             {
-                new div{ Height(1), Width(32), Background(Gray200)},
-                new span { "All", WhiteSpaceNoWrap }
-            },
-            
-            
-            new FlexRow(Gap(4))
-            {
-                new FlexRow(JustifyContentFlexEnd)
+                return new FlexColumn(WidthFull)
                 {
-                    new MagicInput{ Value = "gap", IsBold = true, IsTextAlignRight = true, Suggestions = StyleProperties.Select(x=>x.Name).ToList()}
-                },
-                " : ",
-                new FlexRow()
-                {
-                    new MagicInput{ Value = "5px"}
-                }
-            },
-            new FlexRow(Gap(4))
-            {
-                new FlexRow(JustifyContentFlexEnd)
-                {
-                    new MagicInput{ Value = "width", IsBold = true, IsTextAlignRight = true, Suggestions = StyleProperties.Select(x=>x.Name).ToList()}
-                },
-                " : ",
-                new FlexRow()
-                {
-                    new MagicInput{ Value = "fit-content"}
-                }
-            },
-            
-            new FlexRow(WidthFull,AlignItemsCenter, Gap(4))
-            {
-                new div{ Height(1), Width(32), Background(Gray200)},
-                new MagicInput{ Value = "XXL", Suggestions = ["MD","LG","XXL"]}
-            },
-            
-            new FlexRow(Gap(4))
-            {
-                new FlexRow(JustifyContentFlexEnd)
-                {
-                    new MagicInput{ Value = "gap", IsBold = true, IsTextAlignRight = true, Suggestions = StyleProperties.Select(x=>x.Name).ToList()}
-                },
-                " : ",
-                new FlexRow()
-                {
-                    new MagicInput{ Value = "16"}
-                }
-            },
-            
-            new FlexRow(WidthFull,AlignItemsCenter, Gap(4))
-            {
-                new div{ Height(1), Width(32), Background(Gray200)},
-                new MagicInput{ Value = "state.IsUserActive && MD", Suggestions = ["state.IsUserActive && MD","state.IsUserActive && LG","XXL"]}
-            },
-            
-            new FlexRow(Gap(4))
-            {
-                new FlexRow(JustifyContentFlexEnd)
-                {
-                    new MagicInput{ Value = "width", IsBold = true, IsTextAlignRight = true, Suggestions = StyleProperties.Select(x=>x.Name).ToList()}
-                },
-                " : ",
-                new FlexRow()
-                {
-                    new MagicInput{ Value = "fit-content"}
-                }
-            },
-            
-            new FlexRow(Gap(4))
-            {
-                new FlexRow(JustifyContentFlexEnd)
-                {
-                    new MagicInput{ Value = "display", IsBold = true, IsTextAlignRight = true, Suggestions = StyleProperties.Select(x=>x.Name).ToList()}
-                },
-                " : ",
-                new FlexRow()
-                {
-                    new MagicInput{ Value = "flex"}
-                }
-            },
-            
-            
-            SpaceY(16),
-            new FlexRow(WidthFull,AlignItemsCenter, Gap(4))
-            {
-                new div{ Height(1), WidthFull, Background(Gray200)},
-                new span { "P R O P S", WhiteSpaceNoWrap },
-                new div{ Height(1), WidthFull, Background(Gray200)},
-            },
-            
-            new FlexRow(Gap(4))
-            {
-                new FlexRow(JustifyContentFlexEnd)
-                {
-                    new MagicInput{ Value = "src", IsBold = true, IsTextAlignRight = true, Suggestions = StyleProperties.Select(x=>x.Name).ToList()}
-                },
-                " : ",
-                new FlexRow()
-                {
-                    new MagicInput{ Value = "www.google.com"}
-                }
-            },
-            
-            new FlexRow(Gap(4))
-            {
-                new FlexRow(JustifyContentFlexEnd)
-                {
-                    new MagicInput{ Value = "href", IsBold = true, IsTextAlignRight = true, Suggestions = StyleProperties.Select(x=>x.Name).ToList()}
-                },
-                " : ",
-                new FlexRow()
-                {
-                    new MagicInput{ Value = "www.google.com"}
-                }
-            },
-            
-            new FlexRow(WidthFull,AlignItemsCenter, Gap(4))
-            {
-                new div{ Height(1), Width(32), Background(Gray200)},
-                new MagicInput{ Value = "state.IsUserActive", Suggestions = ["MD","LG","XXL"]}
-            },
-            
-            new FlexRow(Gap(4))
-            {
-                new FlexRow(JustifyContentFlexEnd, Width(3, 10))
-                {
-                    new MagicInput{ Value = "src", IsBold = true, IsTextAlignRight = true, Suggestions = StyleProperties.Select(x=>x.Name).ToList()}
-                },
-                " : ",
-                new FlexRow(Width(7, 10))
-                {
-                    new MagicInput{ Value = "www.google.com"}
-                }
-            },
-            
-            new FlexRow(Gap(4))
-            {
-                new FlexRow(JustifyContentFlexEnd, Width(3, 10))
-                {
-                    new MagicInput{ Value = "href", IsBold = true, IsTextAlignRight = true, Suggestions = StyleProperties.Select(x=>x.Name).ToList()}
-                },
-                " : ",
-                new FlexRow(Width(7, 10))
-                {
-                    new MagicInput{ Value = "www.google.com2"}
-                }
-            },
-            
-            new FlexRow(Gap(4))
-            {
-                new FlexRow(JustifyContentFlexEnd)
-                {
-                    new MagicInput{  Placeholder = "", IsTextAlignRight = true, Suggestions = StyleProperties.Select(x=>x.Name).ToList()}
-                },
-                " : ",
-                new FlexRow()
-                {
-                    new MagicInput{ Placeholder = ""}
-                }
-            },
-            
-            new FlexRow(WidthFull,AlignItemsCenter, Gap(4))
-            {
-                new div{ Height(1), WidthFull, Background(Gray200)},
-                new span { "E V E N T S", WhiteSpaceNoWrap },
-                new div{ Height(1), WidthFull, Background(Gray200)},
-            },
-            
-            tag,
-            
-           
+                    new FlexRow(WidthFull, AlignItemsCenter, Gap(4))
+                    {
+                        new div { Height(1), Width(32), Background(Gray200) },
+                        new span { styleGroup.Condition ?? "All", WhiteSpaceNoWrap }
+                    },
+                    
+                    styleGroup.Items.Select(property =>
+                    {
+                        return new FlexRow(Gap(4))
+                        {
+                            new FlexRow(JustifyContentFlexEnd, Width(3, 10))
+                            {
+                                new MagicInput{ Value = property.Name, IsBold = true, IsTextAlignRight = true, Suggestions = StyleProperties.Select(x=>x.Name).ToList()}
+                            },
+                            " : ",
+                            new FlexRow(Width(7, 10))
+                            {
+                                new MagicInput{ Value = property.Value}
+                            }
+                        };
+                    }),
+                    
+                    new FlexRow(Gap(4))
+                    {
+                        new FlexRow(JustifyContentFlexEnd, Width(3, 10))
+                        {
+                            new MagicInput{  Placeholder = "", IsTextAlignRight = true, Suggestions = StyleProperties.Select(x=>x.Name).ToList()}
+                        },
+                        " : ",
+                        new FlexRow(Width(7, 10))
+                        {
+                            new MagicInput{ Placeholder = ""}
+                        }
+                    }
+                };
+            })
             
         };
     }

@@ -1,5 +1,4 @@
-﻿
-namespace ReactWithDotNet.VisualDesigner.Models;
+﻿namespace ReactWithDotNet.VisualDesigner.Models;
 
 static class Dummy
 {
@@ -16,6 +15,7 @@ static class Dummy
                 RootElement = new()
                 {
                     Tag = "div",
+                    Condition = "state.isWebUser",
                     Children =
                     [
                         new() { Tag = "label", Text = "Abc1" },
@@ -39,7 +39,7 @@ static class Dummy
                     ]
                 }
             },
-            
+
             new ComponentModel
             {
                 Name        = "SiteTitle",
@@ -52,23 +52,34 @@ static class Dummy
                     [
                         new()
                         {
-                            Tag             = "span", 
-                            Text            = "Abc2",
-                            
-                            StyleGroups = [new PropertyGroupModel()
+                            Tag  = "span",
+                            Text = "Abc2",
+
+                            StyleGroups =
+                            [
+                                new PropertyGroupModel
+                                {
+                                    Condition = null,
+                                    Items =
+                                    [
+                                        new PropertyModel { Name = "gap", Value   = "8" },
+                                        new PropertyModel { Name = "width", Value = "auto" }
+                                    ]
+                                },
+                                new PropertyGroupModel
                                 {
                                     Condition = "hover",
-                                    Items = [
+                                    Items =
+                                    [
                                         new PropertyModel { Name = "gap", Value   = "4" },
                                         new PropertyModel { Name = "width", Value = "fit-content" }
                                     ]
-                                }]
-                        },
-                        
+                                }
+                            ]
+                        }
                     ]
                 }
             }
         ]
     };
-
 }
