@@ -1,9 +1,4 @@
-﻿
-using System;
-using System.Reflection;
-using static ReactWithDotNet.WebSite.Components.RenderPreview;
-
-namespace ReactWithDotNet.VisualDesigner.Views;
+﻿namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationView: Component<ApplicationView.State>
 {
@@ -363,14 +358,17 @@ sealed class ApplicationView: Component<ApplicationView.State>
 
         return new FlexColumn( BorderLeft(1, dotted, "#d9d9d9"), OverflowYAuto, Background(White))
         {
-            tag,
+            new FlexColumn(WidthFull, Padding(4))
+            {
+                tag,
             
-            condition,
+                condition,
+            },
             
             new FlexRow(WidthFull,AlignItemsCenter, Gap(4))
             {
                 new div{ Height(1), WidthFull, Background(Gray200)},
-                new span { "S T Y L E", WhiteSpaceNoWrap },
+                new span { "S T Y L E", WhiteSpaceNoWrap, UserSelect(none) },
                 new div{ Height(1), WidthFull, Background(Gray200)},
             },
             
