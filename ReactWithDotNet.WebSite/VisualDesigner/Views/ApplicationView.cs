@@ -1,4 +1,5 @@
-﻿namespace ReactWithDotNet.VisualDesigner.Views;
+﻿
+namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationView: Component<ApplicationView.State>
 {
@@ -306,6 +307,20 @@ sealed class ApplicationView: Component<ApplicationView.State>
 
 
 
+    Task OnCurrentPropertyNameChanged(string senderName, string newValue)
+    {
+        CurrentProperty.Name = newValue;
+        
+        return Task.CompletedTask;
+    }
+    
+    Task OnCurrentPropertyValueChanged(string senderName, string newValue)
+    {
+        CurrentProperty.Value = newValue;
+        
+        return Task.CompletedTask;
+    }
+    
     Task OnInputChanged(string senderName, string newValue)
     {
         if (senderName == SenderName.Tag)
@@ -390,12 +405,27 @@ sealed class ApplicationView: Component<ApplicationView.State>
                 {
                     new FlexRow(WidthFull, AlignItemsCenter, Gap(4))
                     {
-                        new div { Height(1), Width(32), Background(Gray200) },
-                        new span { styleGroup.Condition ?? "All", WhiteSpaceNoWrap },
-                        new FlexRowCentered(Gap(8))
+                        new FlexRowCentered(Size(28))
                         {
-                            new IconPlus(),
+                            When(state.SelectedStyleGroupCondition != styleGroup.Condition, Color(Gray100)),
+                            
+                            When(state.SelectedStyleGroupCondition == styleGroup.Condition,  OnClick(ActiveStyleGroupActivePropertyDeleteClicked)),
+                            
                             new IconMinus()
+                        },
+                        
+                        new MagicInput
+                        {
+                            Name    = styleGroup.Condition, 
+                            OnFocus = OnStyleGroupSelected,
+                            Value   = styleGroup.Condition, 
+                            IsTextAlignCenter = true, 
+                            Suggestions = BooleanSuggestions
+                        },
+                        
+                        new FlexRowCentered(Size(28), OnClick(OnStyleGroupAddNewPropertyClicked))
+                        {
+                            new IconPlus()
                         }
                     },
                     
@@ -405,12 +435,29 @@ sealed class ApplicationView: Component<ApplicationView.State>
                         {
                             new FlexRow(JustifyContentFlexEnd, Width(3, 10))
                             {
-                                new MagicInput{ Name = index.ToString() ,Value = property.Name, IsBold = true, IsTextAlignRight = true, Suggestions = StyleAttributeNameSuggestions}
+                                new MagicInput
+                                {
+                                    OnFocus = OnCurrentPropertyIndexChanged,
+                                    
+                                    Name             = index.ToString(),
+                                    Value            = property.Name,
+                                    OnChange         = OnCurrentPropertyNameChanged,
+                                    IsBold           = true, 
+                                    IsTextAlignRight = true, 
+                                    Suggestions      = StyleAttributeNameSuggestions
+                                }
                             },
                             " : ",
                             new FlexRow(Width(7, 10))
                             {
-                                new MagicInput{ Name = index.ToString(), Value = property.Value}
+                                new MagicInput
+                                { 
+                                    Name    = index.ToString(), 
+                                    Value   = property.Value,
+                                    OnFocus = OnCurrentPropertyIndexChanged,
+                                    OnChange = OnCurrentPropertyValueChanged
+                                    
+                                }
                             }
                         };
                     })
@@ -433,6 +480,52 @@ sealed class ApplicationView: Component<ApplicationView.State>
         };
     }
 
+    public Task OnCurrentPropertyIndexChanged(string senderName)
+    {
+        state.CurrentPropertyIndex = int.Parse(senderName);
+        
+        return Task.CompletedTask;
+    }
+    
+    public Task OnStyleGroupSelected(string senderName)
+    {
+        state.SelectedStyleGroupCondition = senderName;
+        
+        return Task.CompletedTask;
+    }
+
+    PropertyGroupModel ActiveStyleGroup
+    {
+        get
+        {
+            return SelectedVisualElement.StyleGroups.First(x => x.Condition == state.SelectedStyleGroupCondition);
+        }
+    }
+    
+    PropertyModel CurrentProperty
+    {
+        get
+        {
+            return ActiveStyleGroup.Items[state.CurrentPropertyIndex.Value];
+        }
+    }
+    
+    
+    
+    
+            
+    Task ActiveStyleGroupActivePropertyDeleteClicked(MouseEvent _)
+    {
+
+        return Task.CompletedTask;
+    }
+    
+    Task OnStyleGroupAddNewPropertyClicked(MouseEvent _)
+    {
+        ActiveStyleGroup.Items.Add(new());
+
+        return Task.CompletedTask;
+    }
     Task OnAddNewStyleGroupClicked(MouseEvent e)
     {
         var styleGroups = SelectedVisualElement.StyleGroups ??= [];
@@ -534,10 +627,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
         return Task.CompletedTask;
     }
 
-    static Element createLabel(string text)
-    {
-        return new small(Text(text), Color(rgb(73, 86, 193)), FontWeight600, UserSelect(none), WhiteSpaceNoWrap);
-    }
+   
     
     Element PartScale()
     {
@@ -650,5 +740,9 @@ sealed class ApplicationView: Component<ApplicationView.State>
         public ProjectModel Project { get; set; }
 
         public string SelectedComponentName { get; set; }
+        
+        public string SelectedStyleGroupCondition { get; set; }
+        
+        public int? CurrentPropertyIndex { get; set; }
     }
 }

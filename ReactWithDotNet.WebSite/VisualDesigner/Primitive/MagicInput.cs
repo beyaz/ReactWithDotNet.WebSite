@@ -1,6 +1,7 @@
 ﻿namespace ReactWithDotNet.VisualDesigner.Primitive;
 
 delegate Task InputChangeHandler( string senderName, string newValue);
+delegate Task InputFocusHandler( string senderName);
 
 sealed class MagicInput : Component<MagicInput.State>
 {
@@ -8,6 +9,9 @@ sealed class MagicInput : Component<MagicInput.State>
     
     [CustomEvent]
     public InputChangeHandler OnChange { get; init; }
+    
+    [CustomEvent]
+    public InputFocusHandler OnFocus { get; init; }
 
     public IReadOnlyList<string> Suggestions { get; init; } = [];
 
@@ -35,7 +39,8 @@ sealed class MagicInput : Component<MagicInput.State>
     public bool IsBold { get; init; }
     public bool IsTextAlignRight { get; init; }
     public string Placeholder { get; init; }
-    
+    public bool IsTextAlignCenter { get; init; }
+
     protected override Element render()
     {
         return new FlexColumnCentered(FitContent is false ? WidthFull : null)
@@ -49,6 +54,7 @@ sealed class MagicInput : Component<MagicInput.State>
                 onKeyDown                = OnKeyDown,
                 onClick                  = OnInputClicked,
                 placeholder = Placeholder,
+                onFocus = OnFocused,
                 style =
                 {
                     OutlineNone,
@@ -61,12 +67,20 @@ sealed class MagicInput : Component<MagicInput.State>
                     Background(transparent),
                     EditorFont(),
                     IsBold ? FontWeight600 : null,
-                    IsTextAlignRight ? TextAlignRight : null
+                    IsTextAlignRight ? TextAlignRight : null,
+                    IsTextAlignCenter ? TextAlignCenter : null
                 },
                 autoFocus = true
             },
             ViewSuggestions
         };
+    }
+
+    Task OnFocused(FocusEvent e)
+    {
+        DispatchEvent(OnFocus, [Name]);
+
+        return Task.CompletedTask;
     }
 
     void InitializeState()
@@ -212,8 +226,12 @@ sealed class MagicInput : Component<MagicInput.State>
             {
                 Zindex4,
                 IsTextAlignRight ? Right(0) : null,
+                IsTextAlignCenter ? Right(none) : null,
+                
                 suggestions.Take(5).Select(ToOption)
-            }
+            },
+            
+            IsTextAlignCenter ? AlignItemsCenter : null
         };
 
         Element ToOption(string code, int index)

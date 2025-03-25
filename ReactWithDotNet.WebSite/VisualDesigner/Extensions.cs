@@ -335,6 +335,11 @@ static class Extensions
     {
         return !string.IsNullOrWhiteSpace(value);
     }
+    
+    public static bool HasNoValue(this string value)
+    {
+        return string.IsNullOrWhiteSpace(value);
+    }
 
     public static PropertyModel TryParsePropertyValue(string nameValueCombined)
     {
