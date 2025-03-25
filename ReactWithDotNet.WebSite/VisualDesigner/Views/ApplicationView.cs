@@ -1,13 +1,16 @@
 ﻿
 using System.Diagnostics;
+using Page = ReactWithDotNet.WebSite.Page;
 
 namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationView: Component<ApplicationView.State>
 {
+    internal static State AppState;
+    
     protected override Task constructor()
     {
-        state = new()
+        AppState = state = new()
         {
             ScreenWidth              = 400,
             ScreenHeight             = 400,
@@ -28,11 +31,14 @@ sealed class ApplicationView: Component<ApplicationView.State>
 
     public static string UrlPath => "/$";
     internal static string UrlPathOfComponentPreview => $"{UrlPath}?preview=true";
-    
-    
-    
-    
-    
+
+    protected override Task OverrideStateFromPropsBeforeRender()
+    {
+        AppState = state;
+        
+        return Task.CompletedTask;
+    }
+
     StyleModifier ScaleStyle => TransformOrigin("0 0") + Transform($"scale({state.Scale / (double)100})");
     
     protected override Element render()
@@ -276,7 +282,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
             return new iframe
             {
                 id    = "ComponentPreview",
-                src   = "https://www.google.com",
+                src   = Page.VisualDesignerPreview.Url,
                 style = { BorderNone, WidthFull, HeightFull },
                 title = "Component Preview"
             };
@@ -315,12 +321,12 @@ sealed class ApplicationView: Component<ApplicationView.State>
         
         return Task.CompletedTask;
     }
-    
-    Task OnCurrentPropertyValueChanged(string senderName, string newValue)
+
+    async Task OnCurrentPropertyValueChanged(string senderName, string newValue)
     {
         CurrentProperty.Value = newValue;
-        
-        return Task.CompletedTask;
+
+        await SaveState();
     }
     
     Task OnInputChanged(string senderName, string newValue)
@@ -707,7 +713,9 @@ sealed class ApplicationView: Component<ApplicationView.State>
     
     async Task SaveState()
     {
-        await Task.Delay(111);
+        AppState = state;
+
+        await Task.Delay(1);
     }
 
 
@@ -736,5 +744,60 @@ sealed class ApplicationView: Component<ApplicationView.State>
         public string CurrentStyleGroupCondition { get; set; }
         
         public int? CurrentPropertyIndex { get; set; }
+    }
+}
+
+
+sealed class ApplicationPreview : Component
+{
+    protected override Element render()
+    {
+        var state = ApplicationView.AppState;
+
+        if (state is null)
+        {
+            return new div(Size(200), Background(Gray100))
+            {
+                "Has no state"
+            };
+                
+        }
+
+        var componentModel = state.Project.Components.FirstOrDefault(x=>x.Name == state.CurrentComponentName);
+        if (componentModel is null)
+        {
+            return new div(Size(200), Background(Gray100))
+            {
+                "Has no component"
+            };
+
+        }
+        
+        
+        return new div(Size(333), Background("red"))
+        {
+            componentModel.RootElement.StyleGroups[0].Items[0].Name
+        };
+    }
+
+    protected override Task constructor()
+    {
+        Client.GotoMethod(1000, Refresh);
+        
+        return Task.CompletedTask;
+    }
+
+    public Task Refresh()
+    {
+        Client.GotoMethod(1000, Refresh);
+        
+        return Task.CompletedTask;
+    }
+    protected override Element componentDidCatch(Exception exceptionOccurredInRender)
+    {
+        return new div(Background(Gray100))
+        {
+            exceptionOccurredInRender.ToString()
+        };
     }
 }

@@ -30,6 +30,8 @@ static class Page
     public static readonly PageRouteInfo MadeBy = new($"/{nameof(MadeBy)}", typeof(PageMadeBy));
     
     public static readonly PageRouteInfo VisualDesigner = new($"/{nameof(VisualDesigner)}", typeof(ApplicationView));
+    public static readonly PageRouteInfo VisualDesignerPreview = new($"/{nameof(VisualDesignerPreview)}", typeof(ApplicationPreview));
+    
     
     // i n t e r n a l
     public static readonly PageRouteInfo DemoPreview = new($"/{nameof(DemoPreview)}", typeof(DemoPreview));
