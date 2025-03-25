@@ -1,4 +1,6 @@
 ﻿
+using System.Diagnostics;
+
 namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationView: Component<ApplicationView.State>
@@ -462,20 +464,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
                         };
                     })
                 };
-            }),
-            
-            new FlexRow(Gap(4))
-            {
-                new FlexRow(JustifyContentFlexEnd, Width(3, 10))
-                {
-                    new MagicInput{ Name = "lastItem", Value = string.Empty, IsBold = true, IsTextAlignRight = true, Suggestions = StyleAttributeNameSuggestions}
-                },
-                " : ",
-                new FlexRow(Width(7, 10))
-                {
-                    new MagicInput{ Name = "last", Placeholder = ""}
-                }
-            }
+            })
             
         };
     }
@@ -494,7 +483,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
         return Task.CompletedTask;
     }
 
-    PropertyGroupModel ActiveStyleGroup
+    PropertyGroupModel CurrentStyleGroup
     {
         get
         {
@@ -506,7 +495,9 @@ sealed class ApplicationView: Component<ApplicationView.State>
     {
         get
         {
-            return ActiveStyleGroup.Items[state.CurrentPropertyIndex.Value];
+            Debug.Assert(state.CurrentPropertyIndex != null, "state.CurrentPropertyIndex != null");
+            
+            return CurrentStyleGroup.Items[state.CurrentPropertyIndex.Value];
         }
     }
     
@@ -516,13 +507,14 @@ sealed class ApplicationView: Component<ApplicationView.State>
             
     Task ActiveStyleGroupActivePropertyDeleteClicked(MouseEvent _)
     {
-
+        CurrentStyleGroup.Items.Remove(CurrentProperty);
+        
         return Task.CompletedTask;
     }
     
     Task OnStyleGroupAddNewPropertyClicked(MouseEvent _)
     {
-        ActiveStyleGroup.Items.Add(new());
+        CurrentStyleGroup.Items.Add(new());
 
         return Task.CompletedTask;
     }
