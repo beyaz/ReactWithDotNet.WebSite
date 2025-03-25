@@ -28,6 +28,10 @@ sealed class MagicInput : Component<MagicInput.State>
         return Task.CompletedTask;
     }
 
+    public bool IsBold { get; init; }
+    public bool IsTextAlignRight { get; init; }
+    public string Placeholder { get; init; }
+    
     protected override Element render()
     {
         return new FlexColumnCentered(FitContent is false ? WidthFull : null)
@@ -40,6 +44,7 @@ sealed class MagicInput : Component<MagicInput.State>
                 valueBindDebounceHandler = OnTypingFinished,
                 onKeyDown                = OnKeyDown,
                 onClick                  = OnInputClicked,
+                placeholder = Placeholder,
                 style =
                 {
                     OutlineNone,
@@ -49,8 +54,10 @@ sealed class MagicInput : Component<MagicInput.State>
                     Color(rgb(0, 6, 36)),
                     Height(24),
                     FitContent ? Width(CalculateTextWidth(state.Value)) : WidthFull,
-                    
-                    EditorFont()
+                    Background(transparent),
+                    EditorFont(),
+                    IsBold ? FontWeight600 : null,
+                    IsTextAlignRight ? TextAlignRight : null
                 },
                 autoFocus = true
             },
@@ -197,9 +204,10 @@ sealed class MagicInput : Component<MagicInput.State>
         return new FlexColumn(PositionRelative, SizeFull)
         {
             Zindex3,
-            new FlexColumn(PositionAbsolute, Top(4), HeightAuto, Background(White), BoxShadow(0, 6, 6, 0, rgba(22, 45, 61, .06)), Padding(5), BorderRadius(5))
+            new FlexColumn(PositionAbsolute, Top(4),  HeightAuto, Background(White), BoxShadow(0, 6, 6, 0, rgba(22, 45, 61, .06)), Padding(5), BorderRadius(5))
             {
                 Zindex4,
+                IsTextAlignRight ? Right(0) : null,
                 suggestions.Take(5).Select(ToOption)
             }
         };
