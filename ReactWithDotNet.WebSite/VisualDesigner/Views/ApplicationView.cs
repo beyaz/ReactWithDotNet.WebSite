@@ -356,7 +356,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
         
         
 
-        return new FlexColumn( BorderLeft(1, dotted, "#d9d9d9"), OverflowYAuto, Background(White))
+        return new FlexColumn( BorderLeft(1, dotted, "#d9d9d9"), OverflowYAuto, Background(White), PositionRelative)
         {
             new FlexColumn(WidthFull, Padding(4))
             {
@@ -372,6 +372,11 @@ sealed class ApplicationView: Component<ApplicationView.State>
                 new div{ Height(1), WidthFull, Background(Gray200)},
             },
             
+            new FlexRowCentered(PositionAbsolute, TopRight(4))
+            {
+                new IconMinus(),
+                new IconPlus()
+            },
             
             visualElementModel.StyleGroups?.Select(styleGroup =>
             {
