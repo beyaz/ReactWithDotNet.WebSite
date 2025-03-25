@@ -773,12 +773,31 @@ sealed class ApplicationPreview : Component
 
         }
         
-        
         return new div(Size(333), Background("red"))
         {
-            componentModel.RootElement.StyleGroups[0].Items[0].Name
+            renderElement(componentModel.RootElement)
         };
+
+
+        Element renderElement(VisualElementModel model)
+        {
+            var element = new div
+            {
+                model.Tag
+            };
+
+            if (model.HasChild is false)
+            {
+                return element;
+            }
+
+            element.children.AddRange(model.Children.Select(renderElement));
+
+            return element;
+        }
     }
+    
+    
 
     protected override Task constructor()
     {
