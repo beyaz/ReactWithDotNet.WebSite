@@ -1,11 +1,13 @@
 ﻿namespace ReactWithDotNet.VisualDesigner.Primitive;
 
+delegate Task InputChangeHandler( string senderName, string newValue);
+
 sealed class MagicInput : Component<MagicInput.State>
 {
     public required string Name { get; init; }
     
     [CustomEvent]
-    public Func<string, Task> OnChange { get; init; }
+    public InputChangeHandler OnChange { get; init; }
 
     public IReadOnlyList<string> Suggestions { get; init; } = [];
 
@@ -108,7 +110,7 @@ sealed class MagicInput : Component<MagicInput.State>
             {
                 if (state.Value?.Length > 0)
                 {
-                    DispatchEvent(OnChange, [state.Value]);
+                    DispatchEvent(OnChange, [Name, state.Value]);
 
                     return Task.CompletedTask;
                 }
@@ -156,7 +158,7 @@ sealed class MagicInput : Component<MagicInput.State>
             {
                 state.Value = suggestions[state.SelectedSuggestionOffset.Value];
 
-                DispatchEvent(OnChange, [state.Value]);
+                DispatchEvent(OnChange, [Name,state.Value]);
             }
         }
 
@@ -172,7 +174,7 @@ sealed class MagicInput : Component<MagicInput.State>
 
         state.Value = state.FilteredSuggestions[state.SelectedSuggestionOffset.Value];
 
-        DispatchEvent(OnChange, [state.Value]);
+        DispatchEvent(OnChange, [Name, state.Value]);
 
         return Task.CompletedTask;
     }

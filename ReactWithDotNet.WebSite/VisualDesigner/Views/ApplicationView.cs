@@ -313,6 +313,24 @@ sealed class ApplicationView: Component<ApplicationView.State>
 
     Task OnInputChanged(string senderName, string newValue)
     {
+        if (senderName == SenderName.Tag)
+        {
+            SelectedVisualElement.Tag = newValue;    
+        }
+        
+        if (senderName == SenderName.Condition)
+        {
+            SelectedVisualElement.Condition = newValue;    
+        }
+
+        if (senderName == SenderName.ComponentName)
+        {
+            state.SelectedComponentName = newValue;
+                
+            state.SelectedVisualElementTreePath = null;
+        }
+        
+        
         return Task.CompletedTask;
     }
     
@@ -332,31 +350,13 @@ sealed class ApplicationView: Component<ApplicationView.State>
         var tag = new FlexRow(WidthFull, Gap(4))
         {
             new label { "Tag:", FontWeightBold },
-            new MagicInput 
-            {
-                Name = SenderName.Tag,
-                
-                Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = newTag =>
-            {
-                SelectedVisualElement.Tag = newTag;
-
-                return Task.CompletedTask;
-            }}
+            new MagicInput { Name = SenderName.Tag, Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = OnInputChanged}
         };
         
         var condition = new FlexRow(WidthFull, Gap(4))
         {
             new label { "Condition:", FontWeightBold },
-            new MagicInput { 
-                
-                
-                Name = SenderName.Tag,
-                Value = visualElementModel.Condition, Suggestions = BooleanSuggestions, OnChange = newCondition =>
-            {
-                SelectedVisualElement.Condition = newCondition;
-
-                return Task.CompletedTask;
-            }}
+            new MagicInput { Name = SenderName.Condition, Value = visualElementModel.Condition, Suggestions = BooleanSuggestions, OnChange = OnInputChanged}
         };
         
         
@@ -442,6 +442,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
     {
         public static readonly string  ComponentName = nameof(ComponentName);
         public static readonly string  Tag = nameof(Tag);
+        public static readonly string  Condition = nameof(Condition);
     }
     
     Element PartLeftPanel()
@@ -452,14 +453,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
             
             Suggestions = state.Project.Components.Select(x => x.Name).ToList(),
             Value = state.SelectedComponentName,
-            OnChange = async componentName =>
-            {
-                state.SelectedComponentName = componentName;
-                
-                state.SelectedVisualElementTreePath = null;
-                
-                await SaveState();
-            }
+            OnChange = OnInputChanged
         };
 
         return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"))
