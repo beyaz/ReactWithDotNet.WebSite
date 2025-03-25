@@ -411,7 +411,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
                         {
                             When(state.CurrentStyleGroupCondition != styleGroup.Condition, Color(Gray100)),
                             
-                            When(state.CurrentStyleGroupCondition == styleGroup.Condition,  OnClick(ActiveStyleGroupActivePropertyDeleteClicked)),
+                            When(state.CurrentStyleGroupCondition == styleGroup.Condition,  OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked)),
                             
                             new IconMinus()
                         },
@@ -425,7 +425,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
                             Suggestions = BooleanSuggestions
                         },
                         
-                        new FlexRowCentered(Size(28), OnClick(OnStyleGroupAddNewPropertyClicked))
+                        new FlexRowCentered(Size(28), OnClick(CurrentStyleGroup_CurrentProperty_Add_Clicked))
                         {
                             new IconPlus()
                         }
@@ -505,14 +505,14 @@ sealed class ApplicationView: Component<ApplicationView.State>
     
     
             
-    Task ActiveStyleGroupActivePropertyDeleteClicked(MouseEvent _)
+    Task CurrentStyleGroup_CurrentProperty_Delete_Clicked(MouseEvent _)
     {
         CurrentStyleGroup.Items.Remove(CurrentProperty);
         
         return Task.CompletedTask;
     }
     
-    Task OnStyleGroupAddNewPropertyClicked(MouseEvent _)
+    Task CurrentStyleGroup_CurrentProperty_Add_Clicked(MouseEvent _)
     {
         CurrentStyleGroup.Items.Add(new());
 
@@ -535,7 +535,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
         
         styleGroups.Add(new ()
         {
-            Condition = "MD",
+            Condition = "?",
             Items     = [new PropertyModel()]
         });
         
