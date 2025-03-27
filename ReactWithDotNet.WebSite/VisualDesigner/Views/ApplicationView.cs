@@ -437,37 +437,34 @@ sealed class ApplicationView: Component<ApplicationView.State>
                         }
                     },
                     
-                    styleGroup.Items.Select((property , index)=>
+                    styleGroup.Items.Select((property , index)=> new FlexRow(Gap(4))
                     {
-                        return new FlexRow(Gap(4))
+                        new FlexRow(JustifyContentFlexEnd, Width(4, 10))
                         {
-                            new FlexRow(JustifyContentFlexEnd, Width(4, 10))
+                            new MagicInput
                             {
-                                new MagicInput
-                                {
-                                    OnFocus = OnCurrentPropertyIndexChanged,
+                                OnFocus = OnCurrentPropertyIndexChanged,
                                     
-                                    Name             = index.ToString(),
-                                    Value            = property.Name,
-                                    OnChange         = OnCurrentPropertyNameChanged,
-                                    IsBold           = true, 
-                                    IsTextAlignRight = true, 
-                                    Suggestions      = StyleAttributeNameSuggestions
-                                }
-                            },
-                            " : ",
-                            new FlexRow(Width(6, 10))
-                            {
-                                new MagicInput
-                                { 
-                                    Name    = index.ToString(), 
-                                    Value   = property.Value,
-                                    OnFocus = OnCurrentPropertyIndexChanged,
-                                    OnChange = OnCurrentPropertyValueChanged
-                                    
-                                }
+                                Name             = index.ToString(),
+                                Value            = property.Name,
+                                OnChange         = OnCurrentPropertyNameChanged,
+                                IsBold           = true, 
+                                IsTextAlignRight = true, 
+                                Suggestions      = StyleAttributeNameSuggestions
                             }
-                        };
+                        },
+                        " : ",
+                        new FlexRow(Width(6, 10))
+                        {
+                            new MagicInput
+                            { 
+                                Name     = index.ToString(), 
+                                Value    = property.Value,
+                                OnFocus  = OnCurrentPropertyIndexChanged,
+                                OnChange = OnCurrentPropertyValueChanged
+                                    
+                            }
+                        }
                     })
                 };
             })
