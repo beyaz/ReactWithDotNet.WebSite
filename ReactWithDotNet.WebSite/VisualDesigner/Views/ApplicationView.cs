@@ -367,13 +367,15 @@ sealed class ApplicationView: Component<ApplicationView.State>
 
         var tag = new FlexRow(WidthFull, Gap(4))
         {
-            new label { "Tag:", FontWeightBold , Width(4,10)},
+            new label { "Tag", FontWeightBold , Width(4,10), TextAlignRight},
+            " : ",
             new MagicInput { Name = SenderName.Tag, Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = OnInputChanged} + Width(6,10)
         };
         
         var condition = new FlexRow(WidthFull, Gap(4))
         {
-            new label { "Condition:", FontWeightBold, Width(4,10), TextAlignRight },
+            new label { "Condition", FontWeightBold, Width(4,10), TextAlignRight },
+            " : ",
             new MagicInput { Name = SenderName.Condition, Value = visualElementModel.Condition, Suggestions = BooleanSuggestions, OnChange = OnInputChanged} + Width(6,10)
         };
         
