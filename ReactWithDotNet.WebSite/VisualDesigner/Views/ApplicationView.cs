@@ -397,11 +397,11 @@ sealed class ApplicationView: Component<ApplicationView.State>
                     new IconMinus()
                 },
                 
-                new div{ Height(1), WidthFull, Background(Gray200)},
+                new div{ Height(1), FlexGrow(1), Background(Gray200)},
                 new span { "S T Y L E", WhiteSpaceNoWrap, UserSelect(none) },
-                new div{ Height(1), WidthFull, Background(Gray200)},
+                new div{ Height(1), FlexGrow(1), Background(Gray200)},
                  
-                new FlexRowCentered(Size(28), OnClick(OnAddNewStyleGroupClicked))
+                new FlexRowCentered(Size(28), OnClick(OnAddNewStyleGroupClicked) , Hover(Color(Blue300), BorderRadius(8), Border(1,solid,Blue300)))
                 {
                     new IconPlus()
                 }
