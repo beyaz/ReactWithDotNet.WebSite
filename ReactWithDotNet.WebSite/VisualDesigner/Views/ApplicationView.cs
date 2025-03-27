@@ -825,6 +825,31 @@ sealed class ApplicationPreview : Component
                             element.Add(Height(value));
                             continue;
                         }
+                        
+                        
+                        case "border-radius":
+                        {
+                            if (isValueDouble)
+                            {
+                                element.Add(BorderRadius(valueAsDouble));
+                                continue;
+                            }
+                            
+                            element.Add(BorderRadius(value));
+                            continue;
+                        }
+                        
+                        case "gap":
+                        {
+                            if (isValueDouble)
+                            {
+                                element.Add(Gap(valueAsDouble));
+                                continue;
+                            }
+                            
+                            element.Add(Gap(value));
+                            continue;
+                        }
                             
                     }
                 }

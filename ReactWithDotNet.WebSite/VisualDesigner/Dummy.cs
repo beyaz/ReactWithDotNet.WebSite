@@ -14,7 +14,7 @@ static class Dummy
                 StateAsJson = "{'user': { 'name': 'Tom', 'year': 41 }}",
                 RootElement = new()
                 {
-                    Tag = "div",
+                    Tag       = "div",
                     Condition = "state.isWebUser",
                     Children =
                     [
@@ -28,11 +28,40 @@ static class Dummy
                             Children =
                             [
                                 new() { Tag = "label", Text = "Abc1" },
-                                new() { Tag = "span", Text  = "Abc2" },
+                                new()
+                                {
+                                    Tag = "span", Text  = "Abc2" ,
+                                    StyleGroups =
+                                    [
+                                        new PropertyGroupModel
+                                        {
+                                            Items =
+                                            [
+                                                new PropertyModel { Name = "background", Value    = "green" },
+                                                new PropertyModel { Name = "width", Value         = "50" },
+                                                new PropertyModel { Name = "height", Value        = "50" },
+                                                new PropertyModel { Name = "border-radius", Value = "4" }
+                                            ]
+                                        }
+                                    ]
+                                },
                                 new()
                                 {
                                     Tag  = "ul",
-                                    Text = "Abc3"
+                                    Text = "Abc3",
+                                    StyleGroups =
+                                    [
+                                        new PropertyGroupModel
+                                        {
+                                            Items =
+                                            [
+                                                new PropertyModel { Name = "background", Value = "yellow" },
+                                                new PropertyModel { Name = "width", Value      = "100" },
+                                                new PropertyModel { Name = "height", Value     = "100" },
+                                                new PropertyModel { Name = "border-radius", Value     = "8" }
+                                            ]
+                                        }
+                                    ]
                                 }
                             ]
                         }
@@ -62,8 +91,9 @@ static class Dummy
                                     Condition = null,
                                     Items =
                                     [
-                                        new PropertyModel { Name = "gap", Value   = "8" },
-                                        new PropertyModel { Name = "width", Value = "auto" }
+                                        new PropertyModel { Name = "gap", Value        = "8" },
+                                        new PropertyModel { Name = "width", Value      = "auto" },
+                                        new PropertyModel { Name = "background", Value = "yellow" }
                                     ]
                                 },
                                 new PropertyGroupModel
