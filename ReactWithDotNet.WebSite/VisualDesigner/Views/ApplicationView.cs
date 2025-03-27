@@ -795,6 +795,12 @@ sealed class ApplicationPreview : Component
                     
                     switch (styleAttribute.Name)
                     {
+                        case "display":
+                        {
+                            element.Add(Display(value));
+                            continue;
+                        }
+                        
                         case "background":
                         {
                             element.Add(Background(value));

@@ -25,6 +25,22 @@ static class Dummy
                         new()
                         {
                             Tag = "div",
+                            StyleGroups =
+                                [
+                                    
+                                    new PropertyGroupModel
+                                    {
+                                        Condition = "*",
+                                        Items =
+                                        [
+                                            new PropertyModel { Name = "background", Value    = "whitesmoke" },
+                                            new PropertyModel { Name = "width", Value         = "400" },
+                                            new PropertyModel { Name = "height", Value        = "400" },
+                                            new PropertyModel { Name = "border-radius", Value = "8" },
+                                            new PropertyModel { Name = "display", Value = "flex" }
+                                        ]
+                                    }
+                                ],
                             Children =
                             [
                                 new() { Tag = "label", Text = "Abc1" },
@@ -35,6 +51,7 @@ static class Dummy
                                     [
                                         new PropertyGroupModel
                                         {
+                                            Condition = "*",
                                             Items =
                                             [
                                                 new PropertyModel { Name = "background", Value    = "green" },
@@ -53,6 +70,8 @@ static class Dummy
                                     [
                                         new PropertyGroupModel
                                         {
+                                            Condition = "*",
+                                            
                                             Items =
                                             [
                                                 new PropertyModel { Name = "background", Value = "yellow" },
@@ -88,7 +107,7 @@ static class Dummy
                             [
                                 new PropertyGroupModel
                                 {
-                                    Condition = null,
+                                    Condition = "*",
                                     Items =
                                     [
                                         new PropertyModel { Name = "gap", Value        = "8" },
