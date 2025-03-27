@@ -788,9 +788,45 @@ sealed class ApplicationPreview : Component
 
             foreach (var styleGroup in model.StyleGroups??[])
             {
-                foreach (var propertyModel in styleGroup.Items)
+                foreach (var styleAttribute in styleGroup.Items ?? [])
                 {
-                    applyStyleAttribute(element, propertyModel);
+                    var value = styleAttribute.Value;
+
+                    var isValueDouble = double.TryParse(value, out var valueAsDouble);
+                    
+                    switch (styleAttribute.Name)
+                    {
+                        case "background":
+                        {
+                            element.Add(Background(value));
+                            continue;
+                        }
+                        
+                        case "width":
+                        {
+                            if (isValueDouble)
+                            {
+                                element.Add(Width(valueAsDouble));
+                                continue;
+                            }
+                            
+                            element.Add(Width(value));
+                            continue;
+                        }
+                        
+                        case "height":
+                        {
+                            if (isValueDouble)
+                            {
+                                element.Add(Height(valueAsDouble));
+                                continue;
+                            }
+                            
+                            element.Add(Height(value));
+                            continue;
+                        }
+                            
+                    }
                 }
             }
 
@@ -803,21 +839,6 @@ sealed class ApplicationPreview : Component
 
             return element;
             
-            static void applyStyleAttribute(Element element, PropertyModel styleAttribute)
-            {
-                if (styleAttribute.Name == "background")
-                {
-                    element.Add(Background(styleAttribute.Value));
-                }
-                if (styleAttribute.Name == "width")
-                {
-                    element.Add(Width(styleAttribute.Value));
-                }
-                if (styleAttribute.Name == "height")
-                {
-                    element.Add(Height(styleAttribute.Value));
-                }
-            }
         }
 
        
