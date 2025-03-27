@@ -752,9 +752,9 @@ sealed class ApplicationPreview : Component
 {
     protected override Element render()
     {
-        var state = ApplicationView.AppState;
+        var appState = ApplicationView.AppState;
 
-        if (state is null)
+        if (appState is null)
         {
             return new div(Size(200), Background(Gray100))
             {
@@ -763,7 +763,7 @@ sealed class ApplicationPreview : Component
                 
         }
 
-        var componentModel = state.Project.Components.FirstOrDefault(x=>x.Name == state.CurrentComponentName);
+        var componentModel = appState.Project.Components.FirstOrDefault(x=>x.Name == appState.CurrentComponentName);
         if (componentModel is null)
         {
             return new div(Size(200), Background(Gray100))
@@ -773,7 +773,7 @@ sealed class ApplicationPreview : Component
 
         }
         
-        return new div(Size(333), Background("red"))
+        return new div(Size(333))
         {
             renderElement(componentModel.RootElement)
         };
@@ -786,6 +786,14 @@ sealed class ApplicationPreview : Component
                 model.Tag
             };
 
+            foreach (var styleGroup in model.StyleGroups??[])
+            {
+                foreach (var propertyModel in styleGroup.Items)
+                {
+                    applyStyleAttribute(element, propertyModel);
+                }
+            }
+
             if (model.HasChild is false)
             {
                 return element;
@@ -794,7 +802,25 @@ sealed class ApplicationPreview : Component
             element.children.AddRange(model.Children.Select(renderElement));
 
             return element;
+            
+            static void applyStyleAttribute(Element element, PropertyModel styleAttribute)
+            {
+                if (styleAttribute.Name == "background")
+                {
+                    element.Add(Background(styleAttribute.Value));
+                }
+                if (styleAttribute.Name == "width")
+                {
+                    element.Add(Width(styleAttribute.Value));
+                }
+                if (styleAttribute.Name == "height")
+                {
+                    element.Add(Height(styleAttribute.Value));
+                }
+            }
         }
+
+       
     }
     
     
