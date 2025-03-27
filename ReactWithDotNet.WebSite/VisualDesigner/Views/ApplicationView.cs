@@ -367,14 +367,14 @@ sealed class ApplicationView: Component<ApplicationView.State>
 
         var tag = new FlexRow(WidthFull, Gap(4))
         {
-            new label { "Tag:", FontWeightBold },
-            new MagicInput { Name = SenderName.Tag, Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = OnInputChanged}
+            new label { "Tag:", FontWeightBold , Width(4,10)},
+            new MagicInput { Name = SenderName.Tag, Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = OnInputChanged} + Width(6,10)
         };
         
         var condition = new FlexRow(WidthFull, Gap(4))
         {
-            new label { "Condition:", FontWeightBold },
-            new MagicInput { Name = SenderName.Condition, Value = visualElementModel.Condition, Suggestions = BooleanSuggestions, OnChange = OnInputChanged}
+            new label { "Condition:", FontWeightBold, Width(4,10), TextAlignRight },
+            new MagicInput { Name = SenderName.Condition, Value = visualElementModel.Condition, Suggestions = BooleanSuggestions, OnChange = OnInputChanged} + Width(6,10)
         };
         
         
@@ -441,7 +441,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
                     {
                         return new FlexRow(Gap(4))
                         {
-                            new FlexRow(JustifyContentFlexEnd, Width(3, 10))
+                            new FlexRow(JustifyContentFlexEnd, Width(4, 10))
                             {
                                 new MagicInput
                                 {
@@ -456,7 +456,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
                                 }
                             },
                             " : ",
-                            new FlexRow(Width(7, 10))
+                            new FlexRow(Width(6, 10))
                             {
                                 new MagicInput
                                 { 
