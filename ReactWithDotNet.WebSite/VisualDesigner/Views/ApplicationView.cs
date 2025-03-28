@@ -18,7 +18,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     IReadOnlyList<string> BooleanSuggestions => ["MD", "XXL", "state.user.isActive", "MD: state.user.isActive", "XXL: state.user.isActive"];
 
-    PropertyModel CurrentProperty
+    PropertyModel CurrentStyleProperty
     {
         get
         {
@@ -42,7 +42,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
         get { return StyleProperties.Select(x => x.Name).ToList(); }
     }
 
-    public Task OnCurrentPropertyIndexChanged(string senderName)
+    public Task On_CurrentPropertyIndexInStyle_Changed(string senderName)
     {
         StyleInputLocation location = senderName;
 
@@ -243,7 +243,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     Task CurrentStyleGroup_CurrentProperty_Delete_Clicked(MouseEvent _)
     {
-        CurrentStyleGroup.Items.Remove(CurrentProperty);
+        CurrentStyleGroup.Items.Remove(CurrentStyleProperty);
 
         state.CurrentPropertyIndexAtStyleGroup = null;
 
@@ -285,21 +285,21 @@ sealed class ApplicationView : Component<ApplicationView.State>
         await SaveState();
     }
 
-    Task OnCurrentPropertyNameChanged(string senderName, string newValue)
+    Task On_CurrentPropertyNameInStyle_Changed(string senderName, string newValue)
     {
         StyleInputLocation location = senderName;
 
         state.CurrentStyleGroupIndex = location.StyleGroupIndex;
         state.CurrentPropertyIndexAtStyleGroup   = location.PropertyIndexAtGroup;
         
-        CurrentProperty.Name = newValue;
+        CurrentStyleProperty.Name = newValue;
 
         return Task.CompletedTask;
     }
 
-    async Task OnCurrentPropertyValueChanged(string senderName, string newValue)
+    async Task On_CurrentPropertyValueInStyle_Changed(string senderName, string newValue)
     {
-        CurrentProperty.Value = newValue;
+        CurrentStyleProperty.Value = newValue;
 
         await SaveState();
     }
@@ -313,19 +313,18 @@ sealed class ApplicationView : Component<ApplicationView.State>
         return Task.CompletedTask;
     }
 
-    Task OnInputChanged(string senderName, string newValue)
+    Task OnTagNameChanged(string senderName, string newValue)
     {
-        if (senderName == SenderName.Tag)
-        {
-            CurrentVisualElement.Tag = newValue;
-        }
+        CurrentVisualElement.Tag = newValue;
 
-        if (senderName == SenderName.ComponentName)
-        {
-            state.CurrentComponentName = newValue;
+        return Task.CompletedTask;
+    }
+    
+    Task OnComponentNameChanged(string senderName, string newValue)
+    {
+        state.CurrentComponentName = newValue;
 
-            state.CurrentVisualElementTreePath = null;
-        }
+        state.CurrentVisualElementTreePath = null;
 
         return Task.CompletedTask;
     }
@@ -359,7 +358,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
             Suggestions = state.Project.Components.Select(x => x.Name).ToList(),
             Value       = state.CurrentComponentName,
-            OnChange    = OnInputChanged
+            OnChange    = OnComponentNameChanged
         };
 
         return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"))
@@ -597,7 +596,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     Name = SenderName.Tag, 
                     Value = visualElementModel.Tag, 
                     Suggestions = tagSuggestions, 
-                    OnChange = OnInputChanged
+                    OnChange = OnTagNameChanged
                 } + Width(6, 10)
             },
 
@@ -656,11 +655,11 @@ sealed class ApplicationView : Component<ApplicationView.State>
                             {
                                 new MagicInput
                                 {
-                                    OnFocus = OnCurrentPropertyIndexChanged,
+                                    OnFocus = On_CurrentPropertyIndexInStyle_Changed,
 
                                     Name             = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = true, StyleGroupIndex = styleGroupIndex, IsValue = false},
                                     Value            = property.Name,
-                                    OnChange         = OnCurrentPropertyNameChanged,
+                                    OnChange         = On_CurrentPropertyNameInStyle_Changed,
                                     IsBold           = true,
                                     IsTextAlignRight = true,
                                     Suggestions      = StyleAttributeNameSuggestions,
@@ -675,8 +674,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
                                 {
                                     Name        = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true},
                                     Value       = property.Value,
-                                    OnFocus     = OnCurrentPropertyIndexChanged,
-                                    OnChange    = OnCurrentPropertyValueChanged,
+                                    OnFocus     = On_CurrentPropertyIndexInStyle_Changed,
+                                    OnChange    = On_CurrentPropertyValueInStyle_Changed,
                                     Placeholder = "red"
                                 }
                             }
@@ -712,11 +711,11 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     {
                         new MagicInput
                         {
-                            OnFocus = OnCurrentPropertyIndexChanged,
+                            OnFocus = On_CurrentPropertyIndexInStyle_Changed,
 
                             Name             = new PropInputLocation { PropertyIndexAtGroup = index, IsName = true, IsValue = false},
                             Value            = property.Name,
-                            OnChange         = OnCurrentPropertyNameChanged,
+                            OnChange         = On_CurrentPropertyNameInStyle_Changed,
                             IsBold           = true,
                             IsTextAlignRight = true,
                             Suggestions      = StyleAttributeNameSuggestions,
@@ -731,8 +730,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
                         {
                             Name        = new PropInputLocation { PropertyIndexAtGroup = index, IsName = false, IsValue = true},
                             Value       = property.Value,
-                            OnFocus     = OnCurrentPropertyIndexChanged,
-                            OnChange    = OnCurrentPropertyValueChanged,
+                            OnFocus     = On_CurrentPropertyIndexInStyle_Changed,
+                            OnChange    = On_CurrentPropertyValueInStyle_Changed,
                             Placeholder = "? ? ?"
                         }
                     }
