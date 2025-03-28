@@ -386,21 +386,32 @@ sealed class ApplicationView: Component<ApplicationView.State>
                 }
             },
             
-            
             visualElementModel.StyleGroups?.Select(styleGroup =>
             {
-                return new FlexColumn(WidthFull)
+                return new FlexColumn(WidthFull, Gap(4))
                 {
                     new FlexRow(WidthFull, AlignItemsCenter, Gap(4))
                     {
                         new FlexRowCentered(Size(28))
                         {
-                            When(state.CurrentStyleGroupCondition != styleGroup.Condition, Color(Gray100)),
                             
-                            When(state.CurrentStyleGroupCondition == styleGroup.Condition,  OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked)),
+                            new IconMinus(),
                             
-                            new IconMinus()
+                            
+                            BorderRadius(8),
+                            Border(1,solid,Gray200),
+                            
+                            state.CurrentStyleGroupCondition == styleGroup.Condition ?
+                            [
+                                OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked),
+                                Hover(Color(Blue300))
+                            ]:
+                            [
+                                Color(Gray100),
+                                BorderColor(Gray100)
+                            ]
                         },
+                        
                         
                         new MagicInput
                         {
