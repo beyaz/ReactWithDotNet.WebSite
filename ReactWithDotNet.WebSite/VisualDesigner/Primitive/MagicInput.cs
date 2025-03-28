@@ -41,6 +41,8 @@ sealed class MagicInput : Component<MagicInput.State>
     public string Placeholder { get; init; }
     public bool IsTextAlignCenter { get; init; }
 
+    public bool AutoFocus { get; init; }
+    
     protected override Element render()
     {
         return new FlexColumn(FitContent is false ? FlexGrow(1) : null)
@@ -71,7 +73,7 @@ sealed class MagicInput : Component<MagicInput.State>
                     IsTextAlignRight ? TextAlignRight : null,
                     IsTextAlignCenter ? TextAlignCenter : null
                 },
-                autoFocus = true
+                autoFocus = AutoFocus
             },
             ViewSuggestions
         };

@@ -639,7 +639,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
                                     IsBold           = true,
                                     IsTextAlignRight = true,
                                     Suggestions      = StyleAttributeNameSuggestions,
-                                    Placeholder = "color"
+                                    Placeholder = "color",
+                                    AutoFocus = property.Name.HasNoValue()
                                 }
                             },
                             " : ",
