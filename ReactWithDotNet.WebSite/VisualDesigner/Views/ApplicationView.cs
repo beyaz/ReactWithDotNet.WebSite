@@ -281,7 +281,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
             sizes = [20, 60, 20],
             children =
             {
-                PartLeftPanel() + BorderBottomLeftRadius(8),
+                PartLeftPanel() + BorderBottomLeftRadius(8) + OverflowAuto,
+                
                 new FlexColumn(AlignItemsCenter, FlexGrow(1), Padding(7), MarginLeft(40), ScaleStyle, OverflowXAuto)
                 {
                     createHorizontalRuler() + Width(state.ScreenWidth) + MarginTop(12),
@@ -405,7 +406,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
             Suggestions = state.Project.Components.Select(x => x.Name).ToList(),
             Value       = state.CurrentComponentName,
-            OnChange    = OnComponentNameChanged
+            OnChange    = OnComponentNameChanged,
+            IsTextAlignCenter = true
         };
 
         return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"), Background(White))
