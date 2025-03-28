@@ -350,7 +350,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         var componentModel = state.Project.Components.First(x => x.Name == newValue);
 
-        if (state.SettingsPanelCurrentTabName == SettingsPanelTabNames.TabProps)
+        if (state.SettingsPanelCurrentTabName == SettingsPanelTab.Props)
         {
             state.JsonTextInComponentSettings = componentModel.PropsAsJson;    
         }
@@ -446,40 +446,33 @@ sealed class ApplicationView : Component<ApplicationView.State>
         {
             new FlexRow(JustifyContentSpaceAround, Background(Gray100), PaddingY(4), CursorDefault, Opacity(0.7))
             {
-                new FlexRowCentered(When(state.SettingsPanelCurrentTabName == SettingsPanelTabNames.TabProps, FontWeightBold))
+                new FlexRowCentered(When(state.SettingsPanelCurrentTabName == SettingsPanelTab.Props, FontWeightBold))
                 {
                     "Props", 
-                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTabName = SettingsPanelTabNames.TabProps; return Task.CompletedTask;})
+                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTabName = SettingsPanelTab.Props; return Task.CompletedTask;})
                 },
-                new FlexRowCentered(When(state.SettingsPanelCurrentTabName == SettingsPanelTabNames.TabState, FontWeightBold))
+                new FlexRowCentered(When(state.SettingsPanelCurrentTabName == SettingsPanelTab.State, FontWeightBold))
                 {
                     "State", 
-                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTabName = SettingsPanelTabNames.TabProps; return Task.CompletedTask;})
+                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTabName = SettingsPanelTab.State; return Task.CompletedTask;})
                 },
-                new FlexRowCentered(When(state.SettingsPanelCurrentTabName == SettingsPanelTabNames.TabState, FontWeightBold))
+                new FlexRowCentered(When(state.SettingsPanelCurrentTabName == SettingsPanelTab.Other, FontWeightBold))
                 {
                     "Other", 
-                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTabName = SettingsPanelTabNames.TabOther; return Task.CompletedTask;})
+                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTabName = SettingsPanelTab.Other; return Task.CompletedTask;})
                 }
             },
-            When(state.SettingsPanelCurrentTabName == SettingsPanelTabNames.TabProps, JsonEditorInSettings)
-            
-        };
-    }
+            new FlexColumnCentered(SizeFull)
+            {
+                NewJsonEditor(() => state.JsonTextInComponentSettings),
 
-    Element JsonEditorInSettings()
-    {
-        return new FlexColumnCentered(SizeFull)
-        {
-            NewJsonEditor(() => state.JsonTextInComponentSettings),
-
-            PositionRelative,
-            new div{ PositionAbsolute, Top(0), Right(16),  JsonEditorFormatButton(FormatCurrentComponentPropsAsJson)}
+                PositionRelative,
+                new div{ PositionAbsolute, Top(0), Right(16),  JsonEditorFormatButton(FormatJsonTextInComponentSettings)}
+            }
         };
     }
     
-    
-    Task FormatCurrentComponentPropsAsJson(MouseEvent _)
+    Task FormatJsonTextInComponentSettings(MouseEvent _)
     {
         if (state.JsonTextInComponentSettings is null)
         {
@@ -889,7 +882,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         public string LeftPanelCurrentTabName { get; set; }
         
-        public string SettingsPanelCurrentTabName { get; set; }
+        public SettingsPanelTab SettingsPanelCurrentTabName { get; set; }
 
         public ProjectModel Project { get; set; }
 
@@ -909,11 +902,9 @@ sealed class ApplicationView : Component<ApplicationView.State>
         public const string Settings = "Settings";
     }
 
-    class SettingsPanelTabNames
+    internal enum SettingsPanelTab
     {
-        public static string TabProps => nameof(TabProps);
-        public static string TabState => nameof(TabState);
-        public static string TabOther => nameof(TabOther);
+        Props,State,Other
     }
 
     class PropInputLocation
