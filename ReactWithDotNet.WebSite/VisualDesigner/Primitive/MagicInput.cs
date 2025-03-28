@@ -43,7 +43,7 @@ sealed class MagicInput : Component<MagicInput.State>
 
     protected override Element render()
     {
-        return new FlexColumnCentered(FitContent is false ? WidthFull : null)
+        return new FlexColumnCentered(FitContent is false ? FlexGrow(1) : null)
         {
             new input
             {
@@ -63,7 +63,7 @@ sealed class MagicInput : Component<MagicInput.State>
                     PaddingTopBottom(4),
                     Color(rgb(0, 6, 36)),
                     Height(24),
-                    FitContent ? Width(CalculateTextWidth(state.Value)) : WidthFull,
+                    FitContent ? Width(CalculateTextWidth(state.Value)) : FlexGrow(1),
                     Background(transparent),
                     EditorFont(),
                     IsBold ? FontWeight600 : null,

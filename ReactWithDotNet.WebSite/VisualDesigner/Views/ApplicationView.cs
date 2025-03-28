@@ -114,12 +114,12 @@ sealed class ApplicationView : Component<ApplicationView.State>
         };
     }
 
-    static FlexRowCentered CreateIcon(Icon name, int size)
+    static FlexRowCentered CreateIcon(Icon name, int size, Modifier[] modifiers = null)
     {
         return name switch
         {
-            Icon.add    => new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Hover(BorderColor(Blue300), Color(Blue300))) { new IconPlus() },
-            Icon.remove => new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Hover(BorderColor(Blue300), Color(Blue300))) { new IconMinus() },
+            Icon.add    => new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Hover(BorderColor(Blue300), Color(Blue300))) { new IconPlus(), modifiers },
+            Icon.remove => new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Hover(BorderColor(Blue300), Color(Blue300))) { new IconMinus() , modifiers},
             _           => throw new NotImplementedException(name.ToString())
         };
     }
@@ -544,23 +544,15 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     {
                         new FlexRow(WidthFull, AlignItemsCenter, Gap(4))
                         {
-                            new FlexRowCentered(Size(28))
-                            {
-                                new IconMinus(),
-
-                                BorderRadius(8),
-                                Border(1, solid, Gray200),
-
-                                state.CurrentStyleGroupCondition == styleGroup.Condition ?
-                                    [
-                                        OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked),
-                                        Hover(Color(Blue300))
-                                    ] :
-                                    [
-                                        Color(Gray100),
-                                        BorderColor(Gray100)
-                                    ]
-                            },
+                            CreateIcon(Icon.remove, 28, state.CurrentStyleGroupCondition == styleGroup.Condition ?
+                                [
+                                    OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked),
+                                    Hover(Color(Blue300))
+                                ] :
+                                [
+                                    Color(Gray100),
+                                    BorderColor(Gray100)
+                                ]),
 
                             new MagicInput
                             {
@@ -569,7 +561,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                                 Value             = styleGroup.Condition,
                                 IsTextAlignCenter = true,
                                 Suggestions       = BooleanSuggestions
-                            },
+                            } + FlexGrow(1),
                             
                             CreateIcon(Icon.add, 28) + OnClick(CurrentStyleGroup_CurrentProperty_Add_Clicked)
                         },
