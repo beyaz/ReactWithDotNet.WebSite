@@ -58,6 +58,8 @@ sealed class ComponentModel
 
     public string StateAsJson { get; set; }
     
+    public string OtherAsJson { get; set; }
+    
     public VisualElementModel RootElement { get; set; }
     
     // @formatter:on

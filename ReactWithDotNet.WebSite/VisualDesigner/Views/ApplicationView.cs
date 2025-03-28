@@ -440,6 +440,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
         };
     }
 
+    ComponentModel CurrentComponent=> state.Project.Components.First(x => x.Name == state.CurrentComponentName);
+    
     Element PartSettingsPanel()
     {
         return new FlexColumn(SizeFull)
@@ -452,23 +454,40 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     PaddingX(8), OnClick(_ =>
                     {
                         state.SettingsPanelCurrentTab = SettingsPanelTab.Props;
+
+                        state.JsonTextInComponentSettings = CurrentComponent.PropsAsJson;
+                        
                         return Task.CompletedTask;
                     })
                 },
                 new FlexRowCentered(When(state.SettingsPanelCurrentTab == SettingsPanelTab.State, FontWeightBold))
                 {
                     "State", 
-                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTab = SettingsPanelTab.State; return Task.CompletedTask;})
+                    PaddingX(8), OnClick(_ =>
+                    {
+                        state.SettingsPanelCurrentTab     = SettingsPanelTab.State; 
+                        
+                        state.JsonTextInComponentSettings = CurrentComponent.StateAsJson;
+                        
+                        return Task.CompletedTask;
+                    })
                 },
                 new FlexRowCentered(When(state.SettingsPanelCurrentTab == SettingsPanelTab.Other, FontWeightBold))
                 {
                     "Other", 
-                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTab = SettingsPanelTab.Other; return Task.CompletedTask;})
+                    PaddingX(8), OnClick(_ =>
+                    {
+                        state.SettingsPanelCurrentTab = SettingsPanelTab.Other; 
+                        
+                        state.JsonTextInComponentSettings = CurrentComponent.OtherAsJson;
+                        
+                        return Task.CompletedTask;
+                    })
                 }
             },
             new FlexColumnCentered(SizeFull)
             {
-                NewJsonEditor(() => state.JsonTextInComponentSettings),
+                NewJsonEditor(() => state.JsonTextInComponentSettings) ,
 
                 PositionRelative,
                 new div{ PositionAbsolute, Top(0), Right(16),  JsonEditorFormatButton(FormatJsonTextInComponentSettings)}
