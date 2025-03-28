@@ -84,7 +84,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
             ScreenWidth                  = 400,
             ScreenHeight                 = 400,
             Scale                        = 100,
-            LeftPanelCurrentTabName      = LeftPanelSelectedTabNames.ElementTree,
+            LeftPanelCurrentTab      = LeftPanelTab.ElementTree,
             Project                      = Dummy.ProjectModel,
             CurrentVisualElementTreePath = null
         };
@@ -352,7 +352,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         var componentModel = state.Project.Components.First(x => x.Name == newValue);
 
-        if (state.SettingsPanelCurrentTab == SettingsPanelTab.Props)
+        if (state.SettingsCurrentTab == SettingsTab.Props)
         {
             state.JsonTextInComponentSettings = componentModel.PropsAsJson;    
         }
@@ -366,21 +366,21 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     Task OnElementTreeTabClicked(MouseEvent e)
     {
-        state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.ElementTree;
+        state.LeftPanelCurrentTab = LeftPanelTab.ElementTree;
 
         return Task.CompletedTask;
     }
 
     Task OnSaveTabClicked(MouseEvent e)
     {
-        state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.Save;
+        state.LeftPanelCurrentTab = LeftPanelTab.Save;
 
         return Task.CompletedTask;
     }
 
     Task OnSettingsTabClicked(MouseEvent e)
     {
-        state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.Settings;
+        state.LeftPanelCurrentTab = LeftPanelTab.Settings;
 
         return Task.CompletedTask;
     }
@@ -420,26 +420,26 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
                 new FlexRowCentered(WidthFull, OnClick(OnElementTreeTabClicked))
                 {
-                    new IconLayers() + Size(18) + (state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.ElementTree ? Color(Blue300) : null)
+                    new IconLayers() + Size(18) + (state.LeftPanelCurrentTab == LeftPanelTab.ElementTree ? Color(Blue300) : null)
                 },
                 new FlexRowCentered(WidthFull, OnClick(OnSettingsTabClicked))
                 {
-                    new IconSettings() + Size(24) + (state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.Settings ? Color(Blue300) : null)
+                    new IconSettings() + Size(24) + (state.LeftPanelCurrentTab == LeftPanelTab.Settings ? Color(Blue300) : null)
                 },
                 new FlexRowCentered(WidthFull, OnClick(OnSaveTabClicked))
                 {
-                    new IconSave() + Size(24) + (state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.Save ? Color(Blue300) : null)
+                    new IconSave() + Size(24) + (state.LeftPanelCurrentTab == LeftPanelTab.Save ? Color(Blue300) : null)
                 }
             },
 
-            When(state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.ElementTree, () =>new VisualElementTreeView
+            When(state.LeftPanelCurrentTab == LeftPanelTab.ElementTree, () =>new VisualElementTreeView
             {
                 SelectionChanged = OnVisualElementTreeSelected,
                 SelectedPath     = state.CurrentVisualElementTreePath,
                 Model            = state.Project.Components.FirstOrDefault(x => x.Name == state.CurrentComponentName)?.RootElement
             }),
             
-            When(state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.Settings, PartSettingsPanel)
+            When(state.LeftPanelCurrentTab == LeftPanelTab.Settings, PartSettingsPanel)
         };
     }
 
@@ -451,36 +451,36 @@ sealed class ApplicationView : Component<ApplicationView.State>
         {
             new FlexRow(JustifyContentSpaceAround, Background(Gray100), PaddingY(4), CursorDefault, Opacity(0.7))
             {
-                new FlexRowCentered(When(state.SettingsPanelCurrentTab == SettingsPanelTab.Props, FontWeightBold))
+                new FlexRowCentered(When(state.SettingsCurrentTab == SettingsTab.Props, FontWeightBold))
                 {
                     "Props", 
                     PaddingX(8), OnClick(_ =>
                     {
-                        state.SettingsPanelCurrentTab = SettingsPanelTab.Props;
+                        state.SettingsCurrentTab = SettingsTab.Props;
 
                         state.JsonTextInComponentSettings = CurrentComponent.PropsAsJson;
                         
                         return Task.CompletedTask;
                     })
                 },
-                new FlexRowCentered(When(state.SettingsPanelCurrentTab == SettingsPanelTab.State, FontWeightBold))
+                new FlexRowCentered(When(state.SettingsCurrentTab == SettingsTab.State, FontWeightBold))
                 {
                     "State", 
                     PaddingX(8), OnClick(_ =>
                     {
-                        state.SettingsPanelCurrentTab     = SettingsPanelTab.State; 
+                        state.SettingsCurrentTab     = SettingsTab.State; 
                         
                         state.JsonTextInComponentSettings = CurrentComponent.StateAsJson;
                         
                         return Task.CompletedTask;
                     })
                 },
-                new FlexRowCentered(When(state.SettingsPanelCurrentTab == SettingsPanelTab.Other, FontWeightBold))
+                new FlexRowCentered(When(state.SettingsCurrentTab == SettingsTab.Other, FontWeightBold))
                 {
                     "Other", 
                     PaddingX(8), OnClick(_ =>
                     {
-                        state.SettingsPanelCurrentTab = SettingsPanelTab.Other; 
+                        state.SettingsCurrentTab = SettingsTab.Other; 
                         
                         state.JsonTextInComponentSettings = CurrentComponent.OtherAsJson;
                         
@@ -516,17 +516,17 @@ sealed class ApplicationView : Component<ApplicationView.State>
     {
         state.JsonTextInComponentSettings = JsonPrettify(state.JsonTextInComponentSettings);
 
-        switch (state.SettingsPanelCurrentTab)
+        switch (state.SettingsCurrentTab)
         {
-            case SettingsPanelTab.Props:
+            case SettingsTab.Props:
                 CurrentComponent.PropsAsJson = state.JsonTextInComponentSettings;
                 return Task.CompletedTask;
             
-            case SettingsPanelTab.State:
+            case SettingsTab.State:
                 CurrentComponent.StateAsJson = state.JsonTextInComponentSettings;
                 return Task.CompletedTask;
             
-            case SettingsPanelTab.Other:
+            case SettingsTab.Other:
                 CurrentComponent.OtherAsJson = state.JsonTextInComponentSettings;
                 return Task.CompletedTask;
             
@@ -930,9 +930,9 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         public string CurrentVisualElementTreePath { get; set; }
 
-        public string LeftPanelCurrentTabName { get; set; }
+        public LeftPanelTab LeftPanelCurrentTab { get; set; }
         
-        public SettingsPanelTab SettingsPanelCurrentTab { get; set; }
+        public SettingsTab SettingsCurrentTab { get; set; }
 
         public ProjectModel Project { get; set; }
 
@@ -945,17 +945,12 @@ sealed class ApplicationView : Component<ApplicationView.State>
         public string JsonTextInComponentSettings { get; set; }
     }
 
-    class LeftPanelSelectedTabNames
-    {
-        public const string ElementTree = "ElementTree";
-        public const string Save = "Save";
-        public const string Settings = "Settings";
-    }
-    internal enum LeftPanelSelectedTab
+    internal enum LeftPanelTab
     {
         ElementTree,Save,Settings
     }
-    internal enum SettingsPanelTab
+    
+    internal enum SettingsTab
     {
         Props,State,Other
     }
