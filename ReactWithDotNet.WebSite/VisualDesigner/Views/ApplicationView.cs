@@ -91,6 +91,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
         if (state.CurrentComponentName is null && state.Project.Components.Count > 0)
         {
             state.CurrentComponentName = state.Project.Components[0].Name;
+
+            state.CurrentComponentPropsAsJson = state.Project.Components.First(x => x.Name == state.CurrentComponentName).PropsAsJson;
         }
 
         return Task.CompletedTask;
@@ -417,15 +419,42 @@ sealed class ApplicationView : Component<ApplicationView.State>
                 }
             },
 
-            new VisualElementTreeView
+            When(state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.ElementTree, () =>new VisualElementTreeView
             {
                 SelectionChanged = OnVisualElementTreeSelected,
                 SelectedPath     = state.CurrentVisualElementTreePath,
                 Model            = state.Project.Components.FirstOrDefault(x => x.Name == state.CurrentComponentName)?.RootElement
-            }
+            }),
+            
+            When(state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.Settings, PartPropAndJsonEditor)
         };
     }
 
+    Element PartPropAndJsonEditor()
+    {
+        return new FlexColumnCentered(SizeFull)
+        {
+            NewJsonEditor(() => state.CurrentComponentPropsAsJson),
+
+            PositionRelative,
+            new div{ PositionAbsolute, Top(0), Right(16),  JsonEditorFormatButton(FormatCurrentComponentPropsAsJson)}
+        };
+
+    }
+    
+    Task FormatCurrentComponentPropsAsJson(MouseEvent _)
+    {
+        if (state.CurrentComponentPropsAsJson is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        state.CurrentComponentPropsAsJson = JsonPrettify(state.CurrentComponentPropsAsJson);
+
+        return Task.CompletedTask;
+    }
+    
+    
     Element PartMediaSizeButtons()
     {
         return new FlexRow(JustifyContentSpaceAround, AlignItemsCenter, Gap(16))
@@ -830,6 +859,10 @@ sealed class ApplicationView : Component<ApplicationView.State>
         public int ScreenHeight { get; init; }
 
         public int ScreenWidth { get; set; }
+        
+        public string CurrentComponentPropsAsJson { get; set; }
+        
+        public string CurrentComponentStateAsJson { get; set; }
     }
 
     class LeftPanelSelectedTabNames

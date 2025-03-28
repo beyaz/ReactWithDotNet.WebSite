@@ -1,4 +1,9 @@
-﻿namespace ReactWithDotNet.VisualDesigner;
+﻿using System.IO;
+using System.Xml;
+using Newtonsoft.Json;
+using Formatting = Newtonsoft.Json.Formatting;
+
+namespace ReactWithDotNet.VisualDesigner;
 
 static class Theme
 {
@@ -292,6 +297,18 @@ static class Extensions
         }
     };
 
+    public static string JsonPrettify(string json)
+    {
+        using (var stringReader = new StringReader(json))
+        using (var stringWriter = new StringWriter())
+        {
+            var jsonReader = new JsonTextReader(stringReader);
+            var jsonWriter = new JsonTextWriter(stringWriter) { Formatting = Formatting.Indented };
+            jsonWriter.WriteToken(jsonReader);
+            return stringWriter.ToString();
+        }
+    }
+    
     public static double CalculateTextWidth(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -317,7 +334,12 @@ static class Extensions
 
             new link { href = "https://fonts.gstatic.com", rel = "preconnect", crossOrigin = "true" },
 
-            new link { href = "https://fonts.googleapis.com/css2?family=Wix+Madefor+Text:ital,wght@0,400..800;1,400..800&display=swap", rel = "stylesheet" }
+            new link { href = "https://fonts.googleapis.com/css2?family=Wix+Madefor+Text:ital,wght@0,400..800;1,400..800&display=swap", rel = "stylesheet" },
+            new link
+            {
+                href = "https://fonts.cdnfonts.com/css/ibm-plex-mono-3",
+                rel  = "stylesheet"
+            }
         };
     }
     
