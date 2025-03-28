@@ -105,7 +105,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     protected override Element render()
     {
-        return new FlexRow(Padding(10), SizeFull, Background(Theme.BackgroundColor))
+        return new FlexRow(Padding(10), SizeFull,Background(Theme.BackgroundColor))
         {
             EditorFontLinks,
             EditorFont(),
@@ -122,7 +122,6 @@ sealed class ApplicationView : Component<ApplicationView.State>
                 {
                     Border(Solid(1, Theme.BorderColor)),
                     SizeFull,
-                    Background(Theme.WindowBackgroundColor),
                     BorderRadius(10),
                     BoxShadow(0, 30, 30, 0, rgba(69, 42, 124, 0.15))
                 },
