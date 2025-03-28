@@ -431,7 +431,34 @@ sealed class ApplicationView : Component<ApplicationView.State>
                 Model            = state.Project.Components.FirstOrDefault(x => x.Name == state.CurrentComponentName)?.RootElement
             }),
             
-            When(state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.Settings, PartPropAndJsonEditor)
+            When(state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.Settings, PartSettingsPanel)
+        };
+    }
+
+    Element PartSettingsPanel()
+    {
+        return new FlexColumn(SizeFull)
+        {
+            new FlexRow(JustifyContentSpaceAround, Background(Gray100), PaddingY(4), CursorDefault, Opacity(0.7))
+            {
+                new FlexRowCentered(When(state.SettingsPanelCurrentTabName == SettingsPanelTabNames.TabProps, FontWeightBold))
+                {
+                    "Props", 
+                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTabName = SettingsPanelTabNames.TabProps; return Task.CompletedTask;})
+                },
+                new FlexRowCentered(When(state.SettingsPanelCurrentTabName == SettingsPanelTabNames.TabState, FontWeightBold))
+                {
+                    "State", 
+                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTabName = SettingsPanelTabNames.TabProps; return Task.CompletedTask;})
+                },
+                new FlexRowCentered(When(state.SettingsPanelCurrentTabName == SettingsPanelTabNames.TabState, FontWeightBold))
+                {
+                    "Other", 
+                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTabName = SettingsPanelTabNames.TabOther; return Task.CompletedTask;})
+                }
+            },
+            When(state.SettingsPanelCurrentTabName == SettingsPanelTabNames.TabProps, PartPropAndJsonEditor)
+            
         };
     }
 
@@ -856,6 +883,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
         public string CurrentVisualElementTreePath { get; set; }
 
         public string LeftPanelCurrentTabName { get; set; }
+        
+        public string SettingsPanelCurrentTabName { get; set; }
 
         public ProjectModel Project { get; set; }
 
@@ -875,6 +904,13 @@ sealed class ApplicationView : Component<ApplicationView.State>
         public const string ElementTree = "ElementTree";
         public const string Save = "Save";
         public const string Settings = "Settings";
+    }
+
+    class SettingsPanelTabNames
+    {
+        public static string TabProps => nameof(TabProps);
+        public static string TabState => nameof(TabState);
+        public static string TabOther => nameof(TabOther);
     }
 
     class PropInputLocation
