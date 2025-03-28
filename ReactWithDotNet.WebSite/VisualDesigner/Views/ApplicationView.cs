@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using ReactWithDotNet.ThirdPartyLibraries.MonacoEditorReact;
+using ReactWithDotNet.UIDesigner;
 using Page = ReactWithDotNet.WebSite.Page;
 
 namespace ReactWithDotNet.VisualDesigner.Views;
@@ -887,6 +888,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
     async Task SaveState()
     {
         AppState = state;
+        
+        Client.RefreshComponentPreview();
 
         await Task.Delay(1);
     }
@@ -1052,8 +1055,6 @@ sealed class ApplicationPreview : Component
 {
     public Task Refresh()
     {
-        Client.GotoMethod(1000, Refresh);
-
         return Task.CompletedTask;
     }
 
@@ -1064,10 +1065,10 @@ sealed class ApplicationPreview : Component
             exceptionOccurredInRender.ToString()
         };
     }
-
+    
     protected override Task constructor()
     {
-        Client.GotoMethod(1000, Refresh);
+        Client.ListenEvent("RefreshComponentPreview", Refresh);
 
         return Task.CompletedTask;
     }

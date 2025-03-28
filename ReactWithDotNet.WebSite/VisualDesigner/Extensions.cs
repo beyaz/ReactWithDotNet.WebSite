@@ -14,6 +14,43 @@ static class Theme
 
 static class Extensions
 {
+    
+    public static void RefreshComponentPreview(this Client client)
+    {
+        const string jsCode =
+            """
+            var frame = document.getElementById('ComponentPreview')
+            if(frame)
+            {
+              var reactWithDotNet = frame.contentWindow.ReactWithDotNet;
+              if(reactWithDotNet)
+              {
+                reactWithDotNet.DispatchEvent('RefreshComponentPreview', []);
+              }
+            }
+            """;
+        
+        client.RunJavascript(jsCode);
+    }
+    
+    public static void RefreshComponentPreviewCompleted(this Client client)
+    {
+        const string jsCode =
+            """
+            var parentWindow = window.parent;
+            if(parentWindow)
+            {
+              var reactWithDotNet = parentWindow.ReactWithDotNet;
+              if(reactWithDotNet)
+              {
+                reactWithDotNet.DispatchEvent('RefreshComponentPreviewCompleted', []);
+              }
+            }
+            """;
+        
+        client.RunJavascript(jsCode);
+    }
+    
     public static IReadOnlyList<string> TagNameList =>
     [
         "html",
