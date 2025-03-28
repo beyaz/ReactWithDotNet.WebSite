@@ -336,11 +336,6 @@ sealed class ApplicationView: Component<ApplicationView.State>
             CurrentVisualElement.Tag = newValue;    
         }
         
-        if (senderName == SenderName.Condition)
-        {
-            CurrentVisualElement.Condition = newValue;    
-        }
-
         if (senderName == SenderName.ComponentName)
         {
             state.CurrentComponentName = newValue;
@@ -364,48 +359,31 @@ sealed class ApplicationView: Component<ApplicationView.State>
         tagSuggestions.AddRange(state.Project.Components.Where(c => c.Name != state.CurrentComponentName).Select(x => x.Name));
 
         var visualElementModel = CurrentVisualElement;
-
-        var tag = new FlexRow(WidthFull, Gap(4))
-        {
-            new label { "Tag", FontWeightBold , Width(4,10), TextAlignRight},
-            " : ",
-            new MagicInput { Name = SenderName.Tag, Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = OnInputChanged} + Width(6,10)
-        };
         
-        var condition = new FlexRow(WidthFull, Gap(4))
-        {
-            new label { "Condition", FontWeightBold, Width(4,10), TextAlignRight },
-            " : ",
-            new MagicInput { Name = SenderName.Condition, Value = visualElementModel.Condition, Suggestions = BooleanSuggestions, OnChange = OnInputChanged} + Width(6,10)
-        };
-        
-        
-
         return new FlexColumn( BorderLeft(1, dotted, "#d9d9d9"), OverflowYAuto, Background(White))
         {
-            new FlexColumn(WidthFull, Padding(4))
+            new FlexRow(WidthFull, Gap(4))
             {
-                tag,
-            
-                condition,
+                new label { "Tag", FontWeightBold , Width(4,10), TextAlignRight},
+                " : ",
+                new MagicInput { Name = SenderName.Tag, Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = OnInputChanged} + Width(6,10)
             },
             
-            new FlexRow(WidthFull,AlignItemsCenter, Gap(4))
+            new FlexRow(WidthFull,AlignItemsCenter)
             {
-                new FlexRowCentered(Size(28), Color(Gray100))
+                new FlexRowCentered(Size(32), OnClick(StyleGroupRemoveClicked) , BorderRadius(8), Border(1,solid,Gray200), Hover(Color(Blue300)))
                 {
                     new IconMinus()
                 },
                 
                 new div{ Height(1), FlexGrow(1), Background(Gray200)},
-                new span { "S T Y L E", WhiteSpaceNoWrap, UserSelect(none) },
+                new span { "S T Y L E", WhiteSpaceNoWrap, UserSelect(none), PaddingX(4) },
                 new div{ Height(1), FlexGrow(1), Background(Gray200)},
                  
-                new FlexRowCentered(Size(28), OnClick(OnAddNewStyleGroupClicked) , Hover(Color(Blue300), BorderRadius(8), Border(1,solid,Blue300)))
+                new FlexRowCentered(Size(32), OnClick(OnAddNewStyleGroupClicked) , BorderRadius(8), Border(1,solid,Gray200), Hover(Color(Blue300)))
                 {
                     new IconPlus()
                 }
-                
             },
             
             
@@ -546,6 +524,30 @@ sealed class ApplicationView: Component<ApplicationView.State>
         
         return Task.CompletedTask;
     }
+    
+    Task StyleGroupRemoveClicked(MouseEvent e)
+    {
+        var styleGroups = CurrentVisualElement.StyleGroups ??= [];
+
+        if (styleGroups.Count == 0)
+        {
+            styleGroups.Add(new ()
+            {
+                Condition = "*",
+                Items     = [new PropertyModel()]
+            });
+            
+            return Task.CompletedTask;
+        }
+        
+        styleGroups.Add(new ()
+        {
+            Condition = "?",
+            Items     = [new PropertyModel()]
+        });
+        
+        return Task.CompletedTask;
+    }
 
     Task OnElementTreeTabClicked(MouseEvent e)
     {
@@ -570,7 +572,6 @@ sealed class ApplicationView: Component<ApplicationView.State>
     {
         public static readonly string  ComponentName = nameof(ComponentName);
         public static readonly string  Tag = nameof(Tag);
-        public static readonly string  Condition = nameof(Condition);
     }
     
     Element PartLeftPanel()
