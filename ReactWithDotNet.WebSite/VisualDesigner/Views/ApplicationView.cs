@@ -489,10 +489,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
             },
             new FlexColumnCentered(SizeFull)
             {
-                NewJsonEditor(() => state.JsonTextInComponentSettings) ,
-
-                PositionRelative,
-                new div{ PositionAbsolute, Top(0), Right(16),  JsonEditorFormatButton(FormatJsonTextInComponentSettings)}
+                NewJsonEditor(() => state.JsonTextInComponentSettings)
             }
         };
     }
