@@ -578,7 +578,15 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
             new FlexRow(WidthFull, AlignItemsCenter)
             {
-                CreateIcon(Icon.remove, 32) + OnClick(StyleGroupRemoveClicked),
+                CreateIcon(Icon.remove, 32, state.CurrentStyleGroupIndex.HasValue ?
+                               [
+                                   OnClick(StyleGroupRemoveClicked),
+                                   Hover(Color(Blue300))
+                               ] :
+                               [
+                                   Color(Gray100),
+                                   BorderColor(Gray100)
+                               ]),
 
                 new div { Height(1), FlexGrow(1), Background(Gray200) },
                 new span { "S T Y L E", WhiteSpaceNoWrap, UserSelect(none), PaddingX(4) },
@@ -621,7 +629,6 @@ sealed class ApplicationView : Component<ApplicationView.State>
                         {
                             new FlexRow(JustifyContentFlexEnd, Width(4, 10))
                             {
-                                
                                 new MagicInput
                                 {
                                     OnFocus = OnCurrentPropertyIndexChanged,
@@ -631,7 +638,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
                                     OnChange         = OnCurrentPropertyNameChanged,
                                     IsBold           = true,
                                     IsTextAlignRight = true,
-                                    Suggestions      = StyleAttributeNameSuggestions
+                                    Suggestions      = StyleAttributeNameSuggestions,
+                                    Placeholder = "color"
                                 }
                             },
                             " : ",
@@ -639,10 +647,11 @@ sealed class ApplicationView : Component<ApplicationView.State>
                             {
                                 new MagicInput
                                 {
-                                    Name     = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true},
-                                    Value    = property.Value,
-                                    OnFocus  = OnCurrentPropertyIndexChanged,
-                                    OnChange = OnCurrentPropertyValueChanged
+                                    Name        = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true},
+                                    Value       = property.Value,
+                                    OnFocus     = OnCurrentPropertyIndexChanged,
+                                    OnChange    = OnCurrentPropertyValueChanged,
+                                    Placeholder = "red"
                                 }
                             }
                         })
@@ -729,24 +738,10 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     Task StyleGroupRemoveClicked(MouseEvent e)
     {
-        var styleGroups = CurrentVisualElement.StyleGroups ??= [];
-
-        if (styleGroups.Count == 0)
-        {
-            styleGroups.Add(new()
-            {
-                Condition = "*",
-                Items     = [new PropertyModel()]
-            });
-
-            return Task.CompletedTask;
-        }
-
-        styleGroups.Add(new()
-        {
-            Condition = "?",
-            Items     = [new PropertyModel()]
-        });
+        CurrentVisualElement.StyleGroups.Remove(CurrentStyleGroup);
+        
+        state.CurrentStyleGroupIndex = null;
+        state.CurrentPropertyIndexAtStyleGroup = null;
 
         return Task.CompletedTask;
     }
