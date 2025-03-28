@@ -373,8 +373,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     Task OnSaveTabClicked(MouseEvent e)
     {
-        state.LeftPanelCurrentTab = LeftPanelTab.Save;
-
+        this.SuccessNotification("Successfully saved.");
+        
         return Task.CompletedTask;
     }
 
@@ -408,7 +408,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
             Suggestions = state.Project.Components.Select(x => x.Name).ToList(),
             Value       = state.CurrentComponentName,
             OnChange    = OnComponentNameChanged,
-            IsTextAlignCenter = true
+            IsTextAlignCenter = true,
+            IsBold = true
         };
 
         return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"), Background(White))
@@ -428,7 +429,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                 },
                 new FlexRowCentered(WidthFull, OnClick(OnSaveTabClicked))
                 {
-                    new IconSave() + Size(24) + (state.LeftPanelCurrentTab == LeftPanelTab.Save ? Color(Blue300) : null)
+                    new IconSave() + Size(24) + Hover(Color(Blue300))
                 }
             },
 
@@ -947,7 +948,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     internal enum LeftPanelTab
     {
-        ElementTree,Save,Settings
+        ElementTree, Settings
     }
     
     internal enum SettingsTab

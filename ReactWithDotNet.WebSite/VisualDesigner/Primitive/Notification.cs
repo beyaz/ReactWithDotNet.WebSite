@@ -29,7 +29,7 @@ static class NotificationHelper
         {
             icon, new span
             {
-                message.Text,
+                DangerouslySetInnerHTML(message.Text),
 
                 new[]
                 {
@@ -74,7 +74,7 @@ static class NotificationHelper
                 return CompletedTask;;
             };
 
-            return new FlexRowCentered(PositionFixed, Zindex2, Top(24), Right(0), Left(0), MD(Left(inherit)))
+            return new FlexRowCentered(PositionFixed, WidthAuto, Zindex2, Bottom(24), Right(0))
             {
                 AnimateVisibility(message is not null, CreateNotificationContent(message))
             };
