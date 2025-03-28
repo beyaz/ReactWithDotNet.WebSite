@@ -561,7 +561,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         var visualElementModel = CurrentVisualElement;
 
-        return new FlexColumn(BorderLeft(1, dotted, "#d9d9d9"), PaddingX(2), OverflowYAuto, Background(White))
+        return new FlexColumn(BorderLeft(1, dotted, "#d9d9d9"), PaddingX(2), Gap(8), OverflowYAuto, Background(White))
         {
             new FlexRow(WidthFull, Gap(4))
             {
@@ -595,13 +595,13 @@ sealed class ApplicationView : Component<ApplicationView.State>
                 CreateIcon(Icon.add, 32) + OnClick(StyleGroupAddClicked)
             },
 
-            new FlexColumnCentered(WidthFull, Padding(4))
+            new FlexColumnCentered(WidthFull)
             {
                 visualElementModel.StyleGroups?.Select((styleGroup, styleGroupIndex )=>
                 {
                     return new FlexColumn(WidthFull, Gap(4))
                     {
-                        new FlexRow(WidthFull, AlignItemsCenter, Gap(4))
+                        new FlexRow(WidthFull, AlignItemsCenter, Gap(4), PaddingX(2))
                         {
                             CreateIcon(Icon.remove, 28, state.CurrentPropertyIndexAtStyleGroup.HasValue &&  state.CurrentStyleGroupIndex == styleGroupIndex ?
                                 [
