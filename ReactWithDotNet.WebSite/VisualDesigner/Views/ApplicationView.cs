@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 using Page = ReactWithDotNet.WebSite.Page;
 
 namespace ReactWithDotNet.VisualDesigner.Views;
@@ -47,7 +48,11 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     public Task OnCurrentPropertyIndexChanged(string senderName)
     {
-        state.CurrentPropertyIndex = int.Parse(senderName);
+        InputLocation location = senderName;
+
+        state.CurrentStyleGroupCondition = "todo";
+        
+        state.CurrentPropertyIndex       = int.Parse(senderName);
 
         return Task.CompletedTask;
     }
@@ -503,6 +508,40 @@ sealed class ApplicationView : Component<ApplicationView.State>
         }
     }
 
+    class InputLocation
+    {
+        public required int StyleGroupIndex { get; init; }
+        public required int Index { get; init; }
+        public required bool IsName { get; init; }
+        public required bool IsValue { get; init; }
+
+        public override string ToString() =>
+            $"{StyleGroupIndex},{Index},{IsName},{IsValue}";
+
+        public static InputLocation Parse(string input)
+        {
+            var parts = input.Split(',');
+            if (parts.Length != 4)
+                throw new FormatException("Invalid input format");
+
+            return new InputLocation
+            {
+                StyleGroupIndex = int.Parse(parts[0]),
+                Index           = int.Parse(parts[1]),
+                IsName          = bool.Parse(parts[2]),
+                IsValue         = bool.Parse(parts[3])
+            };
+        }
+
+        // String'den InputLocation'a dönüştürme
+        public static implicit operator InputLocation(string input) => Parse(input);
+
+        // InputLocation'dan string'e dönüştürme
+        public static implicit operator string(InputLocation location) => location.ToString();
+    }
+
+
+    
     Element PartRightPanel()
     {
         if (!state.CurrentVisualElementTreePath.HasValue())
@@ -544,7 +583,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
             new FlexColumnCentered(WidthFull, Padding(4))
             {
-                visualElementModel.StyleGroups?.Select(styleGroup =>
+                visualElementModel.StyleGroups?.Select((styleGroup, styleGroupIndex )=>
                 {
                     return new FlexColumn(WidthFull, Gap(4))
                     {
@@ -576,11 +615,12 @@ sealed class ApplicationView : Component<ApplicationView.State>
                         {
                             new FlexRow(JustifyContentFlexEnd, Width(4, 10))
                             {
+                                
                                 new MagicInput
                                 {
                                     OnFocus = OnCurrentPropertyIndexChanged,
 
-                                    Name             = index.ToString(),
+                                    Name             = new InputLocation { Index = index, IsName = true, StyleGroupIndex = styleGroupIndex, IsValue = false},
                                     Value            = property.Name,
                                     OnChange         = OnCurrentPropertyNameChanged,
                                     IsBold           = true,
@@ -593,7 +633,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                             {
                                 new MagicInput
                                 {
-                                    Name     = index.ToString(),
+                                    Name     = new InputLocation { Index = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true},
                                     Value    = property.Value,
                                     OnFocus  = OnCurrentPropertyIndexChanged,
                                     OnChange = OnCurrentPropertyValueChanged
