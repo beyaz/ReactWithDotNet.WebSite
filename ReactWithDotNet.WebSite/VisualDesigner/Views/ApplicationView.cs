@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Linq;
 using Page = ReactWithDotNet.WebSite.Page;
 
 namespace ReactWithDotNet.VisualDesigner.Views;
@@ -31,7 +30,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     PropertyGroupModel CurrentStyleGroup
     {
-        get { return CurrentVisualElement.StyleGroups.First(x => x.Condition == state.CurrentStyleGroupCondition); }
+        get { return CurrentVisualElement.StyleGroups[state.CurrentStyleGroupIndex!.Value]; }
     }
 
     VisualElementModel CurrentVisualElement
@@ -50,16 +49,16 @@ sealed class ApplicationView : Component<ApplicationView.State>
     {
         InputLocation location = senderName;
 
-        state.CurrentStyleGroupCondition = "todo";
+        state.CurrentStyleGroupIndex = location.StyleGroupIndex;
         
-        state.CurrentPropertyIndex       = int.Parse(senderName);
+        state.CurrentPropertyIndex = location.Index;
 
         return Task.CompletedTask;
     }
 
-    public Task OnStyleGroupSelected(string senderName)
+    public Task OnStyleGroupSelected(string senderNameAsStyleGroupIndex)
     {
-        state.CurrentStyleGroupCondition = senderName;
+        state.CurrentStyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex);
 
         return Task.CompletedTask;
     }
@@ -124,7 +123,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
         return name switch
         {
             Icon.add    => new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Color(Gray200), Hover(BorderColor(Blue300), Color(Blue300))) { new IconPlus(), modifiers },
-            Icon.remove => new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Color(Gray200), Hover(BorderColor(Blue300), Color(Blue300))) { new IconMinus() , modifiers},
+            Icon.remove => new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Color(Gray200)) { new IconMinus() , modifiers},
             _           => throw new NotImplementedException(name.ToString())
         };
     }
@@ -289,6 +288,11 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     Task OnCurrentPropertyNameChanged(string senderName, string newValue)
     {
+        InputLocation location = senderName;
+
+        state.CurrentStyleGroupIndex = location.StyleGroupIndex;
+        state.CurrentPropertyIndex   = location.Index;
+        
         CurrentProperty.Name = newValue;
 
         return Task.CompletedTask;
@@ -589,7 +593,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     {
                         new FlexRow(WidthFull, AlignItemsCenter, Gap(4))
                         {
-                            CreateIcon(Icon.remove, 28, state.CurrentStyleGroupCondition == styleGroup.Condition ?
+                            CreateIcon(Icon.remove, 28, state.CurrentStyleGroupIndex == styleGroupIndex ?
                                 [
                                     OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked),
                                     Hover(Color(Blue300))
@@ -601,7 +605,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
                             new MagicInput
                             {
-                                Name              = styleGroup.Condition,
+                                Name              = styleGroupIndex.ToString(),
                                 OnFocus           = OnStyleGroupSelected,
                                 Value             = styleGroup.Condition,
                                 IsTextAlignCenter = true,
@@ -716,7 +720,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         styleGroups.Add(newStyleGroup);
 
-        state.CurrentStyleGroupCondition = newStyleGroup.Condition;
+        state.CurrentStyleGroupIndex = styleGroups.Count -1;
 
         return Task.CompletedTask;
     }
@@ -755,9 +759,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
     {
         public string CurrentComponentName { get; set; }
 
+        public int? CurrentStyleGroupIndex { get; set; }
         public int? CurrentPropertyIndex { get; set; }
-
-        public string CurrentStyleGroupCondition { get; set; }
 
         public string CurrentVisualElementTreePath { get; set; }
         public string LeftPanelCurrentTabName { get; set; }
