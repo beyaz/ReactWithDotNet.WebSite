@@ -516,7 +516,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         var visualElementModel = CurrentVisualElement;
 
-        return new FlexColumn(BorderLeft(1, dotted, "#d9d9d9"), OverflowYAuto, Background(White))
+        return new FlexColumn(BorderLeft(1, dotted, "#d9d9d9"), PaddingX(2), OverflowYAuto, Background(White))
         {
             new FlexRow(WidthFull, Gap(4))
             {
