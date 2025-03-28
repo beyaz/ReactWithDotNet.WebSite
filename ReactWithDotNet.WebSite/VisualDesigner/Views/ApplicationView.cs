@@ -18,6 +18,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     IReadOnlyList<string> BooleanSuggestions => ["MD", "XXL", "state.user.isActive", "MD: state.user.isActive", "XXL: state.user.isActive"];
 
+    PropertyGroupModel CurrentStyleGroup => CurrentVisualElement.StyleGroups[state.CurrentStyleGroupIndex!.Value];
+
     PropertyModel CurrentStyleProperty
     {
         get
@@ -27,8 +29,6 @@ sealed class ApplicationView : Component<ApplicationView.State>
             return CurrentStyleGroup.Items[state.CurrentPropertyIndexInStyleGroup.Value];
         }
     }
-
-    PropertyGroupModel CurrentStyleGroup => CurrentVisualElement.StyleGroups[state.CurrentStyleGroupIndex!.Value];
 
     VisualElementModel CurrentVisualElement
     {
@@ -42,17 +42,6 @@ sealed class ApplicationView : Component<ApplicationView.State>
         get { return StyleProperties.Select(x => x.Name).ToList(); }
     }
 
-    public Task On_CurrentPropertyIndexInStyle_Changed(string senderName)
-    {
-        StyleInputLocation location = senderName;
-
-        state.CurrentStyleGroupIndex = location.StyleGroupIndex;
-        
-        state.CurrentPropertyIndexInStyleGroup = location.PropertyIndexAtGroup;
-
-        return Task.CompletedTask;
-    }
-    
     public Task On_CurrentPropertyIndexInProps_Changed(string senderName)
     {
         PropInputLocation location = senderName;
@@ -61,7 +50,18 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         return Task.CompletedTask;
     }
-    
+
+    public Task On_CurrentPropertyIndexInStyle_Changed(string senderName)
+    {
+        StyleInputLocation location = senderName;
+
+        state.CurrentStyleGroupIndex = location.StyleGroupIndex;
+
+        state.CurrentPropertyIndexInStyleGroup = location.PropertyIndexAtGroup;
+
+        return Task.CompletedTask;
+    }
+
     public Task On_CurrentPropertyValueInProps_Changed(string senderName, string newValue)
     {
         CurrentVisualElement.Properties[state.CurrentPropertyIndexInProps!.Value].Value = newValue;
@@ -105,7 +105,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     protected override Element render()
     {
-        return new FlexRow(Padding(10), SizeFull,Background(Theme.BackgroundColor))
+        return new FlexRow(Padding(10), SizeFull, Background(Theme.BackgroundColor))
         {
             EditorFontLinks,
             EditorFont(),
@@ -135,9 +135,20 @@ sealed class ApplicationView : Component<ApplicationView.State>
         return name switch
         {
             Icon.add    => new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Color(Gray200), Hover(BorderColor(Blue300), Color(Blue300))) { new IconPlus(), modifiers },
-            Icon.remove => new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Color(Gray200)) { new IconMinus() , modifiers},
+            Icon.remove => new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Color(Gray200)) { new IconMinus(), modifiers },
             _           => throw new NotImplementedException(name.ToString())
         };
+    }
+
+    Task AddNewPropsClicked(MouseEvent e)
+    {
+        var properties = CurrentVisualElement.Properties ??= [];
+
+        properties.Add(new());
+
+        state.CurrentPropertyIndexInProps = properties.Count - 1;
+
+        return Task.CompletedTask;
     }
 
     Element applicationTopPanel()
@@ -284,6 +295,36 @@ sealed class ApplicationView : Component<ApplicationView.State>
         };
     }
 
+    Task On_CurrentPropertyNameInProps_Changed(string senderName, string newValue)
+    {
+        PropInputLocation location = senderName;
+
+        state.CurrentPropertyIndexInProps = location.Index;
+
+        CurrentVisualElement.Properties[state.CurrentPropertyIndexInProps!.Value].Name = newValue;
+
+        return Task.CompletedTask;
+    }
+
+    Task On_CurrentPropertyNameInStyle_Changed(string senderName, string newValue)
+    {
+        StyleInputLocation location = senderName;
+
+        state.CurrentStyleGroupIndex           = location.StyleGroupIndex;
+        state.CurrentPropertyIndexInStyleGroup = location.PropertyIndexAtGroup;
+
+        CurrentStyleProperty.Name = newValue;
+
+        return Task.CompletedTask;
+    }
+
+    async Task On_CurrentPropertyValueInStyle_Changed(string senderName, string newValue)
+    {
+        CurrentStyleProperty.Value = newValue;
+
+        await SaveState();
+    }
+
     async Task OnCommonSizeClicked(MouseEvent e)
     {
         state.ScreenWidth = e.currentTarget.data["value"] switch
@@ -300,57 +341,18 @@ sealed class ApplicationView : Component<ApplicationView.State>
         await SaveState();
     }
 
-    Task On_CurrentPropertyNameInStyle_Changed(string senderName, string newValue)
-    {
-        StyleInputLocation location = senderName;
-
-        state.CurrentStyleGroupIndex = location.StyleGroupIndex;
-        state.CurrentPropertyIndexInStyleGroup   = location.PropertyIndexAtGroup;
-        
-        CurrentStyleProperty.Name = newValue;
-
-        return Task.CompletedTask;
-    }
-    
-    Task On_CurrentPropertyNameInProps_Changed(string senderName, string newValue)
-    {
-        PropInputLocation location = senderName;
-
-        state.CurrentPropertyIndexInProps = location.Index;
-        
-        CurrentVisualElement.Properties[state.CurrentPropertyIndexInProps!.Value].Name = newValue;
-
-        return Task.CompletedTask;
-    }
-
-    async Task On_CurrentPropertyValueInStyle_Changed(string senderName, string newValue)
-    {
-        CurrentStyleProperty.Value = newValue;
-
-        await SaveState();
-    }
-    
-    
-
-    Task OnElementTreeTabClicked(MouseEvent e)
-    {
-        state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.ElementTree;
-
-        return Task.CompletedTask;
-    }
-
-    Task OnTagNameChanged(string senderName, string newValue)
-    {
-        CurrentVisualElement.Tag = newValue;
-
-        return Task.CompletedTask;
-    }
-    
     Task OnComponentNameChanged(string senderName, string newValue)
     {
         state.CurrentComponentName = newValue;
 
         state.CurrentVisualElementTreePath = null;
+
+        return Task.CompletedTask;
+    }
+
+    Task OnElementTreeTabClicked(MouseEvent e)
+    {
+        state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.ElementTree;
 
         return Task.CompletedTask;
     }
@@ -365,6 +367,13 @@ sealed class ApplicationView : Component<ApplicationView.State>
     Task OnSettingsTabClicked(MouseEvent e)
     {
         state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.Settings;
+
+        return Task.CompletedTask;
+    }
+
+    Task OnTagNameChanged(string senderName, string newValue)
+    {
+        CurrentVisualElement.Tag = newValue;
 
         return Task.CompletedTask;
     }
@@ -538,66 +547,6 @@ sealed class ApplicationView : Component<ApplicationView.State>
         }
     }
 
-    class StyleInputLocation
-    {
-        public required int StyleGroupIndex { get; init; }
-        public required int PropertyIndexAtGroup { get; init; }
-        public required bool IsName { get; init; }
-        public required bool IsValue { get; init; }
-
-        public override string ToString() =>
-            $"{StyleGroupIndex},{PropertyIndexAtGroup},{IsName},{IsValue}";
-
-        static StyleInputLocation Parse(string input)
-        {
-            var parts = input.Split(',');
-            if (parts.Length != 4)
-                throw new FormatException("Invalid input format");
-
-            return new StyleInputLocation
-            {
-                StyleGroupIndex = int.Parse(parts[0]),
-                PropertyIndexAtGroup           = int.Parse(parts[1]),
-                IsName          = bool.Parse(parts[2]),
-                IsValue         = bool.Parse(parts[3])
-            };
-        }
-
-        public static implicit operator StyleInputLocation(string input) => Parse(input);
-
-        public static implicit operator string(StyleInputLocation location) => location.ToString();
-    }
-    
-    class PropInputLocation
-    {
-        public required int Index { get; init; }
-        public required bool IsName { get; init; }
-        public required bool IsValue { get; init; }
-
-        public override string ToString() =>
-            $"{Index},{IsName},{IsValue}";
-
-        static PropInputLocation Parse(string input)
-        {
-            var parts = input.Split(',');
-            if (parts.Length != 3)
-                throw new FormatException("Invalid input format");
-
-            return new ()
-            {
-                Index = int.Parse(parts[0]),
-                IsName               = bool.Parse(parts[1]),
-                IsValue              = bool.Parse(parts[2])
-            };
-        }
-
-        public static implicit operator PropInputLocation(string input) => Parse(input);
-
-        public static implicit operator string(PropInputLocation location) => location.ToString();
-    }
-
-
-    
     Element PartRightPanel()
     {
         if (!state.CurrentVisualElementTreePath.HasValue())
@@ -619,10 +568,10 @@ sealed class ApplicationView : Component<ApplicationView.State>
                 " : ",
                 new MagicInput
                 {
-                    Name = string.Empty, 
-                    Value = visualElementModel.Tag, 
-                    Suggestions = tagSuggestions, 
-                    OnChange = OnTagNameChanged
+                    Name        = string.Empty,
+                    Value       = visualElementModel.Tag,
+                    Suggestions = tagSuggestions,
+                    OnChange    = OnTagNameChanged
                 } + Width(6, 10)
             },
 
@@ -647,21 +596,21 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
             new FlexColumnCentered(WidthFull)
             {
-                visualElementModel.StyleGroups?.Select((styleGroup, styleGroupIndex )=>
+                visualElementModel.StyleGroups?.Select((styleGroup, styleGroupIndex) =>
                 {
                     return new FlexColumn(WidthFull, Gap(4))
                     {
                         new FlexRow(WidthFull, AlignItemsCenter, Gap(4), PaddingX(2))
                         {
-                            CreateIcon(Icon.remove, 28, state.CurrentPropertyIndexInStyleGroup.HasValue &&  state.CurrentStyleGroupIndex == styleGroupIndex ?
-                                [
-                                    OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked),
-                                    Hover(Color(Blue300))
-                                ] :
-                                [
-                                    Color(Gray100),
-                                    BorderColor(Gray100)
-                                ]),
+                            CreateIcon(Icon.remove, 28, state.CurrentPropertyIndexInStyleGroup.HasValue && state.CurrentStyleGroupIndex == styleGroupIndex ?
+                                           [
+                                               OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked),
+                                               Hover(Color(Blue300))
+                                           ] :
+                                           [
+                                               Color(Gray100),
+                                               BorderColor(Gray100)
+                                           ]),
 
                             new MagicInput
                             {
@@ -671,7 +620,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                                 IsTextAlignCenter = true,
                                 Suggestions       = BooleanSuggestions
                             } + FlexGrow(1),
-                            
+
                             CreateIcon(Icon.add, 28) + OnClick(CurrentStyleGroup_CurrentProperty_Add_Clicked)
                         },
 
@@ -683,14 +632,14 @@ sealed class ApplicationView : Component<ApplicationView.State>
                                 {
                                     OnFocus = On_CurrentPropertyIndexInStyle_Changed,
 
-                                    Name             = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = true, StyleGroupIndex = styleGroupIndex, IsValue = false},
+                                    Name             = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = true, StyleGroupIndex = styleGroupIndex, IsValue = false },
                                     Value            = property.Name,
                                     OnChange         = On_CurrentPropertyNameInStyle_Changed,
                                     IsBold           = true,
                                     IsTextAlignRight = true,
                                     Suggestions      = StyleAttributeNameSuggestions,
-                                    Placeholder = "color",
-                                    AutoFocus = property.Name.HasNoValue()
+                                    Placeholder      = "color",
+                                    AutoFocus        = property.Name.HasNoValue()
                                 }
                             },
                             " : ",
@@ -698,7 +647,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                             {
                                 new MagicInput
                                 {
-                                    Name        = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true},
+                                    Name        = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true },
                                     Value       = property.Value,
                                     OnFocus     = On_CurrentPropertyIndexInStyle_Changed,
                                     OnChange    = On_CurrentPropertyValueInStyle_Changed,
@@ -709,7 +658,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     };
                 })
             },
-            
+
             new FlexRow(WidthFull, AlignItemsCenter)
             {
                 CreateIcon(Icon.remove, 32, state.CurrentPropertyIndexInProps.HasValue ?
@@ -728,10 +677,10 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
                 CreateIcon(Icon.add, 32) + OnClick(AddNewPropsClicked)
             },
-            
+
             new FlexColumnCentered(WidthFull)
             {
-                visualElementModel.Properties?.Select((property, index )=> new FlexRow(Gap(4), WidthFull)
+                visualElementModel.Properties?.Select((property, index) => new FlexRow(Gap(4), WidthFull)
                 {
                     new FlexRow(JustifyContentFlexEnd, Width(4, 10))
                     {
@@ -739,7 +688,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                         {
                             OnFocus = On_CurrentPropertyIndexInProps_Changed,
 
-                            Name             = new PropInputLocation { Index = index, IsName = true, IsValue = false},
+                            Name             = new PropInputLocation { Index = index, IsName = true, IsValue = false },
                             Value            = property.Name,
                             OnChange         = On_CurrentPropertyNameInProps_Changed,
                             IsBold           = true,
@@ -754,7 +703,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     {
                         new MagicInput
                         {
-                            Name        = new PropInputLocation { Index = index, IsName = false, IsValue = true},
+                            Name        = new PropInputLocation { Index = index, IsName = false, IsValue = true },
                             Value       = property.Value,
                             OnFocus     = On_CurrentPropertyIndexInProps_Changed,
                             OnChange    = On_CurrentPropertyValueInProps_Changed,
@@ -762,8 +711,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                         }
                     }
                 })
-            },
-            
+            }
         };
     }
 
@@ -806,6 +754,15 @@ sealed class ApplicationView : Component<ApplicationView.State>
         };
     }
 
+    Task RemoveCurrentPropertyInProps(MouseEvent e)
+    {
+        CurrentVisualElement.Properties.RemoveAt(state.CurrentPropertyIndexInProps!.Value);
+
+        state.CurrentPropertyIndexInProps = null;
+
+        return Task.CompletedTask;
+    }
+
     async Task SaveState()
     {
         AppState = state;
@@ -837,18 +794,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         styleGroups.Add(newStyleGroup);
 
-        state.CurrentStyleGroupIndex = styleGroups.Count -1;
-
-        return Task.CompletedTask;
-    }
-    
-    Task AddNewPropsClicked(MouseEvent e)
-    {
-        var properties = CurrentVisualElement.Properties ??= [];
-
-        properties.Add(new ());
-
-        state.CurrentPropertyIndexInProps = properties.Count - 1;
+        state.CurrentStyleGroupIndex = styleGroups.Count - 1;
 
         return Task.CompletedTask;
     }
@@ -856,35 +802,25 @@ sealed class ApplicationView : Component<ApplicationView.State>
     Task StyleGroupRemoveClicked(MouseEvent e)
     {
         CurrentVisualElement.StyleGroups.Remove(CurrentStyleGroup);
-        
-        state.CurrentStyleGroupIndex = null;
+
+        state.CurrentStyleGroupIndex           = null;
         state.CurrentPropertyIndexInStyleGroup = null;
 
         return Task.CompletedTask;
     }
-    
-    Task RemoveCurrentPropertyInProps(MouseEvent e)
-    {
-        CurrentVisualElement.Properties.RemoveAt(state.CurrentPropertyIndexInProps!.Value);
-        
-        state.CurrentPropertyIndexInProps = null;
 
-        return Task.CompletedTask;
-    }
-
-   
     internal class State
     {
         public string CurrentComponentName { get; set; }
 
-        public int? CurrentStyleGroupIndex { get; set; }
-        
-        public int? CurrentPropertyIndexInStyleGroup { get; set; }
-        
         public int? CurrentPropertyIndexInProps { get; set; }
 
+        public int? CurrentPropertyIndexInStyleGroup { get; set; }
+
+        public int? CurrentStyleGroupIndex { get; set; }
+
         public string CurrentVisualElementTreePath { get; set; }
-        
+
         public string LeftPanelCurrentTabName { get; set; }
 
         public ProjectModel Project { get; set; }
@@ -901,6 +837,84 @@ sealed class ApplicationView : Component<ApplicationView.State>
         public const string ElementTree = "ElementTree";
         public const string Save = "Save";
         public const string Settings = "Settings";
+    }
+
+    class PropInputLocation
+    {
+        public required int Index { get; init; }
+        public required bool IsName { get; init; }
+        public required bool IsValue { get; init; }
+
+        public static implicit operator PropInputLocation(string input)
+        {
+            return Parse(input);
+        }
+
+        public static implicit operator string(PropInputLocation location)
+        {
+            return location.ToString();
+        }
+
+        public override string ToString()
+        {
+            return $"{Index},{IsName},{IsValue}";
+        }
+
+        static PropInputLocation Parse(string input)
+        {
+            var parts = input.Split(',');
+            if (parts.Length != 3)
+            {
+                throw new FormatException("Invalid input format");
+            }
+
+            return new()
+            {
+                Index   = int.Parse(parts[0]),
+                IsName  = bool.Parse(parts[1]),
+                IsValue = bool.Parse(parts[2])
+            };
+        }
+    }
+
+    class StyleInputLocation
+    {
+        public required bool IsName { get; init; }
+        public required bool IsValue { get; init; }
+        public required int PropertyIndexAtGroup { get; init; }
+        public required int StyleGroupIndex { get; init; }
+
+        public static implicit operator StyleInputLocation(string input)
+        {
+            return Parse(input);
+        }
+
+        public static implicit operator string(StyleInputLocation location)
+        {
+            return location.ToString();
+        }
+
+        public override string ToString()
+        {
+            return $"{StyleGroupIndex},{PropertyIndexAtGroup},{IsName},{IsValue}";
+        }
+
+        static StyleInputLocation Parse(string input)
+        {
+            var parts = input.Split(',');
+            if (parts.Length != 4)
+            {
+                throw new FormatException("Invalid input format");
+            }
+
+            return new()
+            {
+                StyleGroupIndex      = int.Parse(parts[0]),
+                PropertyIndexAtGroup = int.Parse(parts[1]),
+                IsName               = bool.Parse(parts[2]),
+                IsValue              = bool.Parse(parts[3])
+            };
+        }
     }
 }
 
