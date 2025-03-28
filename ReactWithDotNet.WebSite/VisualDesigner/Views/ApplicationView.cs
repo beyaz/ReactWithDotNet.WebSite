@@ -505,22 +505,27 @@ sealed class ApplicationView: Component<ApplicationView.State>
     {
         var styleGroups = CurrentVisualElement.StyleGroups ??= [];
 
+        PropertyGroupModel newStyleGroup;
         if (styleGroups.Count == 0)
         {
-            styleGroups.Add(new ()
+            newStyleGroup = new()
             {
                 Condition = "*",
-                Items = [new PropertyModel()]
-            });
-            
-            return Task.CompletedTask;
+                Items     = [new PropertyModel()]
+            };
+        }
+        else
+        {
+            newStyleGroup = new()
+            {
+                Condition = "? ? ? ?",
+                Items     = [new PropertyModel()]
+            };
         }
         
-        styleGroups.Add(new ()
-        {
-            Condition = "?",
-            Items     = [new PropertyModel()]
-        });
+        styleGroups.Add(newStyleGroup);
+
+        state.CurrentStyleGroupCondition = newStyleGroup.Condition;
         
         return Task.CompletedTask;
     }
