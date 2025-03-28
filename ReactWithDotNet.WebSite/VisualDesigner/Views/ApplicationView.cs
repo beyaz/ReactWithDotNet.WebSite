@@ -350,7 +350,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         var componentModel = state.Project.Components.First(x => x.Name == newValue);
 
-        if (state.SettingsPanelCurrentTabName == SettingsPanelTab.Props)
+        if (state.SettingsPanelCurrentTab == SettingsPanelTab.Props)
         {
             state.JsonTextInComponentSettings = componentModel.PropsAsJson;    
         }
@@ -446,20 +446,24 @@ sealed class ApplicationView : Component<ApplicationView.State>
         {
             new FlexRow(JustifyContentSpaceAround, Background(Gray100), PaddingY(4), CursorDefault, Opacity(0.7))
             {
-                new FlexRowCentered(When(state.SettingsPanelCurrentTabName == SettingsPanelTab.Props, FontWeightBold))
+                new FlexRowCentered(When(state.SettingsPanelCurrentTab == SettingsPanelTab.Props, FontWeightBold))
                 {
                     "Props", 
-                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTabName = SettingsPanelTab.Props; return Task.CompletedTask;})
+                    PaddingX(8), OnClick(_ =>
+                    {
+                        state.SettingsPanelCurrentTab = SettingsPanelTab.Props;
+                        return Task.CompletedTask;
+                    })
                 },
-                new FlexRowCentered(When(state.SettingsPanelCurrentTabName == SettingsPanelTab.State, FontWeightBold))
+                new FlexRowCentered(When(state.SettingsPanelCurrentTab == SettingsPanelTab.State, FontWeightBold))
                 {
                     "State", 
-                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTabName = SettingsPanelTab.State; return Task.CompletedTask;})
+                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTab = SettingsPanelTab.State; return Task.CompletedTask;})
                 },
-                new FlexRowCentered(When(state.SettingsPanelCurrentTabName == SettingsPanelTab.Other, FontWeightBold))
+                new FlexRowCentered(When(state.SettingsPanelCurrentTab == SettingsPanelTab.Other, FontWeightBold))
                 {
                     "Other", 
-                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTabName = SettingsPanelTab.Other; return Task.CompletedTask;})
+                    PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTab = SettingsPanelTab.Other; return Task.CompletedTask;})
                 }
             },
             new FlexColumnCentered(SizeFull)
@@ -882,7 +886,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         public string LeftPanelCurrentTabName { get; set; }
         
-        public SettingsPanelTab SettingsPanelCurrentTabName { get; set; }
+        public SettingsPanelTab SettingsPanelCurrentTab { get; set; }
 
         public ProjectModel Project { get; set; }
 
