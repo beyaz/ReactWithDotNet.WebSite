@@ -380,7 +380,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
                 new span { "S T Y L E", WhiteSpaceNoWrap, UserSelect(none), PaddingX(4) },
                 new div{ Height(1), FlexGrow(1), Background(Gray200)},
                  
-                new FlexRowCentered(Size(32), OnClick(OnAddNewStyleGroupClicked) , BorderRadius(8), Border(1,solid,Gray200), Hover(Color(Blue300)))
+                new FlexRowCentered(Size(32), OnClick(StyleGroupAddClicked) , BorderRadius(8), Border(1,solid,Gray200), Hover(Color(Blue300)))
                 {
                     new IconPlus()
                 }
@@ -501,7 +501,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
 
         return Task.CompletedTask;
     }
-    Task OnAddNewStyleGroupClicked(MouseEvent e)
+    Task StyleGroupAddClicked(MouseEvent e)
     {
         var styleGroups = CurrentVisualElement.StyleGroups ??= [];
 
