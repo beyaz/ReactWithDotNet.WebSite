@@ -348,8 +348,13 @@ sealed class ApplicationView : Component<ApplicationView.State>
     {
         state.CurrentComponentName = newValue;
 
-        state.CurrentComponentPropsAsJson = state.Project.Components.First(x => x.Name == newValue).PropsAsJson;
-        state.CurrentComponentStateAsJson = state.Project.Components.First(x => x.Name == newValue).StateAsJson;
+        var componentModel = state.Project.Components.First(x => x.Name == newValue);
+
+        if (state.SettingsPanelCurrentTabName == SettingsPanelTabNames.TabProps)
+        {
+            state.JsonTextInComponentSettings = componentModel.PropsAsJson;    
+        }
+        
         
         
         state.CurrentVisualElementTreePath = null;
@@ -466,7 +471,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
     {
         return new FlexColumnCentered(SizeFull)
         {
-            NewJsonEditor(() => state.CurrentComponentPropsAsJson),
+            NewJsonEditor(() => state.JsonTextInComponentSettings),
 
             PositionRelative,
             new div{ PositionAbsolute, Top(0), Right(16),  JsonEditorFormatButton(FormatCurrentComponentPropsAsJson)}
@@ -476,12 +481,12 @@ sealed class ApplicationView : Component<ApplicationView.State>
     
     Task FormatCurrentComponentPropsAsJson(MouseEvent _)
     {
-        if (state.CurrentComponentPropsAsJson is null)
+        if (state.JsonTextInComponentSettings is null)
         {
             return Task.CompletedTask;
         }
 
-        state.CurrentComponentPropsAsJson = JsonPrettify(state.CurrentComponentPropsAsJson);
+        state.JsonTextInComponentSettings = JsonPrettify(state.JsonTextInComponentSettings);
 
         return Task.CompletedTask;
     }
@@ -894,9 +899,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         public int ScreenWidth { get; set; }
         
-        public string CurrentComponentPropsAsJson { get; set; }
-        
-        public string CurrentComponentStateAsJson { get; set; }
+        public string JsonTextInComponentSettings { get; set; }
     }
 
     class LeftPanelSelectedTabNames
