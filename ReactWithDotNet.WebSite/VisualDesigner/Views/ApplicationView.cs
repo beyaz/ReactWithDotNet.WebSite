@@ -52,6 +52,22 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         return Task.CompletedTask;
     }
+    
+    public Task On_CurrentPropertyIndexInProps_Changed(string senderName)
+    {
+        PropInputLocation location = senderName;
+
+        state.CurrentPropertyIndexInProps = location.Index;
+
+        return Task.CompletedTask;
+    }
+    
+    public Task On_CurrentPropertyValueInProps_Changed(string senderName, string newValue)
+    {
+        CurrentVisualElement.Properties[state.CurrentPropertyIndexInProps!.Value].Value = newValue;
+
+        return Task.CompletedTask;
+    }
 
     public Task OnStyleGroupSelected(string senderNameAsStyleGroupIndex)
     {
@@ -293,6 +309,17 @@ sealed class ApplicationView : Component<ApplicationView.State>
         state.CurrentPropertyIndexInStyleGroup   = location.PropertyIndexAtGroup;
         
         CurrentStyleProperty.Name = newValue;
+
+        return Task.CompletedTask;
+    }
+    
+    Task On_CurrentPropertyNameInProps_Changed(string senderName, string newValue)
+    {
+        PropInputLocation location = senderName;
+
+        state.CurrentPropertyIndexInProps = location.Index;
+        
+        CurrentVisualElement.Properties[state.CurrentPropertyIndexInProps!.Value].Name = newValue;
 
         return Task.CompletedTask;
     }
@@ -544,22 +571,22 @@ sealed class ApplicationView : Component<ApplicationView.State>
     
     class PropInputLocation
     {
-        public required int PropertyIndexAtGroup { get; init; }
+        public required int Index { get; init; }
         public required bool IsName { get; init; }
         public required bool IsValue { get; init; }
 
         public override string ToString() =>
-            $"{PropertyIndexAtGroup},{IsName},{IsValue}";
+            $"{Index},{IsName},{IsValue}";
 
         static PropInputLocation Parse(string input)
         {
             var parts = input.Split(',');
-            if (parts.Length != 4)
+            if (parts.Length != 3)
                 throw new FormatException("Invalid input format");
 
             return new ()
             {
-                PropertyIndexAtGroup = int.Parse(parts[0]),
+                Index = int.Parse(parts[0]),
                 IsName               = bool.Parse(parts[1]),
                 IsValue              = bool.Parse(parts[2])
             };
@@ -686,9 +713,9 @@ sealed class ApplicationView : Component<ApplicationView.State>
             
             new FlexRow(WidthFull, AlignItemsCenter)
             {
-                CreateIcon(Icon.remove, 32, state.CurrentPropertyIndexAtProps.HasValue ?
+                CreateIcon(Icon.remove, 32, state.CurrentPropertyIndexInProps.HasValue ?
                                [
-                                   OnClick(RemoveCurrentPropertyAtProps),
+                                   OnClick(RemoveCurrentPropertyInProps),
                                    Hover(Color(Blue300))
                                ] :
                                [
@@ -711,11 +738,11 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     {
                         new MagicInput
                         {
-                            OnFocus = On_CurrentPropertyIndexInStyle_Changed,
+                            OnFocus = On_CurrentPropertyIndexInProps_Changed,
 
-                            Name             = new PropInputLocation { PropertyIndexAtGroup = index, IsName = true, IsValue = false},
+                            Name             = new PropInputLocation { Index = index, IsName = true, IsValue = false},
                             Value            = property.Name,
-                            OnChange         = On_CurrentPropertyNameInStyle_Changed,
+                            OnChange         = On_CurrentPropertyNameInProps_Changed,
                             IsBold           = true,
                             IsTextAlignRight = true,
                             Suggestions      = StyleAttributeNameSuggestions,
@@ -728,10 +755,10 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     {
                         new MagicInput
                         {
-                            Name        = new PropInputLocation { PropertyIndexAtGroup = index, IsName = false, IsValue = true},
+                            Name        = new PropInputLocation { Index = index, IsName = false, IsValue = true},
                             Value       = property.Value,
-                            OnFocus     = On_CurrentPropertyIndexInStyle_Changed,
-                            OnChange    = On_CurrentPropertyValueInStyle_Changed,
+                            OnFocus     = On_CurrentPropertyIndexInProps_Changed,
+                            OnChange    = On_CurrentPropertyValueInProps_Changed,
                             Placeholder = "? ? ?"
                         }
                     }
@@ -822,7 +849,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         properties.Add(new ());
 
-        state.CurrentPropertyIndexAtProps = properties.Count - 1;
+        state.CurrentPropertyIndexInProps = properties.Count - 1;
 
         return Task.CompletedTask;
     }
@@ -837,11 +864,11 @@ sealed class ApplicationView : Component<ApplicationView.State>
         return Task.CompletedTask;
     }
     
-    Task RemoveCurrentPropertyAtProps(MouseEvent e)
+    Task RemoveCurrentPropertyInProps(MouseEvent e)
     {
-        CurrentVisualElement.Properties.RemoveAt(state.CurrentPropertyIndexAtProps!.Value);
+        CurrentVisualElement.Properties.RemoveAt(state.CurrentPropertyIndexInProps!.Value);
         
-        state.CurrentPropertyIndexAtProps = null;
+        state.CurrentPropertyIndexInProps = null;
 
         return Task.CompletedTask;
     }
@@ -860,7 +887,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
         
         public int? CurrentPropertyIndexInStyleGroup { get; set; }
         
-        public int? CurrentPropertyIndexAtProps { get; set; }
+        public int? CurrentPropertyIndexInProps { get; set; }
 
         public string CurrentVisualElementTreePath { get; set; }
         
