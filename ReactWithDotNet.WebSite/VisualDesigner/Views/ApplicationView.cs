@@ -76,7 +76,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
         return Task.CompletedTask;
     }
 
-    protected override Task constructor()
+    protected override async Task constructor()
     {
         AppState = state = new()
         {
@@ -90,12 +90,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         if (state.CurrentComponentName is null && state.Project.Components.Count > 0)
         {
-            state.CurrentComponentName = state.Project.Components[0].Name;
-
-            state.CurrentComponentPropsAsJson = state.Project.Components.First(x => x.Name == state.CurrentComponentName).PropsAsJson;
+            await OnComponentNameChanged(state.Project.Components[0].Name);
         }
-
-        return Task.CompletedTask;
     }
 
     protected override Task OverrideStateFromPropsBeforeRender()
@@ -345,8 +341,17 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     Task OnComponentNameChanged(string senderName, string newValue)
     {
+        return OnComponentNameChanged(newValue);
+    }
+    
+    Task OnComponentNameChanged(string newValue)
+    {
         state.CurrentComponentName = newValue;
 
+        state.CurrentComponentPropsAsJson = state.Project.Components.First(x => x.Name == newValue).PropsAsJson;
+        state.CurrentComponentStateAsJson = state.Project.Components.First(x => x.Name == newValue).StateAsJson;
+        
+        
         state.CurrentVisualElementTreePath = null;
 
         return Task.CompletedTask;
