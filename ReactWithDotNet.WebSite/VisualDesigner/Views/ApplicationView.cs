@@ -457,12 +457,12 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTabName = SettingsPanelTabNames.TabOther; return Task.CompletedTask;})
                 }
             },
-            When(state.SettingsPanelCurrentTabName == SettingsPanelTabNames.TabProps, PartPropAndJsonEditor)
+            When(state.SettingsPanelCurrentTabName == SettingsPanelTabNames.TabProps, PartPropJsonEditorInSettings)
             
         };
     }
 
-    Element PartPropAndJsonEditor()
+    Element PartPropJsonEditorInSettings()
     {
         return new FlexColumnCentered(SizeFull)
         {
