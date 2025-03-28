@@ -248,6 +248,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
     {
         CurrentStyleGroup.Items.Remove(CurrentProperty);
 
+        state.CurrentPropertyIndex = null;
+
         return Task.CompletedTask;
     }
 
@@ -593,7 +595,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     {
                         new FlexRow(WidthFull, AlignItemsCenter, Gap(4))
                         {
-                            CreateIcon(Icon.remove, 28, state.CurrentStyleGroupIndex == styleGroupIndex ?
+                            CreateIcon(Icon.remove, 28, state.CurrentPropertyIndex.HasValue &&  state.CurrentStyleGroupIndex == styleGroupIndex ?
                                 [
                                     OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked),
                                     Hover(Color(Blue300))
