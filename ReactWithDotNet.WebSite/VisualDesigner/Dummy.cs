@@ -15,13 +15,20 @@ static class Dummy
                 RootElement = new()
                 {
                     Tag       = "div",
-                    Condition = "state.isWebUser",
+                    StyleGroups =
+                        [
+                                    
+                            new PropertyGroupModel
+                            {
+                                Condition = "*",
+                                Items =
+                                [
+                                    new PropertyModel { Name = "padding", Value    = "16" }
+                                ]
+                            }
+                        ],
                     Children =
                     [
-                        new() { Tag = "label", Text = "Abc1" },
-                        new() { Tag = "span", Text  = "Abc2" },
-                        new() { Tag = "ul", Text    = "Abc3" },
-
                         new()
                         {
                             Tag = "div",
@@ -33,11 +40,12 @@ static class Dummy
                                         Condition = "*",
                                         Items =
                                         [
-                                            new PropertyModel { Name = "background", Value    = "whitesmoke" },
+                                            new PropertyModel { Name = "background", Value    = "gray" },
                                             new PropertyModel { Name = "width", Value         = "400" },
                                             new PropertyModel { Name = "height", Value        = "400" },
                                             new PropertyModel { Name = "border-radius", Value = "8" },
-                                            new PropertyModel { Name = "display", Value = "flex" }
+                                            new PropertyModel { Name = "gap", Value = "16" },
+                                            new PropertyModel { Name = "display", Value       = "flex" }
                                         ]
                                     }
                                 ],

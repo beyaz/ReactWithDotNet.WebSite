@@ -855,6 +855,18 @@ sealed class ApplicationPreview : Component
                             element.Add(Gap(value));
                             continue;
                         }
+                        
+                        case "padding":
+                        {
+                            if (isValueDouble)
+                            {
+                                element.Add(Padding(valueAsDouble));
+                                continue;
+                            }
+                            
+                            element.Add(Padding(value));
+                            continue;
+                        }
                             
                     }
                 }
