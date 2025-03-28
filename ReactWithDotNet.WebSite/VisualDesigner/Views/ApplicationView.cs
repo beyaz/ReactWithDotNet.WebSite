@@ -22,9 +22,9 @@ sealed class ApplicationView : Component<ApplicationView.State>
     {
         get
         {
-            Debug.Assert(state.CurrentPropertyIndexAtStyleGroup != null, "state.CurrentPropertyIndex != null");
+            Debug.Assert(state.CurrentPropertyIndexInStyleGroup != null, "state.CurrentPropertyIndex != null");
 
-            return CurrentStyleGroup.Items[state.CurrentPropertyIndexAtStyleGroup.Value];
+            return CurrentStyleGroup.Items[state.CurrentPropertyIndexInStyleGroup.Value];
         }
     }
 
@@ -48,7 +48,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         state.CurrentStyleGroupIndex = location.StyleGroupIndex;
         
-        state.CurrentPropertyIndexAtStyleGroup = location.PropertyIndexAtGroup;
+        state.CurrentPropertyIndexInStyleGroup = location.PropertyIndexAtGroup;
 
         return Task.CompletedTask;
     }
@@ -245,7 +245,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
     {
         CurrentStyleGroup.Items.Remove(CurrentStyleProperty);
 
-        state.CurrentPropertyIndexAtStyleGroup = null;
+        state.CurrentPropertyIndexInStyleGroup = null;
 
         return Task.CompletedTask;
     }
@@ -290,7 +290,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
         StyleInputLocation location = senderName;
 
         state.CurrentStyleGroupIndex = location.StyleGroupIndex;
-        state.CurrentPropertyIndexAtStyleGroup   = location.PropertyIndexAtGroup;
+        state.CurrentPropertyIndexInStyleGroup   = location.PropertyIndexAtGroup;
         
         CurrentStyleProperty.Name = newValue;
 
@@ -627,7 +627,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     {
                         new FlexRow(WidthFull, AlignItemsCenter, Gap(4), PaddingX(2))
                         {
-                            CreateIcon(Icon.remove, 28, state.CurrentPropertyIndexAtStyleGroup.HasValue &&  state.CurrentStyleGroupIndex == styleGroupIndex ?
+                            CreateIcon(Icon.remove, 28, state.CurrentPropertyIndexInStyleGroup.HasValue &&  state.CurrentStyleGroupIndex == styleGroupIndex ?
                                 [
                                     OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked),
                                     Hover(Color(Blue300))
@@ -832,7 +832,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
         CurrentVisualElement.StyleGroups.Remove(CurrentStyleGroup);
         
         state.CurrentStyleGroupIndex = null;
-        state.CurrentPropertyIndexAtStyleGroup = null;
+        state.CurrentPropertyIndexInStyleGroup = null;
 
         return Task.CompletedTask;
     }
@@ -858,7 +858,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         public int? CurrentStyleGroupIndex { get; set; }
         
-        public int? CurrentPropertyIndexAtStyleGroup { get; set; }
+        public int? CurrentPropertyIndexInStyleGroup { get; set; }
         
         public int? CurrentPropertyIndexAtProps { get; set; }
 
