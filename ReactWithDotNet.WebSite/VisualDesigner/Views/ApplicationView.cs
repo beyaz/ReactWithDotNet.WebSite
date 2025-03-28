@@ -732,7 +732,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
             
             new FlexColumnCentered(WidthFull)
             {
-                visualElementModel.Properties?.Select((property, index )=> new FlexRow(Gap(4))
+                visualElementModel.Properties?.Select((property, index )=> new FlexRow(Gap(4), WidthFull)
                 {
                     new FlexRow(JustifyContentFlexEnd, Width(4, 10))
                     {
