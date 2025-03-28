@@ -43,7 +43,7 @@ sealed class MagicInput : Component<MagicInput.State>
 
     protected override Element render()
     {
-        return new FlexColumnCentered(FitContent is false ? FlexGrow(1) : null)
+        return new FlexColumn(FitContent is false ? FlexGrow(1) : null)
         {
             new input
             {
@@ -79,7 +79,7 @@ sealed class MagicInput : Component<MagicInput.State>
 
     Task OnBlur(FocusEvent e)
     {
-        Client.GotoMethod(100, CloseSuggestion);
+        Client.GotoMethod(500, CloseSuggestion);
 
         return Task.CompletedTask;
     }

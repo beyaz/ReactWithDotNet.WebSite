@@ -522,7 +522,13 @@ sealed class ApplicationView : Component<ApplicationView.State>
             {
                 new label { "Tag", FontWeightBold, Width(4, 10), TextAlignRight },
                 " : ",
-                new MagicInput { Name = SenderName.Tag, Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = OnInputChanged } + Width(6, 10)
+                new MagicInput
+                {
+                    Name = SenderName.Tag, 
+                    Value = visualElementModel.Tag, 
+                    Suggestions = tagSuggestions, 
+                    OnChange = OnInputChanged
+                } + Width(6, 10)
             },
 
             new FlexRow(WidthFull, AlignItemsCenter)
