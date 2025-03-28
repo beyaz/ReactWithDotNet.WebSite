@@ -22,9 +22,9 @@ sealed class ApplicationView : Component<ApplicationView.State>
     {
         get
         {
-            Debug.Assert(state.CurrentPropertyIndex != null, "state.CurrentPropertyIndex != null");
+            Debug.Assert(state.CurrentPropertyIndexAtStyleGroup != null, "state.CurrentPropertyIndex != null");
 
-            return CurrentStyleGroup.Items[state.CurrentPropertyIndex.Value];
+            return CurrentStyleGroup.Items[state.CurrentPropertyIndexAtStyleGroup.Value];
         }
     }
 
@@ -47,11 +47,11 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     public Task OnCurrentPropertyIndexChanged(string senderName)
     {
-        InputLocation location = senderName;
+        StyleInputLocation location = senderName;
 
         state.CurrentStyleGroupIndex = location.StyleGroupIndex;
         
-        state.CurrentPropertyIndex = location.Index;
+        state.CurrentPropertyIndexAtStyleGroup = location.PropertyIndexAtGroup;
 
         return Task.CompletedTask;
     }
@@ -248,7 +248,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
     {
         CurrentStyleGroup.Items.Remove(CurrentProperty);
 
-        state.CurrentPropertyIndex = null;
+        state.CurrentPropertyIndexAtStyleGroup = null;
 
         return Task.CompletedTask;
     }
@@ -290,10 +290,10 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
     Task OnCurrentPropertyNameChanged(string senderName, string newValue)
     {
-        InputLocation location = senderName;
+        StyleInputLocation location = senderName;
 
         state.CurrentStyleGroupIndex = location.StyleGroupIndex;
-        state.CurrentPropertyIndex   = location.Index;
+        state.CurrentPropertyIndexAtStyleGroup   = location.PropertyIndexAtGroup;
         
         CurrentProperty.Name = newValue;
 
@@ -514,36 +514,36 @@ sealed class ApplicationView : Component<ApplicationView.State>
         }
     }
 
-    class InputLocation
+    class StyleInputLocation
     {
         public required int StyleGroupIndex { get; init; }
-        public required int Index { get; init; }
+        public required int PropertyIndexAtGroup { get; init; }
         public required bool IsName { get; init; }
         public required bool IsValue { get; init; }
 
         public override string ToString() =>
-            $"{StyleGroupIndex},{Index},{IsName},{IsValue}";
+            $"{StyleGroupIndex},{PropertyIndexAtGroup},{IsName},{IsValue}";
 
-        public static InputLocation Parse(string input)
+        public static StyleInputLocation Parse(string input)
         {
             var parts = input.Split(',');
             if (parts.Length != 4)
                 throw new FormatException("Invalid input format");
 
-            return new InputLocation
+            return new StyleInputLocation
             {
                 StyleGroupIndex = int.Parse(parts[0]),
-                Index           = int.Parse(parts[1]),
+                PropertyIndexAtGroup           = int.Parse(parts[1]),
                 IsName          = bool.Parse(parts[2]),
                 IsValue         = bool.Parse(parts[3])
             };
         }
 
         // String'den InputLocation'a dönüştürme
-        public static implicit operator InputLocation(string input) => Parse(input);
+        public static implicit operator StyleInputLocation(string input) => Parse(input);
 
         // InputLocation'dan string'e dönüştürme
-        public static implicit operator string(InputLocation location) => location.ToString();
+        public static implicit operator string(StyleInputLocation location) => location.ToString();
     }
 
 
@@ -595,7 +595,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     {
                         new FlexRow(WidthFull, AlignItemsCenter, Gap(4))
                         {
-                            CreateIcon(Icon.remove, 28, state.CurrentPropertyIndex.HasValue &&  state.CurrentStyleGroupIndex == styleGroupIndex ?
+                            CreateIcon(Icon.remove, 28, state.CurrentPropertyIndexAtStyleGroup.HasValue &&  state.CurrentStyleGroupIndex == styleGroupIndex ?
                                 [
                                     OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked),
                                     Hover(Color(Blue300))
@@ -626,7 +626,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                                 {
                                     OnFocus = OnCurrentPropertyIndexChanged,
 
-                                    Name             = new InputLocation { Index = index, IsName = true, StyleGroupIndex = styleGroupIndex, IsValue = false},
+                                    Name             = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = true, StyleGroupIndex = styleGroupIndex, IsValue = false},
                                     Value            = property.Name,
                                     OnChange         = OnCurrentPropertyNameChanged,
                                     IsBold           = true,
@@ -639,7 +639,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                             {
                                 new MagicInput
                                 {
-                                    Name     = new InputLocation { Index = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true},
+                                    Name     = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true},
                                     Value    = property.Value,
                                     OnFocus  = OnCurrentPropertyIndexChanged,
                                     OnChange = OnCurrentPropertyValueChanged
@@ -762,9 +762,13 @@ sealed class ApplicationView : Component<ApplicationView.State>
         public string CurrentComponentName { get; set; }
 
         public int? CurrentStyleGroupIndex { get; set; }
+        
+        public int? CurrentPropertyIndexAtStyleGroup { get; set; }
+        
         public int? CurrentPropertyIndex { get; set; }
 
         public string CurrentVisualElementTreePath { get; set; }
+        
         public string LeftPanelCurrentTabName { get; set; }
 
         public ProjectModel Project { get; set; }
