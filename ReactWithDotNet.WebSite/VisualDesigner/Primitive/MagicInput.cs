@@ -77,8 +77,14 @@ sealed class MagicInput : Component<MagicInput.State>
         };
     }
 
-    [StopPropagation]
     Task OnBlur(FocusEvent e)
+    {
+        Client.GotoMethod(100, CloseSuggestion);
+
+        return Task.CompletedTask;
+    }
+    
+    Task CloseSuggestion()
     {
         state.ShowSuggestions = false;
 
