@@ -457,12 +457,12 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     PaddingX(8), OnClick(_ => { state.SettingsPanelCurrentTabName = SettingsPanelTabNames.TabOther; return Task.CompletedTask;})
                 }
             },
-            When(state.SettingsPanelCurrentTabName == SettingsPanelTabNames.TabProps, PartPropJsonEditorInSettings)
+            When(state.SettingsPanelCurrentTabName == SettingsPanelTabNames.TabProps, JsonEditorInSettings)
             
         };
     }
 
-    Element PartPropJsonEditorInSettings()
+    Element JsonEditorInSettings()
     {
         return new FlexColumnCentered(SizeFull)
         {
@@ -471,8 +471,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
             PositionRelative,
             new div{ PositionAbsolute, Top(0), Right(16),  JsonEditorFormatButton(FormatCurrentComponentPropsAsJson)}
         };
-
     }
+    
     
     Task FormatCurrentComponentPropsAsJson(MouseEvent _)
     {
