@@ -1,22 +1,73 @@
-﻿
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Page = ReactWithDotNet.WebSite.Page;
 
 namespace ReactWithDotNet.VisualDesigner.Views;
 
-sealed class ApplicationView: Component<ApplicationView.State>
+sealed class ApplicationView : Component<ApplicationView.State>
 {
     internal static State AppState;
-    
+
+    enum Icon
+    {
+        add,
+        remove
+    }
+
+    public static string UrlPath => "/$";
+    internal static string UrlPathOfComponentPreview => $"{UrlPath}?preview=true";
+
+    IReadOnlyList<string> BooleanSuggestions => ["MD", "XXL", "state.user.isActive", "MD: state.user.isActive", "XXL: state.user.isActive"];
+
+    PropertyModel CurrentProperty
+    {
+        get
+        {
+            Debug.Assert(state.CurrentPropertyIndex != null, "state.CurrentPropertyIndex != null");
+
+            return CurrentStyleGroup.Items[state.CurrentPropertyIndex.Value];
+        }
+    }
+
+    PropertyGroupModel CurrentStyleGroup
+    {
+        get { return CurrentVisualElement.StyleGroups.First(x => x.Condition == state.CurrentStyleGroupCondition); }
+    }
+
+    VisualElementModel CurrentVisualElement
+    {
+        get { return FindTreeNodeByTreePath(state.Project.Components.First(x => x.Name == state.CurrentComponentName).RootElement, state.CurrentVisualElementTreePath); }
+    }
+
+    StyleModifier ScaleStyle => TransformOrigin("0 0") + Transform($"scale({state.Scale / (double)100})");
+
+    IReadOnlyList<string> StyleAttributeNameSuggestions
+    {
+        get { return StyleProperties.Select(x => x.Name).ToList(); }
+    }
+
+    public Task OnCurrentPropertyIndexChanged(string senderName)
+    {
+        state.CurrentPropertyIndex = int.Parse(senderName);
+
+        return Task.CompletedTask;
+    }
+
+    public Task OnStyleGroupSelected(string senderName)
+    {
+        state.CurrentStyleGroupCondition = senderName;
+
+        return Task.CompletedTask;
+    }
+
     protected override Task constructor()
     {
         AppState = state = new()
         {
-            ScreenWidth              = 400,
-            ScreenHeight             = 400,
-            Scale                    = 100,
-            LeftPanelCurrentTabName = LeftPanelSelectedTabNames.ElementTree,
-            Project = Dummy.ProjectModel,
+            ScreenWidth                  = 400,
+            ScreenHeight                 = 400,
+            Scale                        = 100,
+            LeftPanelCurrentTabName      = LeftPanelSelectedTabNames.ElementTree,
+            Project                      = Dummy.ProjectModel,
             CurrentVisualElementTreePath = null
         };
 
@@ -24,23 +75,17 @@ sealed class ApplicationView: Component<ApplicationView.State>
         {
             state.CurrentComponentName = state.Project.Components[0].Name;
         }
-        
-        
+
         return Task.CompletedTask;
     }
-
-    public static string UrlPath => "/$";
-    internal static string UrlPathOfComponentPreview => $"{UrlPath}?preview=true";
 
     protected override Task OverrideStateFromPropsBeforeRender()
     {
         AppState = state;
-        
+
         return Task.CompletedTask;
     }
 
-    StyleModifier ScaleStyle => TransformOrigin("0 0") + Transform($"scale({state.Scale / (double)100})");
-    
     protected override Element render()
     {
         return new FlexRow(Padding(10), SizeFull, Background(Theme.BackgroundColor))
@@ -51,11 +96,11 @@ sealed class ApplicationView: Component<ApplicationView.State>
             {
                 applicationTopPanel,
 
-                new FlexRow(Flex(1,1,0), OverflowYAuto)
+                new FlexRow(Flex(1, 1, 0), OverflowYAuto)
                 {
                     MainContent
                 },
-                
+
                 new Style
                 {
                     Border(Solid(1, Theme.BorderColor)),
@@ -68,20 +113,30 @@ sealed class ApplicationView: Component<ApplicationView.State>
             }
         };
     }
-    
+
+    static FlexRowCentered CreateIcon(Icon name, int size)
+    {
+        return name switch
+        {
+            Icon.add    => new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Hover(BorderColor(Blue300), Color(Blue300))) { new IconPlus() },
+            Icon.remove => new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Hover(BorderColor(Blue300), Color(Blue300))) { new IconMinus() },
+            _           => throw new NotImplementedException(name.ToString())
+        };
+    }
+
     Element applicationTopPanel()
     {
         return new FlexRow
         {
             new h3 { "React Visual Designer" },
 
-           new FlexRowCentered(Gap(24))
-           {
-               PartMediaSizeButtons,
-            
-               PartScale
-           },
-            
+            new FlexRowCentered(Gap(24))
+            {
+                PartMediaSizeButtons,
+
+                PartScale
+            },
+
             new LogoutButton(),
 
             new Style
@@ -94,25 +149,6 @@ sealed class ApplicationView: Component<ApplicationView.State>
         };
     }
 
-    Element MainContent()
-    {
-        return new SplitRow
-        {
-            sizes = [20, 60, 20],
-            children =
-            {
-                PartLeftPanel,
-                new FlexColumn(AlignItemsCenter, FlexGrow(1), Padding(7), MarginLeft(40), ScaleStyle, OverflowXAuto)
-                {
-                    createHorizontalRuler() + Width(state.ScreenWidth) + MarginTop(12),
-                    PartPreview
-                },
-                
-                PartRightPanel
-            }
-        };
-    }
-    
     Element createHorizontalRuler()
     {
         const int step = 50;
@@ -197,6 +233,184 @@ sealed class ApplicationView: Component<ApplicationView.State>
         }
     }
 
+    Task CurrentStyleGroup_CurrentProperty_Add_Clicked(MouseEvent _)
+    {
+        CurrentStyleGroup.Items.Add(new());
+
+        return Task.CompletedTask;
+    }
+
+    Task CurrentStyleGroup_CurrentProperty_Delete_Clicked(MouseEvent _)
+    {
+        CurrentStyleGroup.Items.Remove(CurrentProperty);
+
+        return Task.CompletedTask;
+    }
+
+    Element MainContent()
+    {
+        return new SplitRow
+        {
+            sizes = [20, 60, 20],
+            children =
+            {
+                PartLeftPanel,
+                new FlexColumn(AlignItemsCenter, FlexGrow(1), Padding(7), MarginLeft(40), ScaleStyle, OverflowXAuto)
+                {
+                    createHorizontalRuler() + Width(state.ScreenWidth) + MarginTop(12),
+                    PartPreview
+                },
+
+                PartRightPanel
+            }
+        };
+    }
+
+    async Task OnCommonSizeClicked(MouseEvent e)
+    {
+        state.ScreenWidth = e.currentTarget.data["value"] switch
+        {
+            "M"   => 320,
+            "SM"  => 640,
+            "MD"  => 768,
+            "LG"  => 1024,
+            "XL"  => 1280,
+            "XXL" => 1536,
+            _     => throw new ArgumentOutOfRangeException()
+        };
+
+        await SaveState();
+    }
+
+    Task OnCurrentPropertyNameChanged(string senderName, string newValue)
+    {
+        CurrentProperty.Name = newValue;
+
+        return Task.CompletedTask;
+    }
+
+    async Task OnCurrentPropertyValueChanged(string senderName, string newValue)
+    {
+        CurrentProperty.Value = newValue;
+
+        await SaveState();
+    }
+
+    Task OnElementTreeTabClicked(MouseEvent e)
+    {
+        state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.ElementTree;
+
+        return Task.CompletedTask;
+    }
+
+    Task OnInputChanged(string senderName, string newValue)
+    {
+        if (senderName == SenderName.Tag)
+        {
+            CurrentVisualElement.Tag = newValue;
+        }
+
+        if (senderName == SenderName.ComponentName)
+        {
+            state.CurrentComponentName = newValue;
+
+            state.CurrentVisualElementTreePath = null;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    Task OnSaveTabClicked(MouseEvent e)
+    {
+        state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.Save;
+
+        return Task.CompletedTask;
+    }
+
+    Task OnSettingsTabClicked(MouseEvent e)
+    {
+        state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.Settings;
+
+        return Task.CompletedTask;
+    }
+
+    Task OnVisualElementTreeSelected(string treePath)
+    {
+        state.CurrentVisualElementTreePath = treePath;
+
+        return Task.CompletedTask;
+    }
+
+    Element PartLeftPanel()
+    {
+        var componentSelector = new MagicInput
+        {
+            Name = SenderName.ComponentName,
+
+            Suggestions = state.Project.Components.Select(x => x.Name).ToList(),
+            Value       = state.CurrentComponentName,
+            OnChange    = OnInputChanged
+        };
+
+        return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"))
+        {
+            componentSelector,
+            new FlexRow(WidthFull, AlignItemsCenter, Padding(8, 4), JustifyContentSpaceAround, BorderBottom(1, dotted, "#d9d9d9"), BorderTop(1, dotted, "#d9d9d9"))
+            {
+                Color(Gray300),
+
+                new FlexRowCentered(WidthFull, OnClick(OnElementTreeTabClicked))
+                {
+                    new IconLayers() + Size(18) + (state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.ElementTree ? Color(Blue300) : null)
+                },
+                new FlexRowCentered(WidthFull, OnClick(OnSettingsTabClicked))
+                {
+                    new IconSettings() + Size(24) + (state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.Settings ? Color(Blue300) : null)
+                },
+                new FlexRowCentered(WidthFull, OnClick(OnSaveTabClicked))
+                {
+                    new IconSave() + Size(24) + (state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.Save ? Color(Blue300) : null)
+                }
+            },
+
+            new VisualElementTreeView
+            {
+                SelectionChanged = OnVisualElementTreeSelected,
+                SelectedPath     = state.CurrentVisualElementTreePath,
+                Model            = state.Project.Components.FirstOrDefault(x => x.Name == state.CurrentComponentName)?.RootElement
+            }
+        };
+    }
+
+    Element PartMediaSizeButtons()
+    {
+        return new FlexRow(JustifyContentSpaceAround, AlignItemsCenter, Gap(16))
+        {
+            new[] { "M", "SM", "MD", "LG", "XL", "XXL" }.Select(x => new FlexRowCentered
+            {
+                x,
+                FontSize16,
+                FontWeight300,
+                CursorDefault,
+                PaddingTopBottom(3),
+                FlexGrow(1),
+
+                Data("value", x),
+                OnClick(OnCommonSizeClicked),
+                Hover(Color("#2196f3")),
+
+                (x == "M" && state.ScreenWidth == 320) ||
+                (x == "SM" && state.ScreenWidth == 640) ||
+                (x == "MD" && state.ScreenWidth == 768) ||
+                (x == "LG" && state.ScreenWidth == 1024) ||
+                (x == "XL" && state.ScreenWidth == 1280) ||
+                (x == "XXL" && state.ScreenWidth == 1536)
+                    ? FontWeight500 + Color("#2196f3")
+                    : null
+            })
+        };
+    }
+
     Element PartPreview()
     {
         return new FlexRow(JustifyContentFlexStart, PositionRelative)
@@ -211,7 +425,7 @@ sealed class ApplicationView: Component<ApplicationView.State>
             Height(state.ScreenHeight * percent),
             BoxShadow(0, 4, 12, 0, rgba(0, 0, 0, 0.1))
         };
-        
+
         static Element createVerticleRuler()
         {
             const int maxHeight = 5000;
@@ -289,229 +503,157 @@ sealed class ApplicationView: Component<ApplicationView.State>
         }
     }
 
-    VisualElementModel CurrentVisualElement
-    {
-        get
-        {
-            return  FindTreeNodeByTreePath(state.Project.Components.First(x=>x.Name == state.CurrentComponentName).RootElement, state.CurrentVisualElementTreePath);
-        }
-    }
-
-    IReadOnlyList<string> BooleanSuggestions
-    {
-        get
-        {
-            return ["MD", "XXL", "state.user.isActive", "MD: state.user.isActive", "XXL: state.user.isActive"];
-        }
-    }
-    
-    IReadOnlyList<string> StyleAttributeNameSuggestions
-    {
-        get
-        {
-            return StyleProperties.Select(x => x.Name).ToList();
-        }
-    }
-
-
-
-    Task OnCurrentPropertyNameChanged(string senderName, string newValue)
-    {
-        CurrentProperty.Name = newValue;
-        
-        return Task.CompletedTask;
-    }
-
-    async Task OnCurrentPropertyValueChanged(string senderName, string newValue)
-    {
-        CurrentProperty.Value = newValue;
-
-        await SaveState();
-    }
-    
-    Task OnInputChanged(string senderName, string newValue)
-    {
-        if (senderName == SenderName.Tag)
-        {
-            CurrentVisualElement.Tag = newValue;    
-        }
-        
-        if (senderName == SenderName.ComponentName)
-        {
-            state.CurrentComponentName = newValue;
-                
-            state.CurrentVisualElementTreePath = null;
-        }
-        
-        
-        return Task.CompletedTask;
-    }
-    
     Element PartRightPanel()
     {
         if (!state.CurrentVisualElementTreePath.HasValue())
         {
             return new div();
         }
-        
+
         var tagSuggestions = new List<string>(TagNameList);
 
         tagSuggestions.AddRange(state.Project.Components.Where(c => c.Name != state.CurrentComponentName).Select(x => x.Name));
 
         var visualElementModel = CurrentVisualElement;
-        
-        return new FlexColumn( BorderLeft(1, dotted, "#d9d9d9"), OverflowYAuto, Background(White))
+
+        return new FlexColumn(BorderLeft(1, dotted, "#d9d9d9"), OverflowYAuto, Background(White))
         {
             new FlexRow(WidthFull, Gap(4))
             {
-                new label { "Tag", FontWeightBold , Width(4,10), TextAlignRight},
+                new label { "Tag", FontWeightBold, Width(4, 10), TextAlignRight },
                 " : ",
-                new MagicInput { Name = SenderName.Tag, Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = OnInputChanged} + Width(6,10)
+                new MagicInput { Name = SenderName.Tag, Value = visualElementModel.Tag, Suggestions = tagSuggestions, OnChange = OnInputChanged } + Width(6, 10)
             },
-            
-            new FlexRow(WidthFull,AlignItemsCenter)
+
+            new FlexRow(WidthFull, AlignItemsCenter)
             {
-                new FlexRowCentered(Size(32), OnClick(StyleGroupRemoveClicked) , BorderRadius(8), Border(1,solid,Gray200), Hover(Color(Blue300)))
-                {
-                    new IconMinus()
-                },
-                
-                new div{ Height(1), FlexGrow(1), Background(Gray200)},
+                CreateIcon(Icon.remove, 32) + OnClick(StyleGroupRemoveClicked),
+
+                new div { Height(1), FlexGrow(1), Background(Gray200) },
                 new span { "S T Y L E", WhiteSpaceNoWrap, UserSelect(none), PaddingX(4) },
-                new div{ Height(1), FlexGrow(1), Background(Gray200)},
-                 
-                new FlexRowCentered(Size(32), OnClick(StyleGroupAddClicked) , BorderRadius(8), Border(1,solid,Gray200), Hover(Color(Blue300)))
-                {
-                    new IconPlus()
-                }
+                new div { Height(1), FlexGrow(1), Background(Gray200) },
+
+                CreateIcon(Icon.add, 32) + OnClick(StyleGroupAddClicked)
             },
-            
-            visualElementModel.StyleGroups?.Select(styleGroup =>
+
+            new FlexColumnCentered(WidthFull, Padding(4))
             {
-                return new FlexColumn(WidthFull, Gap(4))
+                visualElementModel.StyleGroups?.Select(styleGroup =>
                 {
-                    new FlexRow(WidthFull, AlignItemsCenter, Gap(4))
+                    return new FlexColumn(WidthFull, Gap(4))
                     {
-                        new FlexRowCentered(Size(28))
+                        new FlexRow(WidthFull, AlignItemsCenter, Gap(4))
                         {
-                            
-                            new IconMinus(),
-                            
-                            
-                            BorderRadius(8),
-                            Border(1,solid,Gray200),
-                            
-                            state.CurrentStyleGroupCondition == styleGroup.Condition ?
-                            [
-                                OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked),
-                                Hover(Color(Blue300))
-                            ]:
-                            [
-                                Color(Gray100),
-                                BorderColor(Gray100)
-                            ]
-                        },
-                        
-                        
-                        new MagicInput
-                        {
-                            Name    = styleGroup.Condition, 
-                            OnFocus = OnStyleGroupSelected,
-                            Value   = styleGroup.Condition, 
-                            IsTextAlignCenter = true, 
-                            Suggestions = BooleanSuggestions
-                        },
-                        
-                        new FlexRowCentered(Size(28), OnClick(CurrentStyleGroup_CurrentProperty_Add_Clicked))
-                        {
-                            new IconPlus()
-                        }
-                    },
-                    
-                    styleGroup.Items.Select((property , index)=> new FlexRow(Gap(4))
-                    {
-                        new FlexRow(JustifyContentFlexEnd, Width(4, 10))
-                        {
+                            new FlexRowCentered(Size(28))
+                            {
+                                new IconMinus(),
+
+                                BorderRadius(8),
+                                Border(1, solid, Gray200),
+
+                                state.CurrentStyleGroupCondition == styleGroup.Condition ?
+                                    [
+                                        OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked),
+                                        Hover(Color(Blue300))
+                                    ] :
+                                    [
+                                        Color(Gray100),
+                                        BorderColor(Gray100)
+                                    ]
+                            },
+
                             new MagicInput
                             {
-                                OnFocus = OnCurrentPropertyIndexChanged,
-                                    
-                                Name             = index.ToString(),
-                                Value            = property.Name,
-                                OnChange         = OnCurrentPropertyNameChanged,
-                                IsBold           = true, 
-                                IsTextAlignRight = true, 
-                                Suggestions      = StyleAttributeNameSuggestions
-                            }
+                                Name              = styleGroup.Condition,
+                                OnFocus           = OnStyleGroupSelected,
+                                Value             = styleGroup.Condition,
+                                IsTextAlignCenter = true,
+                                Suggestions       = BooleanSuggestions
+                            },
+                            
+                            CreateIcon(Icon.add, 28) + OnClick(CurrentStyleGroup_CurrentProperty_Add_Clicked)
                         },
-                        " : ",
-                        new FlexRow(Width(6, 10))
+
+                        styleGroup.Items.Select((property, index) => new FlexRow(Gap(4))
                         {
-                            new MagicInput
-                            { 
-                                Name     = index.ToString(), 
-                                Value    = property.Value,
-                                OnFocus  = OnCurrentPropertyIndexChanged,
-                                OnChange = OnCurrentPropertyValueChanged
-                                    
+                            new FlexRow(JustifyContentFlexEnd, Width(4, 10))
+                            {
+                                new MagicInput
+                                {
+                                    OnFocus = OnCurrentPropertyIndexChanged,
+
+                                    Name             = index.ToString(),
+                                    Value            = property.Name,
+                                    OnChange         = OnCurrentPropertyNameChanged,
+                                    IsBold           = true,
+                                    IsTextAlignRight = true,
+                                    Suggestions      = StyleAttributeNameSuggestions
+                                }
+                            },
+                            " : ",
+                            new FlexRow(Width(6, 10))
+                            {
+                                new MagicInput
+                                {
+                                    Name     = index.ToString(),
+                                    Value    = property.Value,
+                                    OnFocus  = OnCurrentPropertyIndexChanged,
+                                    OnChange = OnCurrentPropertyValueChanged
+                                }
                             }
-                        }
-                    })
-                };
-            })
-            
+                        })
+                    };
+                })
+            }
         };
     }
 
-    public Task OnCurrentPropertyIndexChanged(string senderName)
+    Element PartScale()
     {
-        state.CurrentPropertyIndex = int.Parse(senderName);
-        
-        return Task.CompletedTask;
-    }
-    
-    public Task OnStyleGroupSelected(string senderName)
-    {
-        state.CurrentStyleGroupCondition = senderName;
-        
-        return Task.CompletedTask;
+        return new FlexRow(WidthFull, PaddingLeftRight(3), AlignItemsCenter, Gap(5))
+        {
+            new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
+            {
+                OnClick(async _ =>
+                {
+                    if (state.Scale <= 20)
+                    {
+                        return;
+                    }
+
+                    state.Scale -= 10;
+
+                    await SaveState();
+                }),
+                new IconMinus()
+            },
+
+            $"%{state.Scale}",
+            new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
+            {
+                OnClick(async _ =>
+                {
+                    if (state.Scale >= 100)
+                    {
+                        return;
+                    }
+
+                    state.Scale += 10;
+
+                    await SaveState();
+                }),
+                new IconPlus()
+            }
+        };
     }
 
-    PropertyGroupModel CurrentStyleGroup
+    async Task SaveState()
     {
-        get
-        {
-            return CurrentVisualElement.StyleGroups.First(x => x.Condition == state.CurrentStyleGroupCondition);
-        }
-    }
-    
-    PropertyModel CurrentProperty
-    {
-        get
-        {
-            Debug.Assert(state.CurrentPropertyIndex != null, "state.CurrentPropertyIndex != null");
-            
-            return CurrentStyleGroup.Items[state.CurrentPropertyIndex.Value];
-        }
-    }
-    
-    
-    
-    
-            
-    Task CurrentStyleGroup_CurrentProperty_Delete_Clicked(MouseEvent _)
-    {
-        CurrentStyleGroup.Items.Remove(CurrentProperty);
-        
-        return Task.CompletedTask;
-    }
-    
-    Task CurrentStyleGroup_CurrentProperty_Add_Clicked(MouseEvent _)
-    {
-        CurrentStyleGroup.Items.Add(new());
+        AppState = state;
 
-        return Task.CompletedTask;
+        await Task.Delay(1);
     }
+
     Task StyleGroupAddClicked(MouseEvent e)
     {
         var styleGroups = CurrentVisualElement.StyleGroups ??= [];
@@ -533,239 +675,96 @@ sealed class ApplicationView: Component<ApplicationView.State>
                 Items     = [new PropertyModel()]
             };
         }
-        
+
         styleGroups.Add(newStyleGroup);
 
         state.CurrentStyleGroupCondition = newStyleGroup.Condition;
-        
+
         return Task.CompletedTask;
     }
-    
+
     Task StyleGroupRemoveClicked(MouseEvent e)
     {
         var styleGroups = CurrentVisualElement.StyleGroups ??= [];
 
         if (styleGroups.Count == 0)
         {
-            styleGroups.Add(new ()
+            styleGroups.Add(new()
             {
                 Condition = "*",
                 Items     = [new PropertyModel()]
             });
-            
+
             return Task.CompletedTask;
         }
-        
-        styleGroups.Add(new ()
+
+        styleGroups.Add(new()
         {
             Condition = "?",
             Items     = [new PropertyModel()]
         });
-        
-        return Task.CompletedTask;
-    }
 
-    Task OnElementTreeTabClicked(MouseEvent e)
-    {
-        state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.ElementTree;
-        
-        return Task.CompletedTask;
-    }
-    Task OnSettingsTabClicked(MouseEvent e)
-    {
-        state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.Settings;
-        
-        return Task.CompletedTask;
-    }
-    Task OnSaveTabClicked(MouseEvent e)
-    {
-        state.LeftPanelCurrentTabName = LeftPanelSelectedTabNames.Save;
-        
         return Task.CompletedTask;
     }
 
     static class SenderName
     {
-        public static readonly string  ComponentName = nameof(ComponentName);
-        public static readonly string  Tag = nameof(Tag);
+        public static readonly string ComponentName = nameof(ComponentName);
+        public static readonly string Tag = nameof(Tag);
     }
-    
-    Element PartLeftPanel()
+
+    internal class State
     {
-        var componentSelector = new MagicInput
-        {
-            Name = SenderName.ComponentName,
-            
-            Suggestions = state.Project.Components.Select(x => x.Name).ToList(),
-            Value = state.CurrentComponentName,
-            OnChange = OnInputChanged
-        };
+        public string CurrentComponentName { get; set; }
 
-        return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"))
-        {
-            componentSelector,
-            new FlexRow(WidthFull, AlignItemsCenter, Padding(8,4), JustifyContentSpaceAround, BorderBottom(1, dotted, "#d9d9d9"), BorderTop(1, dotted, "#d9d9d9"))
-            {
-                Color(Gray300),
-                
-                new FlexRowCentered(WidthFull, OnClick(OnElementTreeTabClicked))
-                {
-                    new IconLayers() +Size(18)+ (state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.ElementTree ? Color(Blue300): null)
-                },
-                new FlexRowCentered(WidthFull,OnClick(OnSettingsTabClicked))
-                {
-                    new IconSettings() + Size(24) + (state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.Settings ? Color(Blue300): null)
-                },
-                new FlexRowCentered(WidthFull, OnClick(OnSaveTabClicked))
-                {
-                    new IconSave() + Size(24) + (state.LeftPanelCurrentTabName == LeftPanelSelectedTabNames.Save ? Color(Blue300): null)
-                },
-            },
-            
-            new VisualElementTreeView
-            {
-                SelectionChanged = OnVisualElementTreeSelected,
-                SelectedPath     = state.CurrentVisualElementTreePath,
-                Model = state.Project.Components.FirstOrDefault(x=>x.Name == state.CurrentComponentName)?.RootElement,
-            }
-            
-        };
+        public int? CurrentPropertyIndex { get; set; }
+
+        public string CurrentStyleGroupCondition { get; set; }
+
+        public string CurrentVisualElementTreePath { get; set; }
+        public string LeftPanelCurrentTabName { get; set; }
+
+        public ProjectModel Project { get; set; }
+
+        public int Scale { get; set; }
+
+        public int ScreenHeight { get; init; }
+
+        public int ScreenWidth { get; set; }
     }
-
-    
-
-    Task OnVisualElementTreeSelected(string treePath)
-    {
-        state.CurrentVisualElementTreePath = treePath;
-
-        return Task.CompletedTask;
-    }
-
-   
-    
-    Element PartScale()
-    {
-        return new FlexRow(WidthFull, PaddingLeftRight(3), AlignItemsCenter, Gap(5))
-        {
-            new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
-            {
-                OnClick(async _ =>
-                {
-                    if (state.Scale <= 20)
-                    {
-                        return;
-                    }
-
-                    state.Scale -= 10;
-
-                    await SaveState();
-                }),
-                new IconMinus()
-            },
-            
-            $"%{state.Scale}",
-            new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
-            {
-                OnClick(async _ =>
-                {
-                    if (state.Scale >= 100)
-                    {
-                        return;
-                    }
-
-                    state.Scale += 10;
-
-                    await SaveState();
-                }),
-                new IconPlus()
-            }
-        };
-    }
-    Element PartMediaSizeButtons()
-    {
-        return new FlexRow(JustifyContentSpaceAround, AlignItemsCenter, Gap(16))
-        {
-            new[] { "M", "SM", "MD", "LG", "XL", "XXL" }.Select(x => new FlexRowCentered
-            {
-                x,
-                FontSize16,
-                FontWeight300,
-                CursorDefault,
-                PaddingTopBottom(3),
-                FlexGrow(1),
-
-                Data("value", x),
-                OnClick(OnCommonSizeClicked),
-                Hover(Color("#2196f3")),
-
-                (x == "M" && state.ScreenWidth == 320) ||
-                (x == "SM" && state.ScreenWidth == 640) ||
-                (x == "MD" && state.ScreenWidth == 768) ||
-                (x == "LG" && state.ScreenWidth == 1024) ||
-                (x == "XL" && state.ScreenWidth == 1280) ||
-                (x == "XXL" && state.ScreenWidth == 1536)
-                    ? FontWeight500 + Color("#2196f3")
-                    : null
-            })
-        };
-    }
-    
-    async Task OnCommonSizeClicked(MouseEvent e)
-    {
-        state.ScreenWidth = e.currentTarget.data["value"] switch
-        {
-            "M"   => 320,
-            "SM"  => 640,
-            "MD"  => 768,
-            "LG"  => 1024,
-            "XL"  => 1280,
-            "XXL" => 1536,
-            _     => throw new ArgumentOutOfRangeException()
-        };
-        
-
-        await SaveState();
-    }
-    
-    async Task SaveState()
-    {
-        AppState = state;
-
-        await Task.Delay(1);
-    }
-
 
     class LeftPanelSelectedTabNames
     {
         public const string ElementTree = "ElementTree";
-        public const string Settings = "Settings";
         public const string Save = "Save";
-    }
-    internal class State
-    {
-        public string LeftPanelCurrentTabName { get; set; } 
-
-        public string CurrentVisualElementTreePath { get; set; }
-        
-        public int ScreenWidth { get; set; } 
-        
-        public int ScreenHeight { get; init; } 
-    
-        public int Scale { get; set; }
-        
-        public ProjectModel Project { get; set; }
-
-        public string CurrentComponentName { get; set; }
-        
-        public string CurrentStyleGroupCondition { get; set; }
-        
-        public int? CurrentPropertyIndex { get; set; }
+        public const string Settings = "Settings";
     }
 }
 
-
 sealed class ApplicationPreview : Component
 {
+    public Task Refresh()
+    {
+        Client.GotoMethod(1000, Refresh);
+
+        return Task.CompletedTask;
+    }
+
+    protected override Element componentDidCatch(Exception exceptionOccurredInRender)
+    {
+        return new div(Background(Gray100))
+        {
+            exceptionOccurredInRender.ToString()
+        };
+    }
+
+    protected override Task constructor()
+    {
+        Client.GotoMethod(1000, Refresh);
+
+        return Task.CompletedTask;
+    }
+
     protected override Element render()
     {
         var appState = ApplicationView.AppState;
@@ -776,24 +775,21 @@ sealed class ApplicationPreview : Component
             {
                 "Has no state"
             };
-                
         }
 
-        var componentModel = appState.Project.Components.FirstOrDefault(x=>x.Name == appState.CurrentComponentName);
+        var componentModel = appState.Project.Components.FirstOrDefault(x => x.Name == appState.CurrentComponentName);
         if (componentModel is null)
         {
             return new div(Size(200), Background(Gray100))
             {
                 "Has no component"
             };
-
         }
-        
+
         return new div(Size(333))
         {
             renderElement(componentModel.RootElement)
         };
-
 
         Element renderElement(VisualElementModel model)
         {
@@ -802,14 +798,14 @@ sealed class ApplicationPreview : Component
                 model.Tag
             };
 
-            foreach (var styleGroup in model.StyleGroups??[])
+            foreach (var styleGroup in model.StyleGroups ?? [])
             {
                 foreach (var styleAttribute in styleGroup.Items ?? [])
                 {
                     var value = styleAttribute.Value;
 
                     var isValueDouble = double.TryParse(value, out var valueAsDouble);
-                    
+
                     switch (styleAttribute.Name)
                     {
                         case "display":
@@ -817,13 +813,13 @@ sealed class ApplicationPreview : Component
                             element.Add(Display(value));
                             continue;
                         }
-                        
+
                         case "background":
                         {
                             element.Add(Background(value));
                             continue;
                         }
-                        
+
                         case "width":
                         {
                             if (isValueDouble)
@@ -831,11 +827,11 @@ sealed class ApplicationPreview : Component
                                 element.Add(Width(valueAsDouble));
                                 continue;
                             }
-                            
+
                             element.Add(Width(value));
                             continue;
                         }
-                        
+
                         case "height":
                         {
                             if (isValueDouble)
@@ -843,12 +839,11 @@ sealed class ApplicationPreview : Component
                                 element.Add(Height(valueAsDouble));
                                 continue;
                             }
-                            
+
                             element.Add(Height(value));
                             continue;
                         }
-                        
-                        
+
                         case "border-radius":
                         {
                             if (isValueDouble)
@@ -856,11 +851,11 @@ sealed class ApplicationPreview : Component
                                 element.Add(BorderRadius(valueAsDouble));
                                 continue;
                             }
-                            
+
                             element.Add(BorderRadius(value));
                             continue;
                         }
-                        
+
                         case "gap":
                         {
                             if (isValueDouble)
@@ -868,11 +863,11 @@ sealed class ApplicationPreview : Component
                                 element.Add(Gap(valueAsDouble));
                                 continue;
                             }
-                            
+
                             element.Add(Gap(value));
                             continue;
                         }
-                        
+
                         case "padding":
                         {
                             if (isValueDouble)
@@ -880,11 +875,10 @@ sealed class ApplicationPreview : Component
                                 element.Add(Padding(valueAsDouble));
                                 continue;
                             }
-                            
+
                             element.Add(Padding(value));
                             continue;
                         }
-                            
                     }
                 }
             }
@@ -897,32 +891,6 @@ sealed class ApplicationPreview : Component
             element.children.AddRange(model.Children.Select(renderElement));
 
             return element;
-            
         }
-
-       
-    }
-    
-    
-
-    protected override Task constructor()
-    {
-        Client.GotoMethod(1000, Refresh);
-        
-        return Task.CompletedTask;
-    }
-
-    public Task Refresh()
-    {
-        Client.GotoMethod(1000, Refresh);
-        
-        return Task.CompletedTask;
-    }
-    protected override Element componentDidCatch(Exception exceptionOccurredInRender)
-    {
-        return new div(Background(Gray100))
-        {
-            exceptionOccurredInRender.ToString()
-        };
     }
 }
