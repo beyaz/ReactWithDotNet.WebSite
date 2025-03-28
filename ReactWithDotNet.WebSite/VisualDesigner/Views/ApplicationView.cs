@@ -273,14 +273,14 @@ sealed class ApplicationView : Component<ApplicationView.State>
             sizes = [20, 60, 20],
             children =
             {
-                PartLeftPanel,
+                PartLeftPanel() + BorderBottomLeftRadius(8),
                 new FlexColumn(AlignItemsCenter, FlexGrow(1), Padding(7), MarginLeft(40), ScaleStyle, OverflowXAuto)
                 {
                     createHorizontalRuler() + Width(state.ScreenWidth) + MarginTop(12),
                     PartPreview
                 },
 
-                PartRightPanel
+                PartRightPanel() + BorderBottomRightRadius(8)
             }
         };
     }
@@ -388,7 +388,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
             OnChange    = OnComponentNameChanged
         };
 
-        return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"))
+        return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"), Background(White))
         {
             componentSelector,
             new FlexRow(WidthFull, AlignItemsCenter, Padding(8, 4), JustifyContentSpaceAround, BorderBottom(1, dotted, "#d9d9d9"), BorderTop(1, dotted, "#d9d9d9"))
