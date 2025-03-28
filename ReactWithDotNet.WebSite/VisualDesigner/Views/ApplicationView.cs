@@ -404,7 +404,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
     {
         state.HoveredVisualElementTreeItemPath = treeItemPath;
 
-        return Task.CompletedTask;
+        return SaveState();
     }
     
     
@@ -668,7 +668,12 @@ sealed class ApplicationView : Component<ApplicationView.State>
             };
         }
     }
+    async Task OnTextChanged(string _, string text)
+    {
+        CurrentVisualElement.Text = text;
 
+        await SaveState();
+    }
     Element PartRightPanel()
     {
         if (!state.CurrentVisualElementTreePath.HasValue())
@@ -682,6 +687,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         var visualElementModel = CurrentVisualElement;
 
+        
+
         return new FlexColumn(BorderLeft(1, dotted, "#d9d9d9"), PaddingX(2), Gap(8), OverflowYAuto, Background(White))
         {
             new FlexRow(WidthFull, Gap(4))
@@ -694,6 +701,19 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     Value       = visualElementModel.Tag,
                     Suggestions = tagSuggestions,
                     OnChange    = OnTagNameChanged
+                } + Width(6, 10)
+            },
+            
+            new FlexRow(WidthFull, Gap(4))
+            {
+                new label { "Text", FontWeightBold, Width(4, 10), TextAlignRight },
+                " : ",
+                new MagicInput
+                {
+                    Name        = string.Empty,
+                    Value       = visualElementModel.Text,
+                    Suggestions = tagSuggestions,
+                    OnChange    = OnTextChanged
                 } + Width(6, 10)
             },
 
@@ -1107,10 +1127,12 @@ sealed class ApplicationPreview : Component
 
         Element renderElement(VisualElementModel model)
         {
-            var element = new div
+            var element = new div();
+
+            if (model.Text.HasValue())
             {
-                model.Tag
-            };
+                element.text = model.Text;
+            }
 
             foreach (var styleGroup in model.StyleGroups ?? [])
             {
