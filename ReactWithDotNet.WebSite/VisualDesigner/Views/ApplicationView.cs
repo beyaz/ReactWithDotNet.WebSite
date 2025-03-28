@@ -951,7 +951,10 @@ sealed class ApplicationView : Component<ApplicationView.State>
         public const string Save = "Save";
         public const string Settings = "Settings";
     }
-
+    internal enum LeftPanelSelectedTab
+    {
+        ElementTree,Save,Settings
+    }
     internal enum SettingsPanelTab
     {
         Props,State,Other
