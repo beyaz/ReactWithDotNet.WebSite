@@ -299,6 +299,11 @@ static class Extensions
 
     public static string JsonPrettify(string json)
     {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return string.Empty;
+        }
+        
         using (var stringReader = new StringReader(json))
         using (var stringWriter = new StringWriter())
         {

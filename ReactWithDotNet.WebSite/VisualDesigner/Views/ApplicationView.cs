@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using ReactWithDotNet.ThirdPartyLibraries.MonacoEditorReact;
 using Page = ReactWithDotNet.WebSite.Page;
 
 namespace ReactWithDotNet.VisualDesigner.Views;
@@ -489,23 +490,50 @@ sealed class ApplicationView : Component<ApplicationView.State>
             },
             new FlexColumnCentered(SizeFull)
             {
-                NewJsonEditor(() => state.JsonTextInComponentSettings)
+                new Editor
+                {
+                    defaultLanguage = "json",
+                    valueBind       = () => state.JsonTextInComponentSettings,
+                    valueBindDebounceTimeout = 700,
+                    valueBindDebounceHandler = JsonTextInComponentSettingsUpdatedByUser,
+                    options =
+                    {
+                        renderLineHighlight = "none",
+                        fontFamily          = "'IBM Plex Mono Medium', 'Courier New', monospace",
+                        fontSize            = 11,
+                        minimap             = new { enabled = false },
+                        formatOnPaste       = true,
+                        formatOnType        = true,
+                        automaticLayout     = true,
+                        lineNumbers         = false
+                    }
+                }
             }
         };
     }
-    
-    Task FormatJsonTextInComponentSettings(MouseEvent _)
-    {
-        if (state.JsonTextInComponentSettings is null)
-        {
-            return Task.CompletedTask;
-        }
 
+    Task JsonTextInComponentSettingsUpdatedByUser()
+    {
         state.JsonTextInComponentSettings = JsonPrettify(state.JsonTextInComponentSettings);
 
-        return Task.CompletedTask;
+        switch (state.SettingsPanelCurrentTab)
+        {
+            case SettingsPanelTab.Props:
+                CurrentComponent.PropsAsJson = state.JsonTextInComponentSettings;
+                return Task.CompletedTask;
+            
+            case SettingsPanelTab.State:
+                CurrentComponent.StateAsJson = state.JsonTextInComponentSettings;
+                return Task.CompletedTask;
+            
+            case SettingsPanelTab.Other:
+                CurrentComponent.OtherAsJson = state.JsonTextInComponentSettings;
+                return Task.CompletedTask;
+            
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
-    
     
     Element PartMediaSizeButtons()
     {
