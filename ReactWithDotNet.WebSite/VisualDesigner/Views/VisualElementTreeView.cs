@@ -1,5 +1,7 @@
 ﻿namespace ReactWithDotNet.VisualDesigner.Views;
 
+delegate Task OnTreeItemHover(string treeItemPath);
+
 sealed class VisualElementTreeView : Component
 {
     public VisualElementModel Model { get; init; }
@@ -8,14 +10,27 @@ sealed class VisualElementTreeView : Component
 
     [CustomEvent]
     public Func<string, Task> SelectionChanged { get; init; }
+    
+    [CustomEvent]
+    public OnTreeItemHover TreeItemHover { get; init; }
+    
+    [CustomEvent]
+    public Func<Task> MouseLeave { get; init; }
 
     protected override Element render()
     {
-        return new div(CursorPointer, Padding(5))
+        return new div(CursorPointer, Padding(5), OnMouseLeave(OnMouseLeaveHandler))
         {
             ToVisual(Model, 0, "0"),
             WidthFull, HeightFull
         };
+    }
+
+    Task OnMouseLeaveHandler(MouseEvent e)
+    {
+        DispatchEvent(MouseLeave, []);
+
+        return Task.CompletedTask;
     }
 
     Task OnTreeItemClicked(MouseEvent e)
@@ -26,6 +41,15 @@ sealed class VisualElementTreeView : Component
 
         return Task.CompletedTask;
     }
+    
+    Task OnMouseEnterHandler(MouseEvent e)
+    {
+        var selectedPath = e.currentTarget.id;
+
+        DispatchEvent(TreeItemHover, [selectedPath]);
+
+        return Task.CompletedTask;
+    }
 
     IReadOnlyList<Element> ToVisual(VisualElementModel node, int indent, string path)
     {
@@ -33,7 +57,7 @@ sealed class VisualElementTreeView : Component
 
         var returnList = new List<Element>
         {
-            new FlexRow(AlignItemsCenter, PaddingLeft(indent * 16), Id(path), OnClick(OnTreeItemClicked))
+            new FlexRow(AlignItemsCenter, PaddingLeft(indent * 16), Id(path), OnClick(OnTreeItemClicked), OnMouseEnter(OnMouseEnterHandler))
             {
                 new div { Text(node.Tag), MarginLeft(5), FontSize13 },
 
@@ -57,4 +81,6 @@ sealed class VisualElementTreeView : Component
 
         return returnList;
     }
+
+   
 }

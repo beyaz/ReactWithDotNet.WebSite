@@ -398,6 +398,15 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         return Task.CompletedTask;
     }
+    
+    Task OnVisualElementTreeItemHovered(string treeItemPath)
+    {
+        state.HoveredVisualElementTreeItemPath = treeItemPath;
+
+        return Task.CompletedTask;
+    }
+    
+    
 
     Element PartLeftPanel()
     {
@@ -435,6 +444,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
             When(state.LeftPanelCurrentTab == LeftPanelTab.ElementTree, () =>new VisualElementTreeView
             {
+                TreeItemHover    = OnVisualElementTreeItemHovered,
+                MouseLeave       = () => { state.HoveredVisualElementTreeItemPath = null; return Task.CompletedTask;},
                 SelectionChanged = OnVisualElementTreeSelected,
                 SelectedPath     = state.CurrentVisualElementTreePath,
                 Model            = state.Project.Components.FirstOrDefault(x => x.Name == state.CurrentComponentName)?.RootElement
@@ -930,6 +941,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
         public int? CurrentStyleGroupIndex { get; set; }
 
         public string CurrentVisualElementTreePath { get; set; }
+        
+        public string HoveredVisualElementTreeItemPath { get; set; }
 
         public LeftPanelTab LeftPanelCurrentTab { get; set; }
         
@@ -1080,9 +1093,15 @@ sealed class ApplicationPreview : Component
             };
         }
 
+        var rootElement = componentModel.RootElement;
+        if (appState.HoveredVisualElementTreeItemPath.HasValue())
+        {
+            rootElement = FindTreeNodeByTreePath(rootElement, appState.HoveredVisualElementTreeItemPath);
+        }
+
         return new div(Size(333))
         {
-            renderElement(componentModel.RootElement)
+            renderElement(rootElement)
         };
 
         Element renderElement(VisualElementModel model)
