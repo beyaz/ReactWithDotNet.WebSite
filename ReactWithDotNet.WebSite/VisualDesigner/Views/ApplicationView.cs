@@ -381,7 +381,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
     {
         var componentSelector = new MagicInput
         {
-            Name = SenderName.ComponentName,
+            Name = string.Empty,
 
             Suggestions = state.Project.Components.Select(x => x.Name).ToList(),
             Value       = state.CurrentComponentName,
@@ -620,7 +620,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                 " : ",
                 new MagicInput
                 {
-                    Name = SenderName.Tag, 
+                    Name = string.Empty, 
                     Value = visualElementModel.Tag, 
                     Suggestions = tagSuggestions, 
                     OnChange = OnTagNameChanged
@@ -873,12 +873,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
         return Task.CompletedTask;
     }
 
-    static class SenderName
-    {
-        public static readonly string ComponentName = nameof(ComponentName);
-        public static readonly string Tag = nameof(Tag);
-    }
-
+   
     internal class State
     {
         public string CurrentComponentName { get; set; }
