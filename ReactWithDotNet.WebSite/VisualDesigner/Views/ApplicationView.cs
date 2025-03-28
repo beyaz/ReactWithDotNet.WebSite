@@ -28,10 +28,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
         }
     }
 
-    PropertyGroupModel CurrentStyleGroup
-    {
-        get { return CurrentVisualElement.StyleGroups[state.CurrentStyleGroupIndex!.Value]; }
-    }
+    PropertyGroupModel CurrentStyleGroup => CurrentVisualElement.StyleGroups[state.CurrentStyleGroupIndex!.Value];
 
     VisualElementModel CurrentVisualElement
     {
@@ -306,6 +303,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         await SaveState();
     }
+    
+    
 
     Task OnElementTreeTabClicked(MouseEvent e)
     {
@@ -524,7 +523,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
         public override string ToString() =>
             $"{StyleGroupIndex},{PropertyIndexAtGroup},{IsName},{IsValue}";
 
-        public static StyleInputLocation Parse(string input)
+        static StyleInputLocation Parse(string input)
         {
             var parts = input.Split(',');
             if (parts.Length != 4)
@@ -539,11 +538,37 @@ sealed class ApplicationView : Component<ApplicationView.State>
             };
         }
 
-        // String'den InputLocation'a dönüştürme
         public static implicit operator StyleInputLocation(string input) => Parse(input);
 
-        // InputLocation'dan string'e dönüştürme
         public static implicit operator string(StyleInputLocation location) => location.ToString();
+    }
+    
+    class PropInputLocation
+    {
+        public required int PropertyIndexAtGroup { get; init; }
+        public required bool IsName { get; init; }
+        public required bool IsValue { get; init; }
+
+        public override string ToString() =>
+            $"{PropertyIndexAtGroup},{IsName},{IsValue}";
+
+        static PropInputLocation Parse(string input)
+        {
+            var parts = input.Split(',');
+            if (parts.Length != 4)
+                throw new FormatException("Invalid input format");
+
+            return new ()
+            {
+                PropertyIndexAtGroup = int.Parse(parts[0]),
+                IsName               = bool.Parse(parts[1]),
+                IsValue              = bool.Parse(parts[2])
+            };
+        }
+
+        public static implicit operator PropInputLocation(string input) => Parse(input);
+
+        public static implicit operator string(PropInputLocation location) => location.ToString();
     }
 
 
@@ -658,7 +683,62 @@ sealed class ApplicationView : Component<ApplicationView.State>
                         })
                     };
                 })
-            }
+            },
+            
+            new FlexRow(WidthFull, AlignItemsCenter)
+            {
+                CreateIcon(Icon.remove, 32, state.CurrentPropertyIndexAtProps.HasValue ?
+                               [
+                                   OnClick(RemoveCurrentPropertyAtProps),
+                                   Hover(Color(Blue300))
+                               ] :
+                               [
+                                   Color(Gray100),
+                                   BorderColor(Gray100)
+                               ]),
+
+                new div { Height(1), FlexGrow(1), Background(Gray200) },
+                new span { "P R O P S", WhiteSpaceNoWrap, UserSelect(none), PaddingX(4) },
+                new div { Height(1), FlexGrow(1), Background(Gray200) },
+
+                CreateIcon(Icon.add, 32) + OnClick(AddNewPropsClicked)
+            },
+            
+            new FlexColumnCentered(WidthFull)
+            {
+                visualElementModel.Properties?.Select((property, index )=> new FlexRow(Gap(4))
+                {
+                    new FlexRow(JustifyContentFlexEnd, Width(4, 10))
+                    {
+                        new MagicInput
+                        {
+                            OnFocus = OnCurrentPropertyIndexChanged,
+
+                            Name             = new PropInputLocation { PropertyIndexAtGroup = index, IsName = true, IsValue = false},
+                            Value            = property.Name,
+                            OnChange         = OnCurrentPropertyNameChanged,
+                            IsBold           = true,
+                            IsTextAlignRight = true,
+                            Suggestions      = StyleAttributeNameSuggestions,
+                            Placeholder      = "? ? ?",
+                            AutoFocus        = property.Name.HasNoValue()
+                        }
+                    },
+                    " : ",
+                    new FlexRow(Width(6, 10))
+                    {
+                        new MagicInput
+                        {
+                            Name        = new PropInputLocation { PropertyIndexAtGroup = index, IsName = false, IsValue = true},
+                            Value       = property.Value,
+                            OnFocus     = OnCurrentPropertyIndexChanged,
+                            OnChange    = OnCurrentPropertyValueChanged,
+                            Placeholder = "? ? ?"
+                        }
+                    }
+                })
+            },
+            
         };
     }
 
@@ -736,6 +816,17 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         return Task.CompletedTask;
     }
+    
+    Task AddNewPropsClicked(MouseEvent e)
+    {
+        var properties = CurrentVisualElement.Properties ??= [];
+
+        properties.Add(new ());
+
+        state.CurrentPropertyIndexAtProps = properties.Count - 1;
+
+        return Task.CompletedTask;
+    }
 
     Task StyleGroupRemoveClicked(MouseEvent e)
     {
@@ -743,6 +834,15 @@ sealed class ApplicationView : Component<ApplicationView.State>
         
         state.CurrentStyleGroupIndex = null;
         state.CurrentPropertyIndexAtStyleGroup = null;
+
+        return Task.CompletedTask;
+    }
+    
+    Task RemoveCurrentPropertyAtProps(MouseEvent e)
+    {
+        CurrentVisualElement.Properties.RemoveAt(state.CurrentPropertyIndexAtProps!.Value);
+        
+        state.CurrentPropertyIndexAtProps = null;
 
         return Task.CompletedTask;
     }
@@ -761,7 +861,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
         
         public int? CurrentPropertyIndexAtStyleGroup { get; set; }
         
-        public int? CurrentPropertyIndex { get; set; }
+        public int? CurrentPropertyIndexAtProps { get; set; }
 
         public string CurrentVisualElementTreePath { get; set; }
         
