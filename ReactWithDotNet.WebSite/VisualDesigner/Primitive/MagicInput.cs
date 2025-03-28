@@ -55,6 +55,7 @@ sealed class MagicInput : Component<MagicInput.State>
                 onClick                  = OnInputClicked,
                 placeholder = Placeholder,
                 onFocus = OnFocused,
+                onBlur = OnBlur,
                 style =
                 {
                     OutlineNone,
@@ -74,6 +75,14 @@ sealed class MagicInput : Component<MagicInput.State>
             },
             ViewSuggestions
         };
+    }
+
+    [StopPropagation]
+    Task OnBlur(FocusEvent e)
+    {
+        state.ShowSuggestions = false;
+
+        return Task.CompletedTask;
     }
 
     Task OnFocused(FocusEvent e)
