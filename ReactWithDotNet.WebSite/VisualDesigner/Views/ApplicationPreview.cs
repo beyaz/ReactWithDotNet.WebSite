@@ -49,10 +49,7 @@ sealed class ApplicationPreview : Component
             rootElement = FindTreeNodeByTreePath(rootElement, appState.HoveredVisualElementTreeItemPath);
         }
 
-        return new div(Size(333))
-        {
-            renderElement(rootElement)
-        };
+        return renderElement(rootElement);
 
         Element renderElement(VisualElementModel model)
         {
