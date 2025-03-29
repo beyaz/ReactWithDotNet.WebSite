@@ -6,8 +6,8 @@ namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationView : Component<ApplicationState>
 {
-    internal static int AppStateVersion;
     internal static ApplicationState AppState;
+    internal static int AppStateVersion;
 
     enum Icon
     {
@@ -110,7 +110,7 @@ sealed class ApplicationView : Component<ApplicationState>
             EditorFont(),
             new FlexColumn
             {
-                applicationTopPanel,
+                PartApplicationTopPanel,
 
                 new FlexRow(Flex(1, 1, 0), OverflowYAuto)
                 {
@@ -148,56 +148,6 @@ sealed class ApplicationView : Component<ApplicationState>
         state.CurrentPropertyIndexInProps = properties.Count - 1;
 
         return Task.CompletedTask;
-    }
-
-    Element applicationTopPanel()
-    {
-        return new FlexRow(UserSelect(none))
-        {
-            new h3 { "React Visual Designer" },
-
-            new FlexRowCentered(Gap(24))
-            {
-                new FlexRowCentered(Gap(4))
-                {
-                    new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
-                    {
-                        OnClick(_ =>
-                        {
-                            state.ScreenWidth -= 10;
-
-                            return Task.CompletedTask;
-                        }),
-
-                        new IconMinus()
-                    },
-                    $"{state.ScreenWidth}px",
-                    new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
-                    {
-                        OnClick(_ =>
-                        {
-                            state.ScreenWidth += 10;
-
-                            return Task.CompletedTask;
-                        }),
-                        new IconPlus()
-                    }
-                },
-                PartMediaSizeButtons,
-
-                PartScale
-            },
-
-            new LogoutButton(),
-
-            new Style
-            {
-                JustifyContentSpaceBetween,
-                AlignItemsCenter,
-                BorderBottom(Solid(1, Theme.BorderColor)),
-                Padding(5, 30)
-            }
-        };
     }
 
     Element createHorizontalRuler()
@@ -459,6 +409,56 @@ sealed class ApplicationView : Component<ApplicationState>
         state.CurrentVisualElementTreePath = treePath;
 
         return Task.CompletedTask;
+    }
+
+    Element PartApplicationTopPanel()
+    {
+        return new FlexRow(UserSelect(none))
+        {
+            new h3 { "React Visual Designer" },
+
+            new FlexRowCentered(Gap(24))
+            {
+                new FlexRowCentered(Gap(4))
+                {
+                    new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
+                    {
+                        OnClick(_ =>
+                        {
+                            state.ScreenWidth -= 10;
+
+                            return Task.CompletedTask;
+                        }),
+
+                        new IconMinus()
+                    },
+                    $"{state.ScreenWidth}px",
+                    new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
+                    {
+                        OnClick(_ =>
+                        {
+                            state.ScreenWidth += 10;
+
+                            return Task.CompletedTask;
+                        }),
+                        new IconPlus()
+                    }
+                },
+                PartMediaSizeButtons,
+
+                PartScale
+            },
+
+            new LogoutButton(),
+
+            new Style
+            {
+                JustifyContentSpaceBetween,
+                AlignItemsCenter,
+                BorderBottom(Solid(1, Theme.BorderColor)),
+                Padding(5, 30)
+            }
+        };
     }
 
     Element PartLeftPanel()
