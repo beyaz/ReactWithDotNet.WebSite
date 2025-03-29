@@ -6,6 +6,7 @@ namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationView : Component<ApplicationState>
 {
+    internal static int AppStateVersion;
     internal static ApplicationState AppState;
 
     enum Icon
@@ -93,6 +94,8 @@ sealed class ApplicationView : Component<ApplicationState>
     protected override Task OverrideStateFromPropsBeforeRender()
     {
         AppState = state;
+
+        AppStateVersion++;
 
         Client.RefreshComponentPreview();
 
