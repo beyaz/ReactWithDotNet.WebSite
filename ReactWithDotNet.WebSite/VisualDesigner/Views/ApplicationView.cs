@@ -33,8 +33,6 @@ sealed class ApplicationView : Component<ApplicationState>
         get { return FindTreeNodeByTreePath(state.Project.Components.First(x => x.Name == state.CurrentComponentName).RootElement, state.CurrentVisualElementTreePath); }
     }
 
-    
-
     IReadOnlyList<string> StyleAttributeNameSuggestions
     {
         get { return StyleProperties.Select(x => x.Name).ToList(); }
@@ -96,6 +94,8 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         AppState = state;
 
+        Client.RefreshComponentPreview();
+
         return Task.CompletedTask;
     }
 
@@ -146,7 +146,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
         return Task.CompletedTask;
     }
-    
+
     Element applicationTopPanel()
     {
         return new FlexRow(UserSelect(none))
@@ -159,23 +159,23 @@ sealed class ApplicationView : Component<ApplicationState>
                 {
                     new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
                     {
-                        OnClick(async _ =>
+                        OnClick(_ =>
                         {
                             state.ScreenWidth -= 10;
-                        
-                            await SaveState();
+
+                            return Task.CompletedTask;
                         }),
-                    
+
                         new IconMinus()
                     },
                     $"{state.ScreenWidth}px",
                     new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
                     {
-                        OnClick(async _ =>
+                        OnClick(_ =>
                         {
                             state.ScreenWidth += 10;
-                        
-                            await SaveState();
+
+                            return Task.CompletedTask;
                         }),
                         new IconPlus()
                     }
@@ -323,7 +323,7 @@ sealed class ApplicationView : Component<ApplicationState>
     Element MainContent()
     {
         var scaleStyle = TransformOrigin("0 0") + Transform($"scale({state.Scale / (double)100})");
-        
+
         return new SplitRow
         {
             sizes = [20, 60, 20],
@@ -365,14 +365,14 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
-    async Task On_CurrentPropertyValueInStyle_Changed(string senderName, string newValue)
+    Task On_CurrentPropertyValueInStyle_Changed(string senderName, string newValue)
     {
         CurrentStyleProperty.Value = newValue;
 
-        await SaveState();
+        return Task.CompletedTask;
     }
 
-    async Task OnCommonSizeClicked(MouseEvent e)
+    Task OnCommonSizeClicked(MouseEvent e)
     {
         state.ScreenWidth = e.currentTarget.data["value"] switch
         {
@@ -385,7 +385,7 @@ sealed class ApplicationView : Component<ApplicationState>
             _     => throw new ArgumentOutOfRangeException()
         };
 
-        await SaveState();
+        return Task.CompletedTask;
     }
 
     Task OnComponentNameChanged(string senderName, string newValue)
@@ -437,18 +437,18 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
-    async Task OnTextChanged(string _, string text)
+    Task OnTextChanged(string _, string text)
     {
         CurrentVisualElement.Text = text;
 
-        await SaveState();
+        return Task.CompletedTask;
     }
 
     Task OnVisualElementTreeItemHovered(string treeItemPath)
     {
         state.HoveredVisualElementTreeItemPath = treeItemPath;
 
-        return SaveState();
+        return Task.CompletedTask;
     }
 
     Task OnVisualElementTreeSelected(string treePath)
@@ -817,16 +817,16 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
             {
-                OnClick(async _ =>
+                OnClick(_ =>
                 {
                     if (state.Scale <= 20)
                     {
-                        return;
+                        return Task.CompletedTask;
                     }
 
                     state.Scale -= 10;
 
-                    await SaveState();
+                    return Task.CompletedTask;
                 }),
                 new IconMinus()
             },
@@ -834,16 +834,16 @@ sealed class ApplicationView : Component<ApplicationState>
             $"%{state.Scale}",
             new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
             {
-                OnClick(async _ =>
+                OnClick(_ =>
                 {
                     if (state.Scale >= 100)
                     {
-                        return;
+                        return Task.CompletedTask;
                     }
 
                     state.Scale += 10;
 
-                    await SaveState();
+                    return Task.CompletedTask;
                 }),
                 new IconPlus()
             }
@@ -924,15 +924,6 @@ sealed class ApplicationView : Component<ApplicationState>
         state.CurrentPropertyIndexInProps = null;
 
         return Task.CompletedTask;
-    }
-
-    async Task SaveState()
-    {
-        AppState = state;
-
-        Client.RefreshComponentPreview();
-
-        await ApplicationStateCache.Save(state);
     }
 
     Task StyleGroupAddClicked(MouseEvent e)
