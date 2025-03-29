@@ -24,6 +24,10 @@ public sealed class ApplicationState
 
     public int ScreenWidth { get; set; }
     
+    public string CurrentProjectName { get; set; }
+    
+    public bool CurrentProjectSettingsPopupIsVisible { get; set; }
+    
     public SettingsTab SettingsCurrentTab { get; set; }
 
     public LeftPanelTab LeftPanelCurrentTab { get; set; }

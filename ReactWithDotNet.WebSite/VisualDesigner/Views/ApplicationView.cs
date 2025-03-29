@@ -345,6 +345,21 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         return OnComponentNameChanged(newValue);
     }
+    
+    Task On_Project_Changed(string senderName, string newValue)
+    {
+        return On_Project_Changed(newValue);
+    }
+    
+    
+    Task On_Project_Changed(string newValue)
+    {
+        state.CurrentProjectName = newValue;
+        
+        // reload project state
+
+        return Task.CompletedTask;
+    }
 
     Task OnComponentNameChanged(string newValue)
     {
@@ -415,8 +430,90 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         return new FlexRow(UserSelect(none))
         {
-            new h3 { "React Visual Designer" },
+           new FlexRowCentered(Gap(16))
+           {
+               new h3 { "React Visual Designer" },
 
+               new FlexRowCentered(Gap(4))
+               {
+                   new FlexRowCentered
+                   {
+                        new IconSettings() + Size(24) + Color(state.CurrentProjectSettingsPopupIsVisible ? Gray600: Gray300) + Hover(Color(Gray600)),
+                        
+                        OnClick(_ =>
+                        {
+                            state.CurrentProjectSettingsPopupIsVisible = !state.CurrentProjectSettingsPopupIsVisible;
+                            
+                            return Task.CompletedTask;
+                        }),
+                        
+                        
+                       state.CurrentProjectSettingsPopupIsVisible ? PositionRelative : null,
+                       state.CurrentProjectSettingsPopupIsVisible ? new FlexColumnCentered(PositionAbsolute, Top(24), Left(16), Zindex2)
+                       {
+                           Background(White), Border(Solid(1, Theme.BorderColor)), BorderRadius(4), Padding(8),
+                           
+                           Width(400),
+                           
+                           new FlexColumn(WidthFull, Gap(16))
+                           {
+                               new FlexRow(Gap(4))
+                               {
+                                   new MagicInput
+                                   {
+                                      Placeholder = "New component name",
+                                      Name = string.Empty,
+                                      Value = null
+                                   },
+                                   
+                                   new div(Padding(4),Border(Solid(1, Theme.BorderColor)), BorderRadius(4))
+                                   {
+                                       "Add New Component"
+                                   }
+                               },
+                               
+                               new FlexRowCentered(WidthFull, Height(300))
+                               {
+                                   new Editor
+                                   {
+                                       defaultLanguage          = "json",
+                                       valueBind                = () => state.JsonTextInComponentSettings,
+                                       valueBindDebounceTimeout = 700,
+                                       valueBindDebounceHandler = JsonTextInComponentSettingsUpdatedByUser,
+                                       options =
+                                       {
+                                           renderLineHighlight = "none",
+                                           fontFamily          = "'IBM Plex Mono Medium', 'Courier New', monospace",
+                                           fontSize            = 11,
+                                           minimap             = new { enabled = false },
+                                           formatOnPaste       = true,
+                                           formatOnType        = true,
+                                           automaticLayout     = true,
+                                           lineNumbers         = false
+                                       }
+                                   }
+                               }
+                               
+                           }
+                           
+                           
+                           
+                           
+                       }: null
+                       
+                   },
+
+                   new MagicInput
+                   {
+                       Name = string.Empty,
+
+                       Suggestions = GetProjectNames(state),
+                       Value       = state.CurrentProjectName,
+                       OnChange    = On_Project_Changed,
+                       FitContent  = true
+                   }
+               }
+           },
             new FlexRowCentered(Gap(24))
             {
                 new FlexRowCentered(Gap(4))

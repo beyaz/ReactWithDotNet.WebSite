@@ -7,7 +7,7 @@ namespace ReactWithDotNet.VisualDesigner.Views;
 
 static class ApplicationStateCache
 {
-    static readonly string CacheDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ReactVisualDesigner") +
+    public static readonly string CacheDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ReactVisualDesigner") +
                                             Path.DirectorySeparatorChar;
 
     static readonly object fileLock = new();

@@ -6,4 +6,9 @@ static class ApplicationLogic
     {
         return ["MD", "XXL", "state.user.isActive", "MD: state.user.isActive", "XXL: state.user.isActive"];
     }
+
+    public static IReadOnlyList<string> GetProjectNames(ApplicationState state)
+    {
+        return ApplicationDatabase.GetAllProjects().Select(x => x.Name).ToList();
+    }
 }
