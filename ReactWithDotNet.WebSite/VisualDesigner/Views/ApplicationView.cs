@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using ReactWithDotNet.ThirdPartyLibraries.MonacoEditorReact;
-using ReactWithDotNet.UIDesigner;
 using Page = ReactWithDotNet.WebSite.Page;
 
 namespace ReactWithDotNet.VisualDesigner.Views;
@@ -9,16 +8,28 @@ sealed class ApplicationView : Component<ApplicationView.State>
 {
     internal static State AppState;
 
+    internal enum LeftPanelTab
+    {
+        ElementTree,
+        Settings
+    }
+
+    internal enum SettingsTab
+    {
+        Props,
+        State,
+        Other
+    }
+
     enum Icon
     {
         add,
         remove
     }
 
-    public static string UrlPath => "/$";
-    internal static string UrlPathOfComponentPreview => $"{UrlPath}?preview=true";
-
     IReadOnlyList<string> BooleanSuggestions => ["MD", "XXL", "state.user.isActive", "MD: state.user.isActive", "XXL: state.user.isActive"];
+
+    ComponentModel CurrentComponent => state.Project.Components.First(x => x.Name == state.CurrentComponentName);
 
     PropertyGroupModel CurrentStyleGroup => CurrentVisualElement.StyleGroups[state.CurrentStyleGroupIndex!.Value];
 
@@ -85,7 +96,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
             ScreenWidth                  = 400,
             ScreenHeight                 = 400,
             Scale                        = 100,
-            LeftPanelCurrentTab      = LeftPanelTab.ElementTree,
+            LeftPanelCurrentTab          = LeftPanelTab.ElementTree,
             Project                      = Dummy.ProjectModel,
             CurrentVisualElementTreePath = null
         };
@@ -276,6 +287,29 @@ sealed class ApplicationView : Component<ApplicationView.State>
         return Task.CompletedTask;
     }
 
+    Task JsonTextInComponentSettingsUpdatedByUser()
+    {
+        state.JsonTextInComponentSettings = JsonPrettify(state.JsonTextInComponentSettings);
+
+        switch (state.SettingsCurrentTab)
+        {
+            case SettingsTab.Props:
+                CurrentComponent.PropsAsJson = state.JsonTextInComponentSettings;
+                return Task.CompletedTask;
+
+            case SettingsTab.State:
+                CurrentComponent.StateAsJson = state.JsonTextInComponentSettings;
+                return Task.CompletedTask;
+
+            case SettingsTab.Other:
+                CurrentComponent.OtherAsJson = state.JsonTextInComponentSettings;
+                return Task.CompletedTask;
+
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
     Element MainContent()
     {
         return new SplitRow
@@ -284,7 +318,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
             children =
             {
                 PartLeftPanel() + BorderBottomLeftRadius(8) + OverflowAuto,
-                
+
                 new FlexColumn(AlignItemsCenter, FlexGrow(1), Padding(7), MarginLeft(40), ScaleStyle, OverflowXAuto)
                 {
                     createHorizontalRuler() + Width(state.ScreenWidth) + MarginTop(12),
@@ -346,7 +380,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
     {
         return OnComponentNameChanged(newValue);
     }
-    
+
     Task OnComponentNameChanged(string newValue)
     {
         state.CurrentComponentName = newValue;
@@ -355,11 +389,9 @@ sealed class ApplicationView : Component<ApplicationView.State>
 
         if (state.SettingsCurrentTab == SettingsTab.Props)
         {
-            state.JsonTextInComponentSettings = componentModel.PropsAsJson;    
+            state.JsonTextInComponentSettings = componentModel.PropsAsJson;
         }
-        
-        
-        
+
         state.CurrentVisualElementTreePath = null;
 
         return Task.CompletedTask;
@@ -375,7 +407,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
     Task OnSaveTabClicked(MouseEvent e)
     {
         this.SuccessNotification("Successfully saved.");
-        
+
         return Task.CompletedTask;
     }
 
@@ -393,21 +425,26 @@ sealed class ApplicationView : Component<ApplicationView.State>
         return Task.CompletedTask;
     }
 
-    Task OnVisualElementTreeSelected(string treePath)
+    async Task OnTextChanged(string _, string text)
     {
-        state.CurrentVisualElementTreePath = treePath;
+        CurrentVisualElement.Text = text;
 
-        return Task.CompletedTask;
+        await SaveState();
     }
-    
+
     Task OnVisualElementTreeItemHovered(string treeItemPath)
     {
         state.HoveredVisualElementTreeItemPath = treeItemPath;
 
         return SaveState();
     }
-    
-    
+
+    Task OnVisualElementTreeSelected(string treePath)
+    {
+        state.CurrentVisualElementTreePath = treePath;
+
+        return Task.CompletedTask;
+    }
 
     Element PartLeftPanel()
     {
@@ -415,11 +452,11 @@ sealed class ApplicationView : Component<ApplicationView.State>
         {
             Name = string.Empty,
 
-            Suggestions = state.Project.Components.Select(x => x.Name).ToList(),
-            Value       = state.CurrentComponentName,
-            OnChange    = OnComponentNameChanged,
+            Suggestions       = state.Project.Components.Select(x => x.Name).ToList(),
+            Value             = state.CurrentComponentName,
+            OnChange          = OnComponentNameChanged,
             IsTextAlignCenter = true,
-            IsBold = true
+            IsBold            = true
         };
 
         return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"), Background(White))
@@ -443,111 +480,23 @@ sealed class ApplicationView : Component<ApplicationView.State>
                 }
             },
 
-            When(state.LeftPanelCurrentTab == LeftPanelTab.ElementTree, () =>new VisualElementTreeView
+            When(state.LeftPanelCurrentTab == LeftPanelTab.ElementTree, () => new VisualElementTreeView
             {
-                TreeItemHover    = OnVisualElementTreeItemHovered,
-                MouseLeave       = () => { state.HoveredVisualElementTreeItemPath = null; return Task.CompletedTask;},
+                TreeItemHover = OnVisualElementTreeItemHovered,
+                MouseLeave = () =>
+                {
+                    state.HoveredVisualElementTreeItemPath = null;
+                    return Task.CompletedTask;
+                },
                 SelectionChanged = OnVisualElementTreeSelected,
                 SelectedPath     = state.CurrentVisualElementTreePath,
                 Model            = state.Project.Components.FirstOrDefault(x => x.Name == state.CurrentComponentName)?.RootElement
             }),
-            
+
             When(state.LeftPanelCurrentTab == LeftPanelTab.Settings, PartSettingsPanel)
         };
     }
 
-    ComponentModel CurrentComponent=> state.Project.Components.First(x => x.Name == state.CurrentComponentName);
-    
-    Element PartSettingsPanel()
-    {
-        return new FlexColumn(SizeFull)
-        {
-            new FlexRow(JustifyContentSpaceAround, Background(Gray100), PaddingY(4), CursorDefault, Opacity(0.7))
-            {
-                new FlexRowCentered(When(state.SettingsCurrentTab == SettingsTab.Props, FontWeightBold))
-                {
-                    "Props", 
-                    PaddingX(8), OnClick(_ =>
-                    {
-                        state.SettingsCurrentTab = SettingsTab.Props;
-
-                        state.JsonTextInComponentSettings = CurrentComponent.PropsAsJson;
-                        
-                        return Task.CompletedTask;
-                    })
-                },
-                new FlexRowCentered(When(state.SettingsCurrentTab == SettingsTab.State, FontWeightBold))
-                {
-                    "State", 
-                    PaddingX(8), OnClick(_ =>
-                    {
-                        state.SettingsCurrentTab     = SettingsTab.State; 
-                        
-                        state.JsonTextInComponentSettings = CurrentComponent.StateAsJson;
-                        
-                        return Task.CompletedTask;
-                    })
-                },
-                new FlexRowCentered(When(state.SettingsCurrentTab == SettingsTab.Other, FontWeightBold))
-                {
-                    "Other", 
-                    PaddingX(8), OnClick(_ =>
-                    {
-                        state.SettingsCurrentTab = SettingsTab.Other; 
-                        
-                        state.JsonTextInComponentSettings = CurrentComponent.OtherAsJson;
-                        
-                        return Task.CompletedTask;
-                    })
-                }
-            },
-            new FlexColumnCentered(SizeFull)
-            {
-                new Editor
-                {
-                    defaultLanguage = "json",
-                    valueBind       = () => state.JsonTextInComponentSettings,
-                    valueBindDebounceTimeout = 700,
-                    valueBindDebounceHandler = JsonTextInComponentSettingsUpdatedByUser,
-                    options =
-                    {
-                        renderLineHighlight = "none",
-                        fontFamily          = "'IBM Plex Mono Medium', 'Courier New', monospace",
-                        fontSize            = 11,
-                        minimap             = new { enabled = false },
-                        formatOnPaste       = true,
-                        formatOnType        = true,
-                        automaticLayout     = true,
-                        lineNumbers         = false
-                    }
-                }
-            }
-        };
-    }
-
-    Task JsonTextInComponentSettingsUpdatedByUser()
-    {
-        state.JsonTextInComponentSettings = JsonPrettify(state.JsonTextInComponentSettings);
-
-        switch (state.SettingsCurrentTab)
-        {
-            case SettingsTab.Props:
-                CurrentComponent.PropsAsJson = state.JsonTextInComponentSettings;
-                return Task.CompletedTask;
-            
-            case SettingsTab.State:
-                CurrentComponent.StateAsJson = state.JsonTextInComponentSettings;
-                return Task.CompletedTask;
-            
-            case SettingsTab.Other:
-                CurrentComponent.OtherAsJson = state.JsonTextInComponentSettings;
-                return Task.CompletedTask;
-            
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
-    
     Element PartMediaSizeButtons()
     {
         return new FlexRow(JustifyContentSpaceAround, AlignItemsCenter, Gap(16))
@@ -668,12 +617,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
             };
         }
     }
-    async Task OnTextChanged(string _, string text)
-    {
-        CurrentVisualElement.Text = text;
 
-        await SaveState();
-    }
     Element PartRightPanel()
     {
         if (!state.CurrentVisualElementTreePath.HasValue())
@@ -686,8 +630,6 @@ sealed class ApplicationView : Component<ApplicationView.State>
         tagSuggestions.AddRange(state.Project.Components.Where(c => c.Name != state.CurrentComponentName).Select(x => x.Name));
 
         var visualElementModel = CurrentVisualElement;
-
-        
 
         return new FlexColumn(BorderLeft(1, dotted, "#d9d9d9"), PaddingX(2), Gap(8), OverflowYAuto, Background(White))
         {
@@ -703,7 +645,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
                     OnChange    = OnTagNameChanged
                 } + Width(6, 10)
             },
-            
+
             new FlexRow(WidthFull, Gap(4))
             {
                 new label { "Text", FontWeightBold, Width(4, 10), TextAlignRight },
@@ -896,6 +838,73 @@ sealed class ApplicationView : Component<ApplicationView.State>
         };
     }
 
+    Element PartSettingsPanel()
+    {
+        return new FlexColumn(SizeFull)
+        {
+            new FlexRow(JustifyContentSpaceAround, Background(Gray100), PaddingY(4), CursorDefault, Opacity(0.7))
+            {
+                new FlexRowCentered(When(state.SettingsCurrentTab == SettingsTab.Props, FontWeightBold))
+                {
+                    "Props",
+                    PaddingX(8), OnClick(_ =>
+                    {
+                        state.SettingsCurrentTab = SettingsTab.Props;
+
+                        state.JsonTextInComponentSettings = CurrentComponent.PropsAsJson;
+
+                        return Task.CompletedTask;
+                    })
+                },
+                new FlexRowCentered(When(state.SettingsCurrentTab == SettingsTab.State, FontWeightBold))
+                {
+                    "State",
+                    PaddingX(8), OnClick(_ =>
+                    {
+                        state.SettingsCurrentTab = SettingsTab.State;
+
+                        state.JsonTextInComponentSettings = CurrentComponent.StateAsJson;
+
+                        return Task.CompletedTask;
+                    })
+                },
+                new FlexRowCentered(When(state.SettingsCurrentTab == SettingsTab.Other, FontWeightBold))
+                {
+                    "Other",
+                    PaddingX(8), OnClick(_ =>
+                    {
+                        state.SettingsCurrentTab = SettingsTab.Other;
+
+                        state.JsonTextInComponentSettings = CurrentComponent.OtherAsJson;
+
+                        return Task.CompletedTask;
+                    })
+                }
+            },
+            new FlexColumnCentered(SizeFull)
+            {
+                new Editor
+                {
+                    defaultLanguage          = "json",
+                    valueBind                = () => state.JsonTextInComponentSettings,
+                    valueBindDebounceTimeout = 700,
+                    valueBindDebounceHandler = JsonTextInComponentSettingsUpdatedByUser,
+                    options =
+                    {
+                        renderLineHighlight = "none",
+                        fontFamily          = "'IBM Plex Mono Medium', 'Courier New', monospace",
+                        fontSize            = 11,
+                        minimap             = new { enabled = false },
+                        formatOnPaste       = true,
+                        formatOnType        = true,
+                        automaticLayout     = true,
+                        lineNumbers         = false
+                    }
+                }
+            }
+        };
+    }
+
     Task RemoveCurrentPropertyInProps(MouseEvent e)
     {
         CurrentVisualElement.Properties.RemoveAt(state.CurrentPropertyIndexInProps!.Value);
@@ -908,7 +917,7 @@ sealed class ApplicationView : Component<ApplicationView.State>
     async Task SaveState()
     {
         AppState = state;
-        
+
         Client.RefreshComponentPreview();
 
         await Task.Delay(1);
@@ -964,12 +973,12 @@ sealed class ApplicationView : Component<ApplicationView.State>
         public int? CurrentStyleGroupIndex { get; set; }
 
         public string CurrentVisualElementTreePath { get; set; }
-        
+
         public string HoveredVisualElementTreeItemPath { get; set; }
 
+        public string JsonTextInComponentSettings { get; set; }
+
         public LeftPanelTab LeftPanelCurrentTab { get; set; }
-        
-        public SettingsTab SettingsCurrentTab { get; set; }
 
         public ProjectModel Project { get; set; }
 
@@ -978,18 +987,8 @@ sealed class ApplicationView : Component<ApplicationView.State>
         public int ScreenHeight { get; init; }
 
         public int ScreenWidth { get; set; }
-        
-        public string JsonTextInComponentSettings { get; set; }
-    }
 
-    internal enum LeftPanelTab
-    {
-        ElementTree, Settings
-    }
-    
-    internal enum SettingsTab
-    {
-        Props,State,Other
+        public SettingsTab SettingsCurrentTab { get; set; }
     }
 
     class PropInputLocation
@@ -1085,7 +1084,7 @@ sealed class ApplicationPreview : Component
             exceptionOccurredInRender.ToString()
         };
     }
-    
+
     protected override Task constructor()
     {
         Client.ListenEvent("RefreshComponentPreview", Refresh);
