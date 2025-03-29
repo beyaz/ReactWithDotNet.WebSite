@@ -432,7 +432,7 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             new FlexRowCentered
             {
-                new IconSettings() + Size(24) + Color(state.CurrentProjectSettingsPopupIsVisible ? Gray600 : Gray300) + Hover(Color(Gray600)),
+                new IconPlus() + Size(24) + Color(state.CurrentProjectSettingsPopupIsVisible ? Gray600 : Gray300) + Hover(Color(Gray600)),
 
                 OnClick(_ =>
                 {
@@ -443,24 +443,37 @@ sealed class ApplicationView : Component<ApplicationState>
 
 
                 state.CurrentProjectSettingsPopupIsVisible ? PositionRelative : null,
-                state.CurrentProjectSettingsPopupIsVisible ? new FlexColumnCentered(PositionAbsolute, Top(24), Left(16), Zindex2)
+                state.CurrentProjectSettingsPopupIsVisible ? new FlexColumn(PositionAbsolute, Top(24), Left(16), Zindex2)
                 {
                     Background(White), Border(Solid(1, Theme.BorderColor)), BorderRadius(4), Padding(8),
 
-                    Width(400),
+                    Width(300),
 
-                    new FlexRow(WidthFull, Gap(4))
+                    new MagicInput
                     {
-                        new MagicInput
+                        Placeholder = "New component name",
+                        Name        = string.Empty,
+                        Value       = string.Empty,
+                        AutoFocus   = true,
+                        OnChange = async (_, newValue) =>
                         {
-                            Placeholder = "New component name",
-                            Name        = string.Empty,
-                            Value       = null
-                        },
 
-                        new div(Padding(4), Border(Solid(1, Theme.BorderColor)), BorderRadius(4))
-                        {
-                            "Add New Component"
+                            if (newValue.HasNoValue())
+                            {
+                                this.FailNotification("Component name is empty.");
+                                    
+                                return;
+                            }
+                                
+                            var component = Dummy.ProjectModel.Components[0];
+                                
+                            component.Name = newValue;
+                                
+                            state.Project.Components.Add(component);
+
+                            await OnComponentNameChanged(newValue);
+
+                            state.CurrentProjectSettingsPopupIsVisible = false;
                         }
                     }
 
