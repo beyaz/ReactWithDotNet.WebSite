@@ -76,7 +76,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
     protected override async Task constructor()
     {
-        AppState = state = new()
+        AppState = state = ApplicationStateCache.ReadState() ?? new()
         {
             ScreenWidth                  = 400,
             ScreenHeight                 = 400,
@@ -932,7 +932,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
         Client.RefreshComponentPreview();
 
-        await Task.Delay(1);
+        await ApplicationStateCache.Save(state);
     }
 
     Task StyleGroupAddClicked(MouseEvent e)
