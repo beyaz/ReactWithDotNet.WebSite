@@ -1,13 +1,13 @@
 ﻿namespace ReactWithDotNet.VisualDesigner.Models;
 
-sealed record PropertyInfo
+public sealed record PropertyInfo
 {
     public string Name { get; init; }
 
     public IReadOnlyList<string> Suggestions { get; init; }
 }
 
-sealed record PropertyModel
+public sealed record PropertyModel
 {
     // @formatter:off
     
@@ -18,7 +18,7 @@ sealed record PropertyModel
     // @formatter:on
 }
 
-sealed record PropertyGroupModel
+public sealed record PropertyGroupModel
 {
     // @formatter:off
     
@@ -29,7 +29,7 @@ sealed record PropertyGroupModel
     // @formatter:on
 }
 
-sealed record VisualElementModel
+public sealed record VisualElementModel
 {
     // @formatter:off
     
@@ -48,7 +48,7 @@ sealed record VisualElementModel
     // @formatter:on
 }
 
-sealed class ComponentModel
+public sealed class ComponentModel
 {
     // @formatter:off
     
@@ -65,7 +65,7 @@ sealed class ComponentModel
     // @formatter:on
 }
 
-sealed class ProjectModel
+public sealed class ProjectModel
 {
     // @formatter:off
     
@@ -78,7 +78,7 @@ sealed class ProjectModel
     // @formatter:on
 }
 
-sealed class ApplicationModel
+public sealed class ApplicationModel
 {
     public List<ProjectModel> Projects { get; set; } = [];
 }
