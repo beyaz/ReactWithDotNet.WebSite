@@ -11,17 +11,17 @@ class ApplicationDatabase
 
     static string ConnectionString => $"Data Source={CacheDirectory}app.db";
 
-    static IReadOnlyList<Project> Projects { get; set; }
+    static IReadOnlyList<ProjectEntity> Projects { get; set; }
 
-    public static IReadOnlyList<Project> GetAllProjects()
+    public static IReadOnlyList<ProjectEntity> GetAllProjects()
     {
         if (Projects is null)
         {
-            const string query = $"SELECT * FROM {nameof(Project)}";
+            const string query = "SELECT * FROM Project";
 
             using var connection = new SqliteConnection(ConnectionString);
 
-            Projects = connection.QueryAsync<Project>(query).GetAwaiter().GetResult().ToList();
+            Projects = connection.QueryAsync<ProjectEntity>(query).GetAwaiter().GetResult().ToList();
         }
 
         return Projects;
