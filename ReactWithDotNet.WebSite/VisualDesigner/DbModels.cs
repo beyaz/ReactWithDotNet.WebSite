@@ -5,7 +5,8 @@ namespace ReactWithDotNet.VisualDesigner.DbModels;
 [Table("Project")]
 sealed class ProjectEntity
 {
-    public int RecordId { get; init; }
+    [Key]
+    public int Id { get; init; }
     
     public string Name { get; init; }
     
@@ -13,11 +14,12 @@ sealed class ProjectEntity
 }
 
 [Table("Component")]
-public sealed class ComponentEntity
+public sealed record ComponentEntity
 {
     // @formatter:off
     
-    public int RecordId { get; init; }
+    [Key]
+    public int Id { get; init; }
     
     public int ProjectId { get; init; }
     
@@ -29,7 +31,7 @@ public sealed class ComponentEntity
     
     public string RootElementAsJson { get; init; }
 
-    public string UserName { get; init; }
+    public string UserId { get; init; }
     
     // @formatter:on
 }

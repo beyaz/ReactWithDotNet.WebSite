@@ -9,7 +9,7 @@ static class Dummy
         [
             new ComponentModel
             {
-                Name        = "LoginIcon",
+                Name        = "SampleComponent1",
                 PropsAsJson = "{'isActive': true}",
                 StateAsJson = "{'user': { 'name': 'Tom', 'year': 41 }}",
                 RootElement = new()
@@ -98,7 +98,7 @@ static class Dummy
 
             new ComponentModel
             {
-                Name        = "SiteTitle",
+                Name        = "SampleComponent2",
                 PropsAsJson = "{'isActive': true}",
                 StateAsJson = "{'user': { 'name': 'Tom', 'year': 41 }}",
                 RootElement = new()

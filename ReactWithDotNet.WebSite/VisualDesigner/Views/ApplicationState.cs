@@ -3,11 +3,6 @@
 public enum LeftPanelTab
 {
     ElementTree,
-    Settings
-}
-
-public enum SettingsTab
-{
     Props,
     State
 }
@@ -23,20 +18,19 @@ public sealed class ApplicationState
 
     public int ScreenWidth { get; set; }
     
-    public string CurrentProjectName { get; set; }
+    public int ProjectId { get; set; }
+    
+    public int ComponentId { get; set; }
+    
+    public VisualElementModel ComponentRootElement { get; set; }
     
     public bool CurrentProjectSettingsPopupIsVisible { get; set; }
     
-    public SettingsTab SettingsCurrentTab { get; set; }
-
     public LeftPanelTab LeftPanelCurrentTab { get; set; }
     
     public string JsonTextInComponentSettings { get; set; }
     
     // VISUAL ELEMENT STATE
-    public ProjectModel Project { get; set; }
-    
-    public string CurrentComponentName { get; set; }
     
     public string CurrentVisualElementTreePath { get; set; }
     
@@ -50,5 +44,7 @@ public sealed class ApplicationState
     // PROPS
     public int? CurrentPropertyIndexInProps { get; set; }
     
+    public string UserId { get; init; }
+
     // @formatter:on
 }

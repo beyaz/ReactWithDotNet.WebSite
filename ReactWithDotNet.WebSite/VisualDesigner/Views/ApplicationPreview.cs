@@ -1,4 +1,6 @@
-﻿namespace ReactWithDotNet.VisualDesigner.Views;
+﻿using Newtonsoft.Json;
+
+namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationPreview : Component
 {
@@ -34,7 +36,7 @@ sealed class ApplicationPreview : Component
             };
         }
 
-        var componentModel = appState.Project.Components.FirstOrDefault(x => x.Name == appState.CurrentComponentName);
+        var componentModel = GetSelectedComponent(appState);
         if (componentModel is null)
         {
             return new div(Size(200), Background(Gray100))
@@ -43,7 +45,12 @@ sealed class ApplicationPreview : Component
             };
         }
 
-        var rootElement = componentModel.RootElement;
+        var rootElement = JsonConvert.DeserializeObject<VisualElementModel>(componentModel.RootElementAsJson ?? string.Empty);
+        if (rootElement is null)
+        {
+            return null;
+        }
+        
         if (appState.HoveredVisualElementTreeItemPath.HasValue())
         {
             rootElement = FindTreeNodeByTreePath(rootElement, appState.HoveredVisualElementTreeItemPath);

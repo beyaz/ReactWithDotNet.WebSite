@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using Dapper.Contrib.Extensions;
+using Newtonsoft.Json;
 using ReactWithDotNet.ThirdPartyLibraries.MonacoEditorReact;
 using Page = ReactWithDotNet.WebSite.Page;
 
@@ -15,8 +17,6 @@ sealed class ApplicationView : Component<ApplicationState>
         remove
     }
 
-    ComponentModel CurrentComponent => state.Project.Components.First(x => x.Name == state.CurrentComponentName);
-
     PropertyGroupModel CurrentStyleGroup => CurrentVisualElement.StyleGroups[state.CurrentStyleGroupIndex!.Value];
 
     PropertyModel CurrentStyleProperty
@@ -29,10 +29,7 @@ sealed class ApplicationView : Component<ApplicationState>
         }
     }
 
-    VisualElementModel CurrentVisualElement
-    {
-        get { return FindTreeNodeByTreePath(state.Project.Components.First(x => x.Name == state.CurrentComponentName).RootElement, state.CurrentVisualElementTreePath); }
-    }
+    VisualElementModel CurrentVisualElement => FindTreeNodeByTreePath(state.ComponentRootElement, state.CurrentVisualElementTreePath);
 
     IReadOnlyList<string> StyleAttributeNameSuggestions
     {
@@ -75,19 +72,21 @@ sealed class ApplicationView : Component<ApplicationState>
 
     protected override async Task constructor()
     {
-        AppState = state = ApplicationStateCache.ReadState() ?? new()
+        AppState = state = new()
         {
+            ProjectId = 1,
+            ComponentId = 1,
+            
             ScreenWidth                  = 400,
             ScreenHeight                 = 400,
             Scale                        = 100,
             LeftPanelCurrentTab          = LeftPanelTab.ElementTree,
-            Project                      = Dummy.ProjectModel,
             CurrentVisualElementTreePath = null
         };
 
-        if (state.CurrentComponentName is null && state.Project.Components.Count > 0)
+        if (state.ComponentId > 0)
         {
-            await OnComponentNameChanged(state.Project.Components[0].Name);
+            await ChangeSelectedComponent(state.ComponentId);
         }
     }
 
@@ -254,15 +253,13 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         state.JsonTextInComponentSettings = JsonPrettify(state.JsonTextInComponentSettings);
 
-        switch (state.SettingsCurrentTab)
+        switch (state.LeftPanelCurrentTab)
         {
-            case SettingsTab.Props:
-                CurrentComponent.PropsAsJson = state.JsonTextInComponentSettings;
-                return Task.CompletedTask;
+            case LeftPanelTab.Props:
+                return DbSave(state, x =>  x with { PropsAsJson = state.JsonTextInComponentSettings } );
 
-            case SettingsTab.State:
-                CurrentComponent.StateAsJson = state.JsonTextInComponentSettings;
-                return Task.CompletedTask;
+            case LeftPanelTab.State:
+                return DbSave(state, x =>  x with { StateAsJson = state.JsonTextInComponentSettings } );
 
             default:
                 throw new ArgumentOutOfRangeException();
@@ -350,49 +347,60 @@ sealed class ApplicationView : Component<ApplicationState>
     
     Task On_Project_Changed(string newValue)
     {
-        state.CurrentProjectName = newValue;
+        var projectEntity = GetAllProjects().FirstOrDefault(x=>x.Name == newValue);
+        if (projectEntity is null)
+        {
+            this.FailNotification("Project not found. @" + newValue);
+            
+            return Task.CompletedTask;
+        }
+
+        state.ProjectId = projectEntity.Id;
         
-        // reload project state
+        // TODO: reload project state
 
         return Task.CompletedTask;
     }
 
-    Task OnComponentNameChanged(string newValue)
+    Task ChangeSelectedComponent(int componentId)
     {
-        state.CurrentComponentName = newValue;
+        
+        state.ComponentId = componentId;
 
-        var componentModel = state.Project.Components.First(x => x.Name == newValue);
-
-        if (state.SettingsCurrentTab == SettingsTab.Props)
+        var componentModel = GetSelectedComponent(state);
+        
+        if (state.LeftPanelCurrentTab == LeftPanelTab.Props)
         {
             state.JsonTextInComponentSettings = componentModel.PropsAsJson;
         }
+        else if (state.LeftPanelCurrentTab == LeftPanelTab.State)
+        {
+            state.JsonTextInComponentSettings = componentModel.StateAsJson;
+        }
+        
+        state.ComponentRootElement = JsonConvert.DeserializeObject<VisualElementModel>(componentModel.RootElementAsJson ?? string.Empty);
+        if (state.ComponentRootElement is null)
+        {
+            state.ComponentRootElement = new()
+            {
+                Tag = "div"
+            };
+        }
+        
 
         state.CurrentVisualElementTreePath = null;
 
         return Task.CompletedTask;
     }
-
-    Task OnElementTreeTabClicked(MouseEvent e)
+    
+    Task OnComponentNameChanged(string newValue)
     {
-        state.LeftPanelCurrentTab = LeftPanelTab.ElementTree;
-
-        return Task.CompletedTask;
+        return ChangeSelectedComponent(GetAllComponentsInProject(state).First(x => x.Name == newValue).Id);
     }
 
-    Task OnSaveTabClicked(MouseEvent e)
-    {
-        this.SuccessNotification("Successfully saved.");
+    
 
-        return Task.CompletedTask;
-    }
 
-    Task OnSettingsTabClicked(MouseEvent e)
-    {
-        state.LeftPanelCurrentTab = LeftPanelTab.Settings;
-
-        return Task.CompletedTask;
-    }
 
     Task OnTagNameChanged(string senderName, string newValue)
     {
@@ -461,18 +469,22 @@ sealed class ApplicationView : Component<ApplicationState>
                                 return;
                             }
 
-                            if (state.Project.Components.Any(x=>x.Name == newValue))
+                            if (GetAllComponentsInProject(state).Any(x=>x.Name == newValue))
                             {
                                 this.FailNotification("Has already same named component.");
                                     
                                 return;
                             }
-                                
-                            var component = Dummy.ProjectModel.Components[0];
-                                
-                            component.Name = newValue;
-                                
-                            state.Project.Components.Add(component);
+
+
+                            var newDbRecord = new ComponentEntity
+                            {
+                                Name      = newValue,
+                                ProjectId = state.ProjectId,
+                                UserId    = state.UserId
+                            };
+
+                            await DbOperation(db => db.InsertAsync(newDbRecord));
 
                             await OnComponentNameChanged(newValue);
 
@@ -489,7 +501,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 Name = string.Empty,
 
                 Suggestions = GetProjectNames(state),
-                Value       = state.CurrentProjectName,
+                Value       = GetAllProjects().FirstOrDefault(p=>p.Id == state.ProjectId)?.Name,
                 OnChange    = On_Project_Changed,
                 FitContent  = true
             }
@@ -555,31 +567,78 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             Name = string.Empty,
 
-            Suggestions       = state.Project.Components.Select(x => x.Name).ToList(),
-            Value             = state.CurrentComponentName,
+            Suggestions       = GetSuggestionsForComponentSelection(state),
+            Value             = GetSelectedComponent(state).Name,
             OnChange          = OnComponentNameChanged,
             IsTextAlignCenter = true,
             IsBold            = true
         };
 
+        var removeIconInLayersTab = CreateIcon(Icon.remove, 16);
+        if (state.LeftPanelCurrentTab == LeftPanelTab.ElementTree  && state.CurrentVisualElementTreePath.HasValue())
+        {
+            removeIconInLayersTab.Add(Hover(Color(Blue300), BorderColor(Blue300)));
+        }
+        else
+        {
+            removeIconInLayersTab.Add(VisibilityCollapse);
+        }
+        
         return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"), Background(White))
         {
             componentSelector,
-            new FlexRow(WidthFull, AlignItemsCenter, Padding(8, 4), JustifyContentSpaceAround, BorderBottom(1, dotted, "#d9d9d9"), BorderTop(1, dotted, "#d9d9d9"))
+            new FlexRow(WidthFull, FontWeightBold, AlignItemsCenter, Padding(8, 4), JustifyContentSpaceAround, BorderBottom(1, dotted, "#d9d9d9"), BorderTop(1, dotted, "#d9d9d9"))
             {
-                Color(Gray300),
+                Color(Gray300), CursorDefault, UserSelect(none),
 
-                new FlexRowCentered(WidthFull, OnClick(OnElementTreeTabClicked))
+                new FlexRowCentered(WidthFull)
                 {
-                    new IconLayers() + Size(18) + (state.LeftPanelCurrentTab == LeftPanelTab.ElementTree ? Color(Blue300) : null)
+                    removeIconInLayersTab,
+                    
+                    new FlexRowCentered(WidthFull)
+                    {
+                        new IconLayers() + Size(18) + (state.LeftPanelCurrentTab == LeftPanelTab.ElementTree ? Color(Gray500) : null),
+                    
+                        OnClick(_ =>
+                        {
+                            state.LeftPanelCurrentTab = LeftPanelTab.ElementTree; 
+                        
+                            return Task.CompletedTask;
+                        })
+                    },
+                    
+                    CreateIcon(Icon.remove, 16, state.CurrentVisualElementTreePath.HasValue() ?
+                                   [
+                                       OnClick(RemoveCurrentPropertyInProps),
+                                       Hover(Color(Blue300))
+                                   ] :
+                                   [
+                                       Color(Gray100),
+                                       BorderColor(Gray100)
+                                   ]),
                 },
-                new FlexRowCentered(WidthFull, OnClick(OnSettingsTabClicked))
+                
+                
+                new FlexRowCentered(WidthFull, When(state.LeftPanelCurrentTab == LeftPanelTab.Props, Color(Gray500)))
                 {
-                    new IconSettings() + Size(24) + (state.LeftPanelCurrentTab == LeftPanelTab.Settings ? Color(Blue300) : null)
+                    "Props",
+                    PaddingX(8), OnClick(async _ =>
+                    {
+                        state.LeftPanelCurrentTab = LeftPanelTab.Props;
+                        
+                        await DbOperationForCurrentComponent(state, x => { state.JsonTextInComponentSettings = x.PropsAsJson; });
+                    })
                 },
-                new FlexRowCentered(WidthFull, OnClick(OnSaveTabClicked))
+                new FlexRowCentered(WidthFull, Opacity(0.7), When(state.LeftPanelCurrentTab == LeftPanelTab.State, Color(Gray500)))
                 {
-                    new IconSave() + Size(24) + Hover(Color(Blue300))
+                    "State",
+                    PaddingX(8), OnClick(async _ =>
+                    {
+                        state.LeftPanelCurrentTab = LeftPanelTab.State;
+
+                        await DbOperationForCurrentComponent(state, x => { state.JsonTextInComponentSettings = x.StateAsJson; });
+
+                    })
                 }
             },
 
@@ -593,10 +652,31 @@ sealed class ApplicationView : Component<ApplicationState>
                 },
                 SelectionChanged = OnVisualElementTreeSelected,
                 SelectedPath     = state.CurrentVisualElementTreePath,
-                Model            = state.Project.Components.FirstOrDefault(x => x.Name == state.CurrentComponentName)?.RootElement
+                Model            = state.ComponentRootElement
             }),
-
-            When(state.LeftPanelCurrentTab == LeftPanelTab.Settings, PartSettingsPanel)
+            
+            When(state.LeftPanelCurrentTab == LeftPanelTab.Props ||state.LeftPanelCurrentTab == LeftPanelTab.State, ()=>new FlexColumnCentered(SizeFull)
+            {
+                new Editor
+                {
+                    defaultLanguage          = "json",
+                    valueBind                = () => state.JsonTextInComponentSettings,
+                    valueBindDebounceTimeout = 700,
+                    valueBindDebounceHandler = JsonTextInComponentSettingsUpdatedByUser,
+                    options =
+                    {
+                        renderLineHighlight = "none",
+                        fontFamily          = "'IBM Plex Mono Medium', 'Courier New', monospace",
+                        fontSize            = 11,
+                        minimap             = new { enabled = false },
+                        formatOnPaste       = true,
+                        formatOnType        = true,
+                        automaticLayout     = true,
+                        lineNumbers         = false
+                    }
+                }
+            }),
+           
         };
     }
 
@@ -728,10 +808,6 @@ sealed class ApplicationView : Component<ApplicationState>
             return new div();
         }
 
-        var tagSuggestions = new List<string>(TagNameList);
-
-        tagSuggestions.AddRange(state.Project.Components.Where(c => c.Name != state.CurrentComponentName).Select(x => x.Name));
-
         var visualElementModel = CurrentVisualElement;
 
         return new FlexColumn(BorderLeft(1, dotted, "#d9d9d9"), PaddingX(2), Gap(8), OverflowYAuto, Background(White))
@@ -744,7 +820,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 {
                     Name        = string.Empty,
                     Value       = visualElementModel.Tag,
-                    Suggestions = tagSuggestions,
+                    Suggestions = GetTagSuggestions(state),
                     OnChange    = OnTagNameChanged
                 } + Width(6, 10)
             },
@@ -757,7 +833,6 @@ sealed class ApplicationView : Component<ApplicationState>
                 {
                     Name        = string.Empty,
                     Value       = visualElementModel.Text,
-                    Suggestions = tagSuggestions,
                     OnChange    = OnTextChanged
                 } + Width(6, 10)
             },
@@ -941,60 +1016,7 @@ sealed class ApplicationView : Component<ApplicationState>
         };
     }
 
-    Element PartSettingsPanel()
-    {
-        return new FlexColumn(SizeFull)
-        {
-            new FlexRow(JustifyContentSpaceAround, Background(Gray100), PaddingY(4), CursorDefault, Opacity(0.7))
-            {
-                new FlexRowCentered(When(state.SettingsCurrentTab == SettingsTab.Props, FontWeightBold))
-                {
-                    "Props",
-                    PaddingX(8), OnClick(_ =>
-                    {
-                        state.SettingsCurrentTab = SettingsTab.Props;
-
-                        state.JsonTextInComponentSettings = CurrentComponent.PropsAsJson;
-
-                        return Task.CompletedTask;
-                    })
-                },
-                new FlexRowCentered(When(state.SettingsCurrentTab == SettingsTab.State, FontWeightBold))
-                {
-                    "State",
-                    PaddingX(8), OnClick(_ =>
-                    {
-                        state.SettingsCurrentTab = SettingsTab.State;
-
-                        state.JsonTextInComponentSettings = CurrentComponent.StateAsJson;
-
-                        return Task.CompletedTask;
-                    })
-                }
-            },
-            new FlexColumnCentered(SizeFull)
-            {
-                new Editor
-                {
-                    defaultLanguage          = "json",
-                    valueBind                = () => state.JsonTextInComponentSettings,
-                    valueBindDebounceTimeout = 700,
-                    valueBindDebounceHandler = JsonTextInComponentSettingsUpdatedByUser,
-                    options =
-                    {
-                        renderLineHighlight = "none",
-                        fontFamily          = "'IBM Plex Mono Medium', 'Courier New', monospace",
-                        fontSize            = 11,
-                        minimap             = new { enabled = false },
-                        formatOnPaste       = true,
-                        formatOnType        = true,
-                        automaticLayout     = true,
-                        lineNumbers         = false
-                    }
-                }
-            }
-        };
-    }
+    
 
     Task RemoveCurrentPropertyInProps(MouseEvent e)
     {

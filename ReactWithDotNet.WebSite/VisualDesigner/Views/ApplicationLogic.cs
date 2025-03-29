@@ -1,14 +1,82 @@
-﻿namespace ReactWithDotNet.VisualDesigner.Views;
+﻿using Dapper.Contrib.Extensions;
+
+namespace ReactWithDotNet.VisualDesigner.Views;
 
 static class ApplicationLogic
 {
+    public static Task DbOperationForCurrentComponent(ApplicationState state, Func<ComponentEntity, Task> operation)
+    {
+        return DbOperation(async connection =>
+        {
+            var dbRecord = await connection.GetAsync<ComponentEntity>(state.ComponentId);
+
+            await operation(dbRecord);
+        });
+    }
+
+    public static Task DbOperationForCurrentComponent(ApplicationState state, Action<ComponentEntity> operation)
+    {
+        return DbOperation(async connection =>
+        {
+            var dbRecord = await connection.GetAsync<ComponentEntity>(state.ComponentId);
+
+            operation(dbRecord);
+        });
+    }
+
+    public static Task DbSave(ApplicationState state, Func<ComponentEntity, ComponentEntity> modify)
+    {
+        return DbOperation(async connection =>
+        {
+            var dbRecord = await connection.GetAsync<ComponentEntity>(state.ComponentId);
+
+            dbRecord = modify(dbRecord);
+
+            await connection.UpdateAsync(dbRecord);
+        });
+    }
+
+    public static IReadOnlyList<ComponentEntity> GetAllComponentsInProject(ApplicationState state)
+    {
+        var query = $"SELECT * FROM Component WHERE ProjectId = @{nameof(state.ProjectId)}";
+
+        var dbRecords = DbOperation(async connection => (await connection.QueryAsync<ComponentEntity>(query, new{state.ProjectId})).ToList()).GetAwaiter().GetResult();
+
+        return dbRecords;
+    }
+
+    public static IReadOnlyList<string> GetProjectNames(ApplicationState state)
+    {
+        return GetAllProjects().Select(x => x.Name).ToList();
+    }
+
+    public static ComponentEntity GetSelectedComponent(ApplicationState state)
+    {
+        var query = $"SELECT * FROM Component WHERE Id = @{nameof(state.ComponentId)}";
+
+        var dbRecords = DbOperation(async connection => (await connection.QueryAsync<ComponentEntity>(query, new { state.ComponentId })).ToList()).GetAwaiter().GetResult();
+
+        return dbRecords.First();
+    }
+
     public static IReadOnlyList<string> GetStyleGroupConditionSuggestions(ApplicationState state)
     {
         return ["MD", "XXL", "state.user.isActive", "MD: state.user.isActive", "XXL: state.user.isActive"];
     }
 
-    public static IReadOnlyList<string> GetProjectNames(ApplicationState state)
+    public static IReadOnlyList<string> GetSuggestionsForComponentSelection(ApplicationState state)
     {
-        return ApplicationDatabase.GetAllProjects().Select(x => x.Name).ToList();
+        return GetAllComponentsInProject(state).Where(c => c.Id != state.ComponentId).Select(x => x.Name).ToList();
+    }
+
+    public static IReadOnlyList<string> GetTagSuggestions(ApplicationState state)
+    {
+        var suggestions = new List<string>(TagNameList);
+
+        var allComponentsInProject = GetAllComponentsInProject(state);
+
+        suggestions.AddRange(allComponentsInProject.Where(c => c.Id != state.ComponentId).Select(x => x.Name));
+
+        return suggestions;
     }
 }

@@ -19,6 +19,11 @@ sealed class VisualElementTreeView : Component
 
     protected override Element render()
     {
+        if (Model is null)
+        {
+            return new FlexRowCentered (SizeFull){ "Empty" };
+        }
+        
         return new div(CursorPointer, Padding(5), OnMouseLeave(OnMouseLeaveHandler))
         {
             ToVisual(Model, 0, "0"),
