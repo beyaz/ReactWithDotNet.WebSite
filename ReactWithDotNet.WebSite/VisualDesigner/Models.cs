@@ -71,7 +71,5 @@ public sealed class ProjectModel
     
     public List<ComponentModel> Components { get; set; } = [];
     
-    public string OutputDirectoryPath { get; set; }
-    
     // @formatter:on
 }

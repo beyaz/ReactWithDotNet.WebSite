@@ -8,6 +8,8 @@ sealed class ProjectEntity
     public int RecordId { get; init; }
     
     public string Name { get; init; }
+    
+    public string OutputDirectory { get; init; }
 }
 
 [Table("Component")]
