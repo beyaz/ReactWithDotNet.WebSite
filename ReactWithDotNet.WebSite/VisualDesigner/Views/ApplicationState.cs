@@ -9,8 +9,7 @@ public enum LeftPanelTab
 public enum SettingsTab
 {
     Props,
-    State,
-    Other
+    State
 }
 
 public sealed class ApplicationState

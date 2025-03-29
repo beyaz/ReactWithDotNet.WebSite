@@ -12,7 +12,6 @@ static class Dummy
                 Name        = "LoginIcon",
                 PropsAsJson = "{'isActive': true}",
                 StateAsJson = "{'user': { 'name': 'Tom', 'year': 41 }}",
-                OtherAsJson = "{'is': { 'user': 'Tom', 'year': 45 }}",
                 RootElement = new()
                 {
                     Tag       = "div",

@@ -264,10 +264,6 @@ sealed class ApplicationView : Component<ApplicationState>
                 CurrentComponent.StateAsJson = state.JsonTextInComponentSettings;
                 return Task.CompletedTask;
 
-            case SettingsTab.Other:
-                CurrentComponent.OtherAsJson = state.JsonTextInComponentSettings;
-                return Task.CompletedTask;
-
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -971,18 +967,6 @@ sealed class ApplicationView : Component<ApplicationState>
                         state.SettingsCurrentTab = SettingsTab.State;
 
                         state.JsonTextInComponentSettings = CurrentComponent.StateAsJson;
-
-                        return Task.CompletedTask;
-                    })
-                },
-                new FlexRowCentered(When(state.SettingsCurrentTab == SettingsTab.Other, FontWeightBold))
-                {
-                    "Other",
-                    PaddingX(8), OnClick(_ =>
-                    {
-                        state.SettingsCurrentTab = SettingsTab.Other;
-
-                        state.JsonTextInComponentSettings = CurrentComponent.OtherAsJson;
 
                         return Task.CompletedTask;
                     })
