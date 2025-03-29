@@ -93,6 +93,7 @@ sealed class MagicInput : Component<MagicInput.State>
         return Task.CompletedTask;
     }
 
+    [StopPropagation]
     Task OnFocused(FocusEvent e)
     {
         DispatchEvent(OnFocus, [Name]);
@@ -112,6 +113,7 @@ sealed class MagicInput : Component<MagicInput.State>
         };
     }
 
+    [StopPropagation]
     Task OnInputClicked(MouseEvent e)
     {
         state.ShowSuggestions = !state.ShowSuggestions;
