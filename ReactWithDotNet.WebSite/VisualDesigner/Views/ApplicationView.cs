@@ -331,7 +331,7 @@ sealed class ApplicationView : Component<ApplicationState>
             {
                 PartLeftPanel() + BorderBottomLeftRadius(8) + OverflowAuto,
 
-                new FlexColumn(AlignItemsCenter, FlexGrow(1), Padding(7), MarginLeft(40), scaleStyle, OverflowXAuto)
+                new FlexColumn(state.ScreenWidth < 768 ? AlignItemsCenter : AlignItemsFlexStart, FlexGrow(1), Padding(7), MarginLeft(40), scaleStyle, OverflowXAuto)
                 {
                     createHorizontalRuler() + Width(state.ScreenWidth) + MarginTop(12),
                     PartPreview
