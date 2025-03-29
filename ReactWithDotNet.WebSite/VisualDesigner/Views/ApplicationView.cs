@@ -464,6 +464,13 @@ sealed class ApplicationView : Component<ApplicationState>
                                     
                                 return;
                             }
+
+                            if (state.Project.Components.Any(x=>x.Name == newValue))
+                            {
+                                this.FailNotification("Has already same named component.");
+                                    
+                                return;
+                            }
                                 
                             var component = Dummy.ProjectModel.Components[0];
                                 
