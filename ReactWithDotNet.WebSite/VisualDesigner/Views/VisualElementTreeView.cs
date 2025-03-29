@@ -6,16 +6,16 @@ sealed class VisualElementTreeView : Component
 {
     public VisualElementModel Model { get; init; }
 
+    [CustomEvent]
+    public Func<Task> MouseLeave { get; init; }
+
     public string SelectedPath { get; init; }
 
     [CustomEvent]
     public Func<string, Task> SelectionChanged { get; init; }
-    
+
     [CustomEvent]
     public OnTreeItemHover TreeItemHover { get; init; }
-    
-    [CustomEvent]
-    public Func<Task> MouseLeave { get; init; }
 
     protected override Element render()
     {
@@ -24,6 +24,15 @@ sealed class VisualElementTreeView : Component
             ToVisual(Model, 0, "0"),
             WidthFull, HeightFull
         };
+    }
+
+    Task OnMouseEnterHandler(MouseEvent e)
+    {
+        var selectedPath = e.currentTarget.id;
+
+        DispatchEvent(TreeItemHover, [selectedPath]);
+
+        return Task.CompletedTask;
     }
 
     Task OnMouseLeaveHandler(MouseEvent e)
@@ -38,15 +47,6 @@ sealed class VisualElementTreeView : Component
         var selectedPath = e.currentTarget.id;
 
         DispatchEvent(SelectionChanged, [selectedPath]);
-
-        return Task.CompletedTask;
-    }
-    
-    Task OnMouseEnterHandler(MouseEvent e)
-    {
-        var selectedPath = e.currentTarget.id;
-
-        DispatchEvent(TreeItemHover, [selectedPath]);
 
         return Task.CompletedTask;
     }
@@ -81,6 +81,4 @@ sealed class VisualElementTreeView : Component
 
         return returnList;
     }
-
-   
 }

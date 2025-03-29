@@ -4,56 +4,6 @@ using Page = ReactWithDotNet.WebSite.Page;
 
 namespace ReactWithDotNet.VisualDesigner.Views;
 
-public enum LeftPanelTab
-{
-    ElementTree,
-    Settings
-}
-
-public enum SettingsTab
-{
-    Props,
-    State,
-    Other
-}
-
-public sealed class ApplicationState
-{
-    // @formatter:off
-
-    // APPLICATION STATE
-    public int Scale { get; set; }
-
-    public int ScreenHeight { get; init; }
-
-    public int ScreenWidth { get; set; }
-    
-    public SettingsTab SettingsCurrentTab { get; set; }
-
-    public LeftPanelTab LeftPanelCurrentTab { get; set; }
-    
-    public string JsonTextInComponentSettings { get; set; }
-    
-    // VISUAL ELEMENT STATE
-    public ProjectModel Project { get; set; }
-    
-    public string CurrentComponentName { get; set; }
-    
-    public string CurrentVisualElementTreePath { get; set; }
-    
-    public string HoveredVisualElementTreeItemPath { get; set; }
-    
-    // STYLE
-    public int? CurrentStyleGroupIndex { get; set; }
-    
-    public int? CurrentPropertyIndexInStyleGroup { get; set; }
-    
-    // PROPS
-    public int? CurrentPropertyIndexInProps { get; set; }
-    
-    // @formatter:on
-}
-
 sealed class ApplicationView : Component<ApplicationState>
 {
     internal static ApplicationState AppState;
@@ -63,8 +13,6 @@ sealed class ApplicationView : Component<ApplicationState>
         add,
         remove
     }
-
-    IReadOnlyList<string> BooleanSuggestions => ["MD", "XXL", "state.user.isActive", "MD: state.user.isActive", "XXL: state.user.isActive"];
 
     ComponentModel CurrentComponent => state.Project.Components.First(x => x.Name == state.CurrentComponentName);
 
@@ -85,7 +33,7 @@ sealed class ApplicationView : Component<ApplicationState>
         get { return FindTreeNodeByTreePath(state.Project.Components.First(x => x.Name == state.CurrentComponentName).RootElement, state.CurrentVisualElementTreePath); }
     }
 
-    StyleModifier ScaleStyle => TransformOrigin("0 0") + Transform($"scale({state.Scale / (double)100})");
+    
 
     IReadOnlyList<string> StyleAttributeNameSuggestions
     {
@@ -349,6 +297,8 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Element MainContent()
     {
+        var scaleStyle = TransformOrigin("0 0") + Transform($"scale({state.Scale / (double)100})");
+        
         return new SplitRow
         {
             sizes = [20, 60, 20],
@@ -356,7 +306,7 @@ sealed class ApplicationView : Component<ApplicationState>
             {
                 PartLeftPanel() + BorderBottomLeftRadius(8) + OverflowAuto,
 
-                new FlexColumn(AlignItemsCenter, FlexGrow(1), Padding(7), MarginLeft(40), ScaleStyle, OverflowXAuto)
+                new FlexColumn(AlignItemsCenter, FlexGrow(1), Padding(7), MarginLeft(40), scaleStyle, OverflowXAuto)
                 {
                     createHorizontalRuler() + Width(state.ScreenWidth) + MarginTop(12),
                     PartPreview
@@ -739,7 +689,7 @@ sealed class ApplicationView : Component<ApplicationState>
                                 OnFocus           = OnStyleGroupSelected,
                                 Value             = styleGroup.Condition,
                                 IsTextAlignCenter = true,
-                                Suggestions       = BooleanSuggestions
+                                Suggestions       = GetStyleGroupConditionSuggestions(state)
                             } + FlexGrow(1),
 
                             CreateIcon(Icon.add, 28) + OnClick(CurrentStyleGroup_CurrentProperty_Add_Clicked)
