@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -58,6 +59,6 @@ static class ApplicationStateCache
             }
         }
 
-        return File.WriteAllTextAsync(path, contents);
+        return File.WriteAllTextAsync(path, contents, Encoding.UTF8);
     }
 }
