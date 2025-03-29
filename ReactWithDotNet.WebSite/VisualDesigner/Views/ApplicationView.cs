@@ -146,15 +146,40 @@ sealed class ApplicationView : Component<ApplicationState>
 
         return Task.CompletedTask;
     }
-
+    
     Element applicationTopPanel()
     {
-        return new FlexRow
+        return new FlexRow(UserSelect(none))
         {
             new h3 { "React Visual Designer" },
 
             new FlexRowCentered(Gap(24))
             {
+                new FlexRowCentered(Gap(4))
+                {
+                    new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
+                    {
+                        OnClick(async _ =>
+                        {
+                            state.ScreenWidth -= 10;
+                        
+                            await SaveState();
+                        }),
+                    
+                        new IconMinus()
+                    },
+                    $"{state.ScreenWidth}px",
+                    new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
+                    {
+                        OnClick(async _ =>
+                        {
+                            state.ScreenWidth += 10;
+                        
+                            await SaveState();
+                        }),
+                        new IconPlus()
+                    }
+                },
                 PartMediaSizeButtons,
 
                 PartScale
@@ -788,7 +813,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Element PartScale()
     {
-        return new FlexRow(WidthFull, PaddingLeftRight(3), AlignItemsCenter, Gap(5))
+        return new FlexRow(WidthFull, PaddingLeftRight(3), AlignItemsCenter, Gap(4))
         {
             new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
             {
