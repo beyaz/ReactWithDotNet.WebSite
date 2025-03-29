@@ -75,8 +75,3 @@ public sealed class ProjectModel
     
     // @formatter:on
 }
-
-public sealed class ApplicationModel
-{
-    public List<ProjectModel> Projects { get; set; } = [];
-}
