@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Xml.Linq;
+﻿using System.Diagnostics;
 using Dapper.Contrib.Extensions;
 using Newtonsoft.Json;
 using ReactWithDotNet.ThirdPartyLibraries.MonacoEditorReact;
