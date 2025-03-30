@@ -49,6 +49,10 @@ public sealed record LastUsageInfoEntity
     public int ProjectId { get; init; }
     
     public int ComponentId { get; init; }
+    
+    public int Scale { get; init; }
+
+    public int ScreenWidth { get; init; }
 
     public DateTime AccessTime { get; init; }
     

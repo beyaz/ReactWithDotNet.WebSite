@@ -84,10 +84,12 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             lastUsage = new()
             {
-                UserName = userName,
-                ProjectId = 1,
+                UserName    = userName,
+                ProjectId   = 1,
                 ComponentId = 1,
-                AccessTime = DateTime.Now
+                ScreenWidth = 600,
+                Scale       = 100,
+                AccessTime  = DateTime.Now,
             };
         }
         
@@ -98,10 +100,10 @@ sealed class ApplicationView : Component<ApplicationState>
             ProjectId   = lastUsage.ProjectId,
             ComponentId = lastUsage.ComponentId,    
             
-            ScreenWidth                  = 600,
-            ScreenHeight                 = 100,
-            Scale                        = 100,
-            LeftPanelSelectedTab          = LeftPanelTab.ElementTree
+            ScreenWidth          = lastUsage.ScreenWidth,
+            ScreenHeight         = 100,
+            Scale                = lastUsage.Scale,
+            LeftPanelSelectedTab = LeftPanelTab.ElementTree
         };
 
         if (state.ComponentId > 0)

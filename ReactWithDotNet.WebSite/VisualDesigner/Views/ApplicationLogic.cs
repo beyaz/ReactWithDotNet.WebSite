@@ -70,7 +70,12 @@ static class ApplicationLogic
             var dbRecord = dbRecords.FirstOrDefault(x => x.ComponentId == state.ComponentId);
             if (dbRecord is not null)
             {
-                await db.UpdateAsync(dbRecord with { AccessTime = DateTime.Now });
+                await db.UpdateAsync(dbRecord with
+                {
+                    Scale = state.Scale,
+                    ScreenWidth = state.ScreenWidth,
+                    AccessTime = DateTime.Now
+                });
             }
             else
             {
@@ -79,6 +84,9 @@ static class ApplicationLogic
                     UserName = state.UserName, 
                     ProjectId = state.ProjectId,
                     ComponentId = state.ComponentId,
+                    
+                    Scale = state.Scale,
+                    ScreenWidth = state.ScreenWidth,
                     AccessTime = DateTime.Now
                 });
             }
