@@ -20,6 +20,13 @@ static class ApplicationDatabase
         operation(connection);
     }
 
+    public static T DbOperation<T>(Func<IDbConnection, T> operation)
+    {
+        using IDbConnection connection = new SqliteConnection(ConnectionString);
+
+        return operation(connection);
+    }
+    
     public static async Task DbOperation(Func<IDbConnection, Task> operation)
     {
         using IDbConnection connection = new SqliteConnection(ConnectionString);
@@ -44,5 +51,12 @@ static class ApplicationDatabase
         }
 
         return Projects;
+    }
+    
+    public static IReadOnlyList<LastUsageInfoEntity> GetLastUsageInfoByUserName(string userName)
+    {
+        const string query = $"SELECT * FROM LastUsageInfo WHERE UserName = @{nameof(userName)} Order BY {nameof(LastUsageInfoEntity.AccessTime)} DESC";
+
+        return DbOperation(db =>  db.Query<LastUsageInfoEntity>(query, new{ userName})).ToList();
     }
 }

@@ -45,7 +45,7 @@ public sealed class ApplicationState
     // PROPS
     public int? SelectedPropertyIndexInProps { get; set; }
     
-    public string UserId { get; init; }
+    public string UserName { get; init; }
 
     // @formatter:on
 }

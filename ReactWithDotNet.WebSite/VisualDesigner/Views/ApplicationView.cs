@@ -72,16 +72,31 @@ sealed class ApplicationView : Component<ApplicationState>
 
     protected override async Task constructor()
     {
+        var userName = Environment.UserName; // future: get from session or url
+
+        var lastUsage = GetLastUsageInfoByUserName(userName).FirstOrDefault();
+        if (lastUsage == null)
+        {
+            lastUsage = new()
+            {
+                UserName = userName,
+                ProjectId = 1,
+                ComponentId = 1,
+                AccessTime = DateTime.Now
+            };
+        }
+        
         AppState = state = new()
         {
-            ProjectId = 1,
-            ComponentId = 1,
+            UserName = lastUsage.UserName,
             
-            ScreenWidth                  = 400,
-            ScreenHeight                 = 400,
+            ProjectId   = lastUsage.ProjectId,
+            ComponentId = lastUsage.ComponentId,
+            
+            ScreenWidth                  = 600,
+            ScreenHeight                 = 900,
             Scale                        = 100,
-            LeftPanelSelectedTab          = LeftPanelTab.ElementTree,
-            SelectedVisualElementTreeItemPath = null
+            LeftPanelSelectedTab          = LeftPanelTab.ElementTree
         };
 
         if (state.ComponentId > 0)
@@ -481,7 +496,7 @@ sealed class ApplicationView : Component<ApplicationState>
                             {
                                 Name      = newValue,
                                 ProjectId = state.ProjectId,
-                                UserId    = state.UserId
+                                UserName    = state.UserName
                             };
 
                             await DbOperation(db => db.InsertAsync(newDbRecord));

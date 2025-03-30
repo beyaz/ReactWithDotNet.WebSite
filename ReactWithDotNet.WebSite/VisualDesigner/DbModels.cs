@@ -31,7 +31,23 @@ public sealed record ComponentEntity
     
     public string RootElementAsJson { get; init; }
 
-    public string UserId { get; init; }
+    public string UserName { get; init; }
+    
+    // @formatter:on
+}
+
+[Table("LastUsageInfo")]
+public sealed record LastUsageInfoEntity
+{
+    // @formatter:off
+    
+    public string UserName { get; init; }
+    
+    public int ProjectId { get; init; }
+    
+    public int ComponentId { get; init; }
+
+    public DateTime AccessTime { get; init; }
     
     // @formatter:on
 }
