@@ -24,25 +24,26 @@ public sealed class ApplicationState
     
     public VisualElementModel ComponentRootElement { get; set; }
     
-    public bool CurrentProjectSettingsPopupIsVisible { get; set; }
+    public bool IsProjectSettingsPopupVisible { get; set; }
     
-    public LeftPanelTab LeftPanelCurrentTab { get; set; }
+    public LeftPanelTab LeftPanelSelectedTab { get; set; }
     
-    public string JsonTextInComponentSettings { get; set; }
+    public string JsonText { get; set; }
+    
     
     // VISUAL ELEMENT STATE
     
-    public string CurrentVisualElementTreePath { get; set; }
+    public string SelectedVisualElementTreePath { get; set; }
     
     public string HoveredVisualElementTreeItemPath { get; set; }
     
     // STYLE
-    public int? CurrentStyleGroupIndex { get; set; }
+    public int? SelectedStyleGroupIndex { get; set; }
     
-    public int? CurrentPropertyIndexInStyleGroup { get; set; }
+    public int? SelectedPropertyIndexInStyleGroup { get; set; }
     
     // PROPS
-    public int? CurrentPropertyIndexInProps { get; set; }
+    public int? SelectedPropertyIndexInProps { get; set; }
     
     public string UserId { get; init; }
 

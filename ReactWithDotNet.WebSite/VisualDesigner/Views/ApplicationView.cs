@@ -17,19 +17,19 @@ sealed class ApplicationView : Component<ApplicationState>
         remove
     }
 
-    PropertyGroupModel CurrentStyleGroup => CurrentVisualElement.StyleGroups[state.CurrentStyleGroupIndex!.Value];
+    PropertyGroupModel CurrentStyleGroup => CurrentVisualElement.StyleGroups[state.SelectedStyleGroupIndex!.Value];
 
     PropertyModel CurrentStyleProperty
     {
         get
         {
-            Debug.Assert(state.CurrentPropertyIndexInStyleGroup != null, "state.CurrentPropertyIndex != null");
+            Debug.Assert(state.SelectedPropertyIndexInStyleGroup != null, "state.CurrentPropertyIndex != null");
 
-            return CurrentStyleGroup.Items[state.CurrentPropertyIndexInStyleGroup.Value];
+            return CurrentStyleGroup.Items[state.SelectedPropertyIndexInStyleGroup.Value];
         }
     }
 
-    VisualElementModel CurrentVisualElement => FindTreeNodeByTreePath(state.ComponentRootElement, state.CurrentVisualElementTreePath);
+    VisualElementModel CurrentVisualElement => FindTreeNodeByTreePath(state.ComponentRootElement, state.SelectedVisualElementTreePath);
 
     IReadOnlyList<string> StyleAttributeNameSuggestions
     {
@@ -40,7 +40,7 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         PropInputLocation location = senderName;
 
-        state.CurrentPropertyIndexInProps = location.Index;
+        state.SelectedPropertyIndexInProps = location.Index;
 
         return Task.CompletedTask;
     }
@@ -49,23 +49,23 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         StyleInputLocation location = senderName;
 
-        state.CurrentStyleGroupIndex = location.StyleGroupIndex;
+        state.SelectedStyleGroupIndex = location.StyleGroupIndex;
 
-        state.CurrentPropertyIndexInStyleGroup = location.PropertyIndexAtGroup;
+        state.SelectedPropertyIndexInStyleGroup = location.PropertyIndexAtGroup;
 
         return Task.CompletedTask;
     }
 
     public Task On_CurrentPropertyValueInProps_Changed(string senderName, string newValue)
     {
-        CurrentVisualElement.Properties[state.CurrentPropertyIndexInProps!.Value].Value = newValue;
+        CurrentVisualElement.Properties[state.SelectedPropertyIndexInProps!.Value].Value = newValue;
 
         return Task.CompletedTask;
     }
 
     public Task OnStyleGroupSelected(string senderNameAsStyleGroupIndex)
     {
-        state.CurrentStyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex);
+        state.SelectedStyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex);
 
         return Task.CompletedTask;
     }
@@ -80,8 +80,8 @@ sealed class ApplicationView : Component<ApplicationState>
             ScreenWidth                  = 400,
             ScreenHeight                 = 400,
             Scale                        = 100,
-            LeftPanelCurrentTab          = LeftPanelTab.ElementTree,
-            CurrentVisualElementTreePath = null
+            LeftPanelSelectedTab          = LeftPanelTab.ElementTree,
+            SelectedVisualElementTreePath = null
         };
 
         if (state.ComponentId > 0)
@@ -144,7 +144,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
         properties.Add(new());
 
-        state.CurrentPropertyIndexInProps = properties.Count - 1;
+        state.SelectedPropertyIndexInProps = properties.Count - 1;
 
         return Task.CompletedTask;
     }
@@ -244,22 +244,22 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         CurrentStyleGroup.Items.Remove(CurrentStyleProperty);
 
-        state.CurrentPropertyIndexInStyleGroup = null;
+        state.SelectedPropertyIndexInStyleGroup = null;
 
         return Task.CompletedTask;
     }
 
     Task JsonTextInComponentSettingsUpdatedByUser()
     {
-        state.JsonTextInComponentSettings = JsonPrettify(state.JsonTextInComponentSettings);
+        state.JsonText = JsonPrettify(state.JsonText);
 
-        switch (state.LeftPanelCurrentTab)
+        switch (state.LeftPanelSelectedTab)
         {
             case LeftPanelTab.Props:
-                return DbSave(state, x =>  x with { PropsAsJson = state.JsonTextInComponentSettings } );
+                return DbSave(state, x =>  x with { PropsAsJson = state.JsonText } );
 
             case LeftPanelTab.State:
-                return DbSave(state, x =>  x with { StateAsJson = state.JsonTextInComponentSettings } );
+                return DbSave(state, x =>  x with { StateAsJson = state.JsonText } );
 
             default:
                 throw new ArgumentOutOfRangeException();
@@ -292,9 +292,9 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         PropInputLocation location = senderName;
 
-        state.CurrentPropertyIndexInProps = location.Index;
+        state.SelectedPropertyIndexInProps = location.Index;
 
-        CurrentVisualElement.Properties[state.CurrentPropertyIndexInProps!.Value].Name = newValue;
+        CurrentVisualElement.Properties[state.SelectedPropertyIndexInProps!.Value].Name = newValue;
 
         return Task.CompletedTask;
     }
@@ -303,8 +303,8 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         StyleInputLocation location = senderName;
 
-        state.CurrentStyleGroupIndex           = location.StyleGroupIndex;
-        state.CurrentPropertyIndexInStyleGroup = location.PropertyIndexAtGroup;
+        state.SelectedStyleGroupIndex           = location.StyleGroupIndex;
+        state.SelectedPropertyIndexInStyleGroup = location.PropertyIndexAtGroup;
 
         CurrentStyleProperty.Name = newValue;
 
@@ -369,13 +369,13 @@ sealed class ApplicationView : Component<ApplicationState>
 
         var componentModel = GetSelectedComponent(state);
         
-        if (state.LeftPanelCurrentTab == LeftPanelTab.Props)
+        if (state.LeftPanelSelectedTab == LeftPanelTab.Props)
         {
-            state.JsonTextInComponentSettings = componentModel.PropsAsJson;
+            state.JsonText = componentModel.PropsAsJson;
         }
-        else if (state.LeftPanelCurrentTab == LeftPanelTab.State)
+        else if (state.LeftPanelSelectedTab == LeftPanelTab.State)
         {
-            state.JsonTextInComponentSettings = componentModel.StateAsJson;
+            state.JsonText = componentModel.StateAsJson;
         }
         
         state.ComponentRootElement = JsonConvert.DeserializeObject<VisualElementModel>(componentModel.RootElementAsJson ?? string.Empty);
@@ -388,7 +388,7 @@ sealed class ApplicationView : Component<ApplicationState>
         }
         
 
-        state.CurrentVisualElementTreePath = null;
+        state.SelectedVisualElementTreePath = null;
 
         return Task.CompletedTask;
     }
@@ -425,7 +425,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Task OnVisualElementTreeSelected(string treePath)
     {
-        state.CurrentVisualElementTreePath = treePath;
+        state.SelectedVisualElementTreePath = treePath;
 
         return Task.CompletedTask;
     }
@@ -436,18 +436,18 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             new FlexRowCentered
             {
-                new IconPlus() + Size(24) + Color(state.CurrentProjectSettingsPopupIsVisible ? Gray600 : Gray300) + Hover(Color(Gray600)),
+                new IconPlus() + Size(24) + Color(state.IsProjectSettingsPopupVisible ? Gray600 : Gray300) + Hover(Color(Gray600)),
 
                 OnClick(_ =>
                 {
-                    state.CurrentProjectSettingsPopupIsVisible = !state.CurrentProjectSettingsPopupIsVisible;
+                    state.IsProjectSettingsPopupVisible = !state.IsProjectSettingsPopupVisible;
 
                     return Task.CompletedTask;
                 }),
 
 
-                state.CurrentProjectSettingsPopupIsVisible ? PositionRelative : null,
-                state.CurrentProjectSettingsPopupIsVisible ? new FlexColumn(PositionAbsolute, Top(24), Left(16), Zindex2)
+                state.IsProjectSettingsPopupVisible ? PositionRelative : null,
+                state.IsProjectSettingsPopupVisible ? new FlexColumn(PositionAbsolute, Top(24), Left(16), Zindex2)
                 {
                     Background(White), Border(Solid(1, Theme.BorderColor)), BorderRadius(4), Padding(8),
 
@@ -488,7 +488,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
                             await OnComponentNameChanged(newValue);
 
-                            state.CurrentProjectSettingsPopupIsVisible = false;
+                            state.IsProjectSettingsPopupVisible = false;
                         }
                     }
 
@@ -575,7 +575,7 @@ sealed class ApplicationView : Component<ApplicationState>
         };
 
         var removeIconInLayersTab = CreateIcon(Icon.remove, 16);
-        if (state.LeftPanelCurrentTab == LeftPanelTab.ElementTree  && state.CurrentVisualElementTreePath.HasValue())
+        if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree  && state.SelectedVisualElementTreePath.HasValue())
         {
             removeIconInLayersTab.Add(Hover(Color(Blue300), BorderColor(Blue300)));
         }
@@ -597,17 +597,17 @@ sealed class ApplicationView : Component<ApplicationState>
                     
                     new FlexRowCentered(WidthFull)
                     {
-                        new IconLayers() + Size(18) + (state.LeftPanelCurrentTab == LeftPanelTab.ElementTree ? Color(Gray500) : null),
+                        new IconLayers() + Size(18) + (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree ? Color(Gray500) : null),
                     
                         OnClick(_ =>
                         {
-                            state.LeftPanelCurrentTab = LeftPanelTab.ElementTree; 
+                            state.LeftPanelSelectedTab = LeftPanelTab.ElementTree; 
                         
                             return Task.CompletedTask;
                         })
                     },
                     
-                    CreateIcon(Icon.remove, 16, state.CurrentVisualElementTreePath.HasValue() ?
+                    CreateIcon(Icon.remove, 16, state.SelectedVisualElementTreePath.HasValue() ?
                                    [
                                        OnClick(RemoveCurrentPropertyInProps),
                                        Hover(Color(Blue300))
@@ -619,30 +619,30 @@ sealed class ApplicationView : Component<ApplicationState>
                 },
                 
                 
-                new FlexRowCentered(WidthFull, When(state.LeftPanelCurrentTab == LeftPanelTab.Props, Color(Gray500)))
+                new FlexRowCentered(WidthFull, When(state.LeftPanelSelectedTab == LeftPanelTab.Props, Color(Gray500)))
                 {
                     "Props",
                     PaddingX(8), OnClick(async _ =>
                     {
-                        state.LeftPanelCurrentTab = LeftPanelTab.Props;
+                        state.LeftPanelSelectedTab = LeftPanelTab.Props;
                         
-                        await DbOperationForCurrentComponent(state, x => { state.JsonTextInComponentSettings = x.PropsAsJson; });
+                        await DbOperationForCurrentComponent(state, x => { state.JsonText = x.PropsAsJson; });
                     })
                 },
-                new FlexRowCentered(WidthFull, Opacity(0.7), When(state.LeftPanelCurrentTab == LeftPanelTab.State, Color(Gray500)))
+                new FlexRowCentered(WidthFull, Opacity(0.7), When(state.LeftPanelSelectedTab == LeftPanelTab.State, Color(Gray500)))
                 {
                     "State",
                     PaddingX(8), OnClick(async _ =>
                     {
-                        state.LeftPanelCurrentTab = LeftPanelTab.State;
+                        state.LeftPanelSelectedTab = LeftPanelTab.State;
 
-                        await DbOperationForCurrentComponent(state, x => { state.JsonTextInComponentSettings = x.StateAsJson; });
+                        await DbOperationForCurrentComponent(state, x => { state.JsonText = x.StateAsJson; });
 
                     })
                 }
             },
 
-            When(state.LeftPanelCurrentTab == LeftPanelTab.ElementTree, () => new VisualElementTreeView
+            When(state.LeftPanelSelectedTab == LeftPanelTab.ElementTree, () => new VisualElementTreeView
             {
                 TreeItemHover = OnVisualElementTreeItemHovered,
                 MouseLeave = () =>
@@ -651,16 +651,16 @@ sealed class ApplicationView : Component<ApplicationState>
                     return Task.CompletedTask;
                 },
                 SelectionChanged = OnVisualElementTreeSelected,
-                SelectedPath     = state.CurrentVisualElementTreePath,
+                SelectedPath     = state.SelectedVisualElementTreePath,
                 Model            = state.ComponentRootElement
             }),
             
-            When(state.LeftPanelCurrentTab == LeftPanelTab.Props ||state.LeftPanelCurrentTab == LeftPanelTab.State, ()=>new FlexColumnCentered(SizeFull)
+            When(state.LeftPanelSelectedTab == LeftPanelTab.Props ||state.LeftPanelSelectedTab == LeftPanelTab.State, ()=>new FlexColumnCentered(SizeFull)
             {
                 new Editor
                 {
                     defaultLanguage          = "json",
-                    valueBind                = () => state.JsonTextInComponentSettings,
+                    valueBind                = () => state.JsonText,
                     valueBindDebounceTimeout = 700,
                     valueBindDebounceHandler = JsonTextInComponentSettingsUpdatedByUser,
                     options =
@@ -803,7 +803,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Element PartRightPanel()
     {
-        if (!state.CurrentVisualElementTreePath.HasValue())
+        if (!state.SelectedVisualElementTreePath.HasValue())
         {
             return new div();
         }
@@ -839,7 +839,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
             new FlexRow(WidthFull, AlignItemsCenter)
             {
-                CreateIcon(Icon.remove, 32, state.CurrentStyleGroupIndex.HasValue ?
+                CreateIcon(Icon.remove, 32, state.SelectedStyleGroupIndex.HasValue ?
                                [
                                    OnClick(StyleGroupRemoveClicked),
                                    Hover(Color(Blue300))
@@ -864,7 +864,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         new FlexRow(WidthFull, AlignItemsCenter, Gap(4), PaddingX(2))
                         {
-                            CreateIcon(Icon.remove, 28, state.CurrentPropertyIndexInStyleGroup.HasValue && state.CurrentStyleGroupIndex == styleGroupIndex ?
+                            CreateIcon(Icon.remove, 28, state.SelectedPropertyIndexInStyleGroup.HasValue && state.SelectedStyleGroupIndex == styleGroupIndex ?
                                            [
                                                OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked),
                                                Hover(Color(Blue300))
@@ -923,7 +923,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
             new FlexRow(WidthFull, AlignItemsCenter)
             {
-                CreateIcon(Icon.remove, 32, state.CurrentPropertyIndexInProps.HasValue ?
+                CreateIcon(Icon.remove, 32, state.SelectedPropertyIndexInProps.HasValue ?
                                [
                                    OnClick(RemoveCurrentPropertyInProps),
                                    Hover(Color(Blue300))
@@ -1020,9 +1020,9 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Task RemoveCurrentPropertyInProps(MouseEvent e)
     {
-        CurrentVisualElement.Properties.RemoveAt(state.CurrentPropertyIndexInProps!.Value);
+        CurrentVisualElement.Properties.RemoveAt(state.SelectedPropertyIndexInProps!.Value);
 
-        state.CurrentPropertyIndexInProps = null;
+        state.SelectedPropertyIndexInProps = null;
 
         return Task.CompletedTask;
     }
@@ -1051,7 +1051,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
         styleGroups.Add(newStyleGroup);
 
-        state.CurrentStyleGroupIndex = styleGroups.Count - 1;
+        state.SelectedStyleGroupIndex = styleGroups.Count - 1;
 
         return Task.CompletedTask;
     }
@@ -1060,8 +1060,8 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         CurrentVisualElement.StyleGroups.Remove(CurrentStyleGroup);
 
-        state.CurrentStyleGroupIndex           = null;
-        state.CurrentPropertyIndexInStyleGroup = null;
+        state.SelectedStyleGroupIndex           = null;
+        state.SelectedPropertyIndexInStyleGroup = null;
 
         return Task.CompletedTask;
     }
