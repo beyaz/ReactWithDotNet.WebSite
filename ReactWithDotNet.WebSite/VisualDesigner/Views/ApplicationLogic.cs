@@ -58,6 +58,37 @@ static class ApplicationLogic
 
         return dbRecords.First();
     }
+    
+    public static Task UpdateLastUsageInfo(ApplicationState state)
+    {
+        const string query = $"SELECT * FROM LastUsageInfo WHERE UserName = @{nameof(state.UserName)}";
+
+        return DbOperation(async db =>
+        {
+            var dbRecords = await db.QueryAsync<LastUsageInfoEntity>(query, new { state.UserName });
+
+            var dbRecord = dbRecords.FirstOrDefault(x => x.ComponentId == state.ComponentId);
+            if (dbRecord is not null)
+            {
+                await db.UpdateAsync(dbRecord with { AccessTime = DateTime.Now });
+            }
+            else
+            {
+                await db.InsertAsync(new LastUsageInfoEntity
+                {
+                    UserName = state.UserName, 
+                    ProjectId = state.ProjectId,
+                    ComponentId = state.ComponentId,
+                    AccessTime = DateTime.Now
+                });
+            }
+            
+            
+
+        });
+
+
+    }
 
     public static IReadOnlyList<string> GetStyleGroupConditionSuggestions(ApplicationState state)
     {

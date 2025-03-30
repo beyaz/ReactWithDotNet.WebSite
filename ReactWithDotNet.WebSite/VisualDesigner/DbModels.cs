@@ -41,6 +41,9 @@ public sealed record LastUsageInfoEntity
 {
     // @formatter:off
     
+    [Key]
+    public int Id { get; init; }
+    
     public string UserName { get; init; }
     
     public int ProjectId { get; init; }

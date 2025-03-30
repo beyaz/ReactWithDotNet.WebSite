@@ -8,9 +8,6 @@ namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationView : Component<ApplicationState>
 {
-    internal static ApplicationState AppState;
-    internal static int AppStateVersion;
-
     enum Icon
     {
         add,
@@ -72,7 +69,15 @@ sealed class ApplicationView : Component<ApplicationState>
 
     protected override async Task constructor()
     {
-        var userName = Environment.UserName; // future: get from session or url
+        var userName = Environment.UserName; // future: get userName from cookie or url
+
+        var userLastState = GetUserLastState(userName);
+        if (userLastState is not null)
+        {
+            state = userLastState;
+
+            return;
+        }
 
         var lastUsage = GetLastUsageInfoByUserName(userName).FirstOrDefault();
         if (lastUsage == null)
@@ -86,15 +91,15 @@ sealed class ApplicationView : Component<ApplicationState>
             };
         }
         
-        AppState = state = new()
+        state = new()
         {
             UserName = lastUsage.UserName,
             
             ProjectId   = lastUsage.ProjectId,
-            ComponentId = lastUsage.ComponentId,
+            ComponentId = lastUsage.ComponentId,    
             
             ScreenWidth                  = 600,
-            ScreenHeight                 = 900,
+            ScreenHeight                 = 100,
             Scale                        = 100,
             LeftPanelSelectedTab          = LeftPanelTab.ElementTree
         };
@@ -103,13 +108,13 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             await ChangeSelectedComponent(state.ComponentId);
         }
+        
+        
     }
 
     protected override Task OverrideStateFromPropsBeforeRender()
     {
-        AppState = state;
-
-        AppStateVersion++;
+        SetUserLastState(state);
 
         Client.RefreshComponentPreview();
 

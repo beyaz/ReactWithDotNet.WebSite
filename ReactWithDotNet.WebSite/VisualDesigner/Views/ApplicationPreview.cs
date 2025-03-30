@@ -26,7 +26,9 @@ sealed class ApplicationPreview : Component
 
     protected override Element render()
     {
-        var appState = ApplicationView.AppState;
+        var userName = Environment.UserName; // future: get userName from cookie or url
+
+        var appState = GetUserLastState(userName);
 
         if (appState is null)
         {

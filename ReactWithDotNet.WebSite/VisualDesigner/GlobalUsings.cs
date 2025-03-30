@@ -9,3 +9,4 @@ global using static ReactWithDotNet.VisualDesigner.Primitive.NotificationHelper;
 global using static ReactWithDotNet.VisualDesigner.Primitive.Animation;
 global using static ReactWithDotNet.VisualDesigner.Views.ApplicationLogic;
 global using static ReactWithDotNet.VisualDesigner.Views.ApplicationDatabase;
+global using static ReactWithDotNet.VisualDesigner.Views.ApplicationStateMemoryCache;

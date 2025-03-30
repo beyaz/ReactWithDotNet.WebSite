@@ -1,4 +1,6 @@
-﻿namespace ReactWithDotNet.VisualDesigner.Views;
+﻿using System.Collections.Concurrent;
+
+namespace ReactWithDotNet.VisualDesigner.Views;
 
 public enum LeftPanelTab
 {
@@ -48,4 +50,21 @@ public sealed class ApplicationState
     public string UserName { get; init; }
 
     // @formatter:on
+}
+
+static class ApplicationStateMemoryCache
+{
+    internal static readonly ConcurrentDictionary<string, ApplicationState> ApplicationStateCache = new();
+
+    public static ApplicationState GetUserLastState(string userName)
+    {
+        ApplicationStateCache.TryGetValue(userName, out var state);
+
+        return state;
+    }
+
+    public static void SetUserLastState(ApplicationState state)
+    {
+        ApplicationStateCache.AddOrUpdate(state.UserName, state, (_, _) => state);
+    }
 }
