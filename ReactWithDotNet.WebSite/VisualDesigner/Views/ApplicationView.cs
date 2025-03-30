@@ -584,6 +584,16 @@ sealed class ApplicationView : Component<ApplicationState>
             removeIconInLayersTab.Add(VisibilityCollapse);
         }
         
+        var addIconInLayersTab =CreateIcon(Icon.add, 16);
+        if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree && (state.ComponentRootElement is null || state.SelectedVisualElementTreePath.HasValue()))
+        {
+            addIconInLayersTab.Add(Hover(Color(Blue300), BorderColor(Blue300)));
+        }
+        else
+        {
+            addIconInLayersTab.Add(VisibilityCollapse);
+        }
+        
         return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"), Background(White))
         {
             componentSelector,
@@ -607,15 +617,7 @@ sealed class ApplicationView : Component<ApplicationState>
                         })
                     },
                     
-                    CreateIcon(Icon.remove, 16, state.SelectedVisualElementTreePath.HasValue() ?
-                                   [
-                                       OnClick(RemoveCurrentPropertyInProps),
-                                       Hover(Color(Blue300))
-                                   ] :
-                                   [
-                                       Color(Gray100),
-                                       BorderColor(Gray100)
-                                   ]),
+                    addIconInLayersTab
                 },
                 
                 
