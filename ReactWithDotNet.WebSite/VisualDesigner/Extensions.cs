@@ -165,15 +165,7 @@ static class Extensions
         return node;
     }
     
-    public static VisualElementModel RemoveTreeNodeByTreePath(VisualElementModel node, string path)
-    {
-        foreach (var index in path.Split(',').Select(int.Parse).Skip(1))
-        {
-            node = node.Children[index];
-        }
-
-        return node;
-    }
+    
     
     public static IReadOnlyList<PropertyInfo> StyleProperties = new List<PropertyInfo>
     {

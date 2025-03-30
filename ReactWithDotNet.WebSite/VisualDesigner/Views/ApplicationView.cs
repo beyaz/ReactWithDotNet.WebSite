@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Xml.Linq;
 using Dapper.Contrib.Extensions;
 using Newtonsoft.Json;
 using ReactWithDotNet.ThirdPartyLibraries.MonacoEditorReact;
@@ -587,7 +589,7 @@ sealed class ApplicationView : Component<ApplicationState>
         var addIconInLayersTab =CreateIcon(Icon.add, 16);
         if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree && (state.ComponentRootElement is null || state.SelectedVisualElementTreeItemPath.HasValue()))
         {
-            addIconInLayersTab.Add(Hover(Color(Blue300), BorderColor(Blue300)));
+            addIconInLayersTab.Add(Hover(Color(Blue300), BorderColor(Blue300)), OnClick(AddNewLayerClicked));
         }
         else
         {
@@ -684,11 +686,55 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Task LayersTabRemoveSelectedItemClicked(MouseEvent e)
     {
-        RemoveTreeNodeByTreePath(state.ComponentRootElement, state.SelectedVisualElementTreeItemPath);
+        var intArray = state.SelectedVisualElementTreeItemPath.Split(',');
+        if (intArray.Length == 1)
+        {
+            state.ComponentRootElement = null;
+        }
+        else
+        {
+            var node = state.ComponentRootElement;
+            
+            for (var i = 1; i < intArray.Length - 1; i++)
+            {
+                node = node.Children[int.Parse(intArray[i])];
+            }
 
+            node.Children.RemoveAt(int.Parse(intArray[^1]));
+        }
+        
         state.SelectedVisualElementTreeItemPath    = null;
         state.HoveredVisualElementTreeItemPath = null;
         
+        
+        return Task.CompletedTask;
+    }
+    
+    Task AddNewLayerClicked(MouseEvent e)
+    {
+        // add as root
+        if (state.ComponentRootElement is null)
+        {
+            state.ComponentRootElement = new()
+            {
+                Tag = "div"
+            };
+            
+            state.SelectedVisualElementTreeItemPath = "0";
+            state.HoveredVisualElementTreeItemPath  = null;
+            
+            return Task.CompletedTask;
+        }
+
+        var node = FindTreeNodeByTreePath(state.ComponentRootElement, state.SelectedVisualElementTreeItemPath);
+        
+        (node.Children ??= []).Add(new()
+        {
+            Tag = "div"
+        });
+        
+        state.SelectedVisualElementTreeItemPath = state.SelectedVisualElementTreeItemPath + "," + (node.Children.Count -1);
+        state.HoveredVisualElementTreeItemPath  = null;
         
         return Task.CompletedTask;
     }
