@@ -29,7 +29,7 @@ sealed class ApplicationView : Component<ApplicationState>
         }
     }
 
-    VisualElementModel CurrentVisualElement => FindTreeNodeByTreePath(state.ComponentRootElement, state.SelectedVisualElementTreePath);
+    VisualElementModel CurrentVisualElement => FindTreeNodeByTreePath(state.ComponentRootElement, state.SelectedVisualElementTreeItemPath);
 
     IReadOnlyList<string> StyleAttributeNameSuggestions
     {
@@ -81,7 +81,7 @@ sealed class ApplicationView : Component<ApplicationState>
             ScreenHeight                 = 400,
             Scale                        = 100,
             LeftPanelSelectedTab          = LeftPanelTab.ElementTree,
-            SelectedVisualElementTreePath = null
+            SelectedVisualElementTreeItemPath = null
         };
 
         if (state.ComponentId > 0)
@@ -388,7 +388,7 @@ sealed class ApplicationView : Component<ApplicationState>
         }
         
 
-        state.SelectedVisualElementTreePath = null;
+        state.SelectedVisualElementTreeItemPath = null;
 
         return Task.CompletedTask;
     }
@@ -425,7 +425,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Task OnVisualElementTreeSelected(string treePath)
     {
-        state.SelectedVisualElementTreePath = treePath;
+        state.SelectedVisualElementTreeItemPath = treePath;
 
         return Task.CompletedTask;
     }
@@ -575,9 +575,9 @@ sealed class ApplicationView : Component<ApplicationState>
         };
 
         var removeIconInLayersTab = CreateIcon(Icon.remove, 16);
-        if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree  && state.SelectedVisualElementTreePath.HasValue())
+        if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree  && state.SelectedVisualElementTreeItemPath.HasValue())
         {
-            removeIconInLayersTab.Add(Hover(Color(Blue300), BorderColor(Blue300)));
+            removeIconInLayersTab.Add(Hover(Color(Blue300), BorderColor(Blue300)), OnClick(LayersTabRemoveSelectedItemClicked));
         }
         else
         {
@@ -585,7 +585,7 @@ sealed class ApplicationView : Component<ApplicationState>
         }
         
         var addIconInLayersTab =CreateIcon(Icon.add, 16);
-        if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree && (state.ComponentRootElement is null || state.SelectedVisualElementTreePath.HasValue()))
+        if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree && (state.ComponentRootElement is null || state.SelectedVisualElementTreeItemPath.HasValue()))
         {
             addIconInLayersTab.Add(Hover(Color(Blue300), BorderColor(Blue300)));
         }
@@ -653,7 +653,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     return Task.CompletedTask;
                 },
                 SelectionChanged = OnVisualElementTreeSelected,
-                SelectedPath     = state.SelectedVisualElementTreePath,
+                SelectedPath     = state.SelectedVisualElementTreeItemPath,
                 Model            = state.ComponentRootElement
             }),
             
@@ -680,6 +680,17 @@ sealed class ApplicationView : Component<ApplicationState>
             }),
            
         };
+    }
+
+    Task LayersTabRemoveSelectedItemClicked(MouseEvent e)
+    {
+        RemoveTreeNodeByTreePath(state.ComponentRootElement, state.SelectedVisualElementTreeItemPath);
+
+        state.SelectedVisualElementTreeItemPath    = null;
+        state.HoveredVisualElementTreeItemPath = null;
+        
+        
+        return Task.CompletedTask;
     }
 
     Element PartMediaSizeButtons()
@@ -805,7 +816,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Element PartRightPanel()
     {
-        if (!state.SelectedVisualElementTreePath.HasValue())
+        if (!state.SelectedVisualElementTreeItemPath.HasValue())
         {
             return new div();
         }

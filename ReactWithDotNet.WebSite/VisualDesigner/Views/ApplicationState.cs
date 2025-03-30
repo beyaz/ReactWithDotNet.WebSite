@@ -33,7 +33,7 @@ public sealed class ApplicationState
     
     // VISUAL ELEMENT STATE
     
-    public string SelectedVisualElementTreePath { get; set; }
+    public string SelectedVisualElementTreeItemPath { get; set; }
     
     public string HoveredVisualElementTreeItemPath { get; set; }
     
