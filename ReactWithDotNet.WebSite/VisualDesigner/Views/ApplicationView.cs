@@ -386,30 +386,16 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Task ChangeSelectedComponent(int componentId)
     {
+        state.JsonText = null;
+        
+        state.LeftPanelSelectedTab = LeftPanelTab.ElementTree;
         
         state.ComponentId = componentId;
 
         var componentModel = GetSelectedComponent(state);
         
-        if (state.LeftPanelSelectedTab == LeftPanelTab.Props)
-        {
-            state.JsonText = componentModel.PropsAsJson;
-        }
-        else if (state.LeftPanelSelectedTab == LeftPanelTab.State)
-        {
-            state.JsonText = componentModel.StateAsJson;
-        }
-        
         state.ComponentRootElement = JsonConvert.DeserializeObject<VisualElementModel>(componentModel.RootElementAsJson ?? string.Empty);
-        if (state.ComponentRootElement is null)
-        {
-            state.ComponentRootElement = new()
-            {
-                Tag = "div"
-            };
-        }
         
-
         state.SelectedVisualElementTreeItemPath = null;
 
         return Task.CompletedTask;
@@ -650,6 +636,8 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         state.LeftPanelSelectedTab = LeftPanelTab.Props;
                         
+                        state.JsonText = GetSelectedComponent(state).PropsAsJson;
+                        
                         await DbOperationForCurrentComponent(state, x => { state.JsonText = x.PropsAsJson; });
                     })
                 },
@@ -659,6 +647,8 @@ sealed class ApplicationView : Component<ApplicationState>
                     PaddingX(8), OnClick(async _ =>
                     {
                         state.LeftPanelSelectedTab = LeftPanelTab.State;
+                        
+                        state.JsonText = GetSelectedComponent(state).StateAsJson;
 
                         await DbOperationForCurrentComponent(state, x => { state.JsonText = x.StateAsJson; });
 
