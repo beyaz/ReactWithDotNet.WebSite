@@ -371,13 +371,6 @@ sealed class ApplicationView : Component<ApplicationState>
 
     
 
-    Task OnVisualElementTreeSelected(string treePath)
-    {
-        state.SelectedVisualElementTreeItemPath = treePath;
-
-        return Task.CompletedTask;
-    }
-
     Element PartProject()
     {
         return new FlexRowCentered(Gap(4))
@@ -609,7 +602,11 @@ sealed class ApplicationView : Component<ApplicationState>
                     state.HoveredVisualElementTreeItemPath = null;
                     return Task.CompletedTask;
                 },
-                SelectionChanged = OnVisualElementTreeSelected,
+                SelectionChanged = treeItemPath =>
+                {
+                    state.SelectedVisualElementTreeItemPath = treeItemPath;
+                    return Task.CompletedTask;
+                },
                 SelectedPath     = state.SelectedVisualElementTreeItemPath,
                 Model            = state.ComponentRootElement
             }),
