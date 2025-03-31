@@ -214,7 +214,6 @@ sealed class ApplicationView : Component<ApplicationState>
 
             ComponentRootElement = componentRootElement
         };
-
     }
 
     async Task ChangeSelectedProject(int projectId)
@@ -390,7 +389,7 @@ sealed class ApplicationView : Component<ApplicationState>
             sizes = [20, 60, 20],
             children =
             {
-                (await PartLeftPanel()) + BorderBottomLeftRadius(8) + OverflowAuto,
+                await PartLeftPanel() + BorderBottomLeftRadius(8) + OverflowAuto,
 
                 new FlexColumn(state.Preview.Width < 768 ? AlignItemsCenter : AlignItemsFlexStart, FlexGrow(1), Padding(7), MarginLeft(40), scaleStyle, OverflowXAuto)
                 {
@@ -925,7 +924,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
             CreateIcon(Icon.add, 32) + OnClick(AddNewPropsClicked)
         };
-        
+
         return new FlexColumn(BorderLeft(1, dotted, "#d9d9d9"), PaddingX(2), Gap(8), OverflowYAuto, Background(White))
         {
             inputTag,
@@ -940,7 +939,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 {
                     return new FlexColumn(WidthFull, Gap(4))
                     {
-                        newStyleGroupHeader(styleGroup,styleGroupIndex),
+                        newStyleGroupHeader(styleGroup, styleGroupIndex),
 
                         styleGroup.Items_old.Select((property, index) => newStylePropertyEditor(index, styleGroupIndex, property))
                     };
@@ -951,58 +950,13 @@ sealed class ApplicationView : Component<ApplicationState>
 
             new FlexColumnCentered(WidthFull)
             {
-                visualElementModel.Properties?.Select((property, index) => new FlexRow(Gap(4), WidthFull)
-                {
-                    new FlexRow(JustifyContentFlexEnd, Width(4, 10))
-                    {
-                        new MagicInput
-                        {
-                            OnFocus = senderName =>
-                            {
-                                state.SelectedPropertyIndexInProps = ((PropInputLocation)senderName).Index;
-
-                                return Task.CompletedTask;
-                            },
-
-                            Name             = new PropInputLocation { Index = index, IsName = true, IsValue = false },
-                            Value            = property.Name,
-                            OnChange         = On_CurrentPropertyNameInProps_Changed,
-                            IsBold           = true,
-                            IsTextAlignRight = true,
-                            Suggestions      = StyleAttributeNameSuggestions,
-                            Placeholder      = "? ? ?",
-                            AutoFocus        = property.Name.HasNoValue()
-                        }
-                    },
-                    " : ",
-                    new FlexRow(Width(6, 10))
-                    {
-                        new MagicInput
-                        {
-                            Name  = new PropInputLocation { Index = index, IsName = false, IsValue = true },
-                            Value = property.Value,
-                            OnFocus = senderName =>
-                            {
-                                state.SelectedPropertyIndexInProps = ((PropInputLocation)senderName).Index;
-
-                                return Task.CompletedTask;
-                            },
-                            OnChange = (_, newValue) =>
-                            {
-                                CurrentVisualElement.Properties[state.SelectedPropertyIndexInProps!.Value].Value = newValue;
-
-                                return Task.CompletedTask;
-                            },
-                            Placeholder = "? ? ?"
-                        }
-                    }
-                })
+                visualElementModel.Properties?.Select((property, index) => newPropertyEditorInProps(index, property))
             }
         };
 
         FlexRow newStylePropertyEditor(int index, int styleGroupIndex, PropertyModel property)
         {
-            return new FlexRow(Gap(4))
+            return new(Gap(4))
             {
                 new FlexRow(JustifyContentFlexEnd, Width(4, 10))
                 {
@@ -1083,6 +1037,56 @@ sealed class ApplicationView : Component<ApplicationState>
                 })
             };
         }
+
+        FlexRow newPropertyEditorInProps(int index, PropertyModel property)
+        {
+            return new(Gap(4), WidthFull)
+            {
+                new FlexRow(JustifyContentFlexEnd, Width(4, 10))
+                {
+                    new MagicInput
+                    {
+                        OnFocus = senderName =>
+                        {
+                            state.SelectedPropertyIndexInProps = ((PropInputLocation)senderName).Index;
+
+                            return Task.CompletedTask;
+                        },
+
+                        Name             = new PropInputLocation { Index = index, IsName = true, IsValue = false },
+                        Value            = property.Name,
+                        OnChange         = On_CurrentPropertyNameInProps_Changed,
+                        IsBold           = true,
+                        IsTextAlignRight = true,
+                        Suggestions      = StyleAttributeNameSuggestions,
+                        Placeholder      = "? ? ?",
+                        AutoFocus        = property.Name.HasNoValue()
+                    }
+                },
+                " : ",
+                new FlexRow(Width(6, 10))
+                {
+                    new MagicInput
+                    {
+                        Name  = new PropInputLocation { Index = index, IsName = false, IsValue = true },
+                        Value = property.Value,
+                        OnFocus = senderName =>
+                        {
+                            state.SelectedPropertyIndexInProps = ((PropInputLocation)senderName).Index;
+
+                            return Task.CompletedTask;
+                        },
+                        OnChange = (_, newValue) =>
+                        {
+                            CurrentVisualElement.Properties[state.SelectedPropertyIndexInProps!.Value].Value = newValue;
+
+                            return Task.CompletedTask;
+                        },
+                        Placeholder = "? ? ?"
+                    }
+                }
+            };
+        }
     }
 
     Element PartScale()
@@ -1134,7 +1138,7 @@ sealed class ApplicationView : Component<ApplicationState>
             newStyleGroup = new()
             {
                 Condition = "*",
-                Items_old     = [new PropertyModel()]
+                Items_old = [new PropertyModel()]
             };
         }
         else
@@ -1142,7 +1146,7 @@ sealed class ApplicationView : Component<ApplicationState>
             newStyleGroup = new()
             {
                 Condition = "? ? ? ?",
-                Items_old     = [new PropertyModel()]
+                Items_old = [new PropertyModel()]
             };
         }
 
