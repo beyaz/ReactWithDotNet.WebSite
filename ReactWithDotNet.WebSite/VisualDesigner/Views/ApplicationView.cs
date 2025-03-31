@@ -192,9 +192,11 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
-    Task ChangeSelectedComponent(int componentId)
+    async Task ChangeSelectedComponent(int componentId)
     {
-        var componentModel = GetSelectedComponent(state);
+        state.ComponentId = componentId;
+
+        var componentModel = await GetSelectedComponent(state);
 
         var componentRootElement = DeserializeFromJson<VisualElementModel>(componentModel.RootElementAsJson ?? string.Empty);
 
@@ -213,7 +215,6 @@ sealed class ApplicationView : Component<ApplicationState>
             ComponentRootElement = componentRootElement
         };
 
-        return Task.CompletedTask;
     }
 
     async Task ChangeSelectedProject(int projectId)
@@ -380,7 +381,7 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
-    Element MainContent()
+    async Task<Element> MainContent()
     {
         var scaleStyle = TransformOrigin("0 0") + Transform($"scale({state.Preview.Scale / (double)100})");
 
@@ -389,7 +390,7 @@ sealed class ApplicationView : Component<ApplicationState>
             sizes = [20, 60, 20],
             children =
             {
-                PartLeftPanel() + BorderBottomLeftRadius(8) + OverflowAuto,
+                (await PartLeftPanel()) + BorderBottomLeftRadius(8) + OverflowAuto,
 
                 new FlexColumn(state.Preview.Width < 768 ? AlignItemsCenter : AlignItemsFlexStart, FlexGrow(1), Padding(7), MarginLeft(40), scaleStyle, OverflowXAuto)
                 {
@@ -500,14 +501,14 @@ sealed class ApplicationView : Component<ApplicationState>
         };
     }
 
-    Element PartLeftPanel()
+    async Task<Element> PartLeftPanel()
     {
         var componentSelector = new MagicInput
         {
             Name = string.Empty,
 
             Suggestions       = GetSuggestionsForComponentSelection(state),
-            Value             = GetSelectedComponent(state).Name,
+            Value             = await GetSelectedComponentName(state),
             OnChange          = (_, componentName) => OnComponentNameChanged(componentName),
             IsTextAlignCenter = true,
             IsBold            = true
@@ -566,7 +567,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         state.LeftPanelSelectedTab = LeftPanelTab.Props;
 
-                        state.JsonText = GetSelectedComponent(state).PropsAsJson;
+                        state.JsonText = (await GetSelectedComponent(state)).PropsAsJson;
 
                         await DbOperationForCurrentComponent(state, x => { state.JsonText = x.PropsAsJson; });
                     })
@@ -578,7 +579,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         state.LeftPanelSelectedTab = LeftPanelTab.State;
 
-                        state.JsonText = GetSelectedComponent(state).StateAsJson;
+                        state.JsonText = (await GetSelectedComponent(state)).StateAsJson;
 
                         await DbOperationForCurrentComponent(state, x => { state.JsonText = x.StateAsJson; });
                     })

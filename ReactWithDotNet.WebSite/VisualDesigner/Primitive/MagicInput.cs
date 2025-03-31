@@ -184,6 +184,10 @@ sealed class MagicInput : Component<MagicInput.State>
 
             if (state.SelectedSuggestionOffset is null)
             {
+                if (state.Value.HasValue() && state.Value.Trim() != Value?.Trim())
+                {
+                    DispatchEvent(OnChange, [Name, state.Value]);
+                }
                 return Task.CompletedTask;
             }
 

@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace ReactWithDotNet.VisualDesigner.Views;
+﻿namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationPreview : Component
 {
@@ -37,17 +35,8 @@ sealed class ApplicationPreview : Component
                 "Has no state"
             };
         }
-
-        var componentModel = GetSelectedComponent(appState);
-        if (componentModel is null)
-        {
-            return new div(Size(200), Background(Gray100))
-            {
-                "Has no component"
-            };
-        }
-
-        var rootElement = JsonConvert.DeserializeObject<VisualElementModel>(componentModel.RootElementAsJson ?? string.Empty);
+        
+        var rootElement = appState.ComponentRootElement;
         if (rootElement is null)
         {
             return null;
@@ -86,6 +75,7 @@ sealed class ApplicationPreview : Component
                         }
 
                         case "background":
+                        case "bg":
                         {
                             element.Add(Background(value));
                             continue;
@@ -148,6 +138,18 @@ sealed class ApplicationPreview : Component
                             }
 
                             element.Add(Padding(value));
+                            continue;
+                        }
+                        
+                        case "size":
+                        {
+                            if (isValueDouble)
+                            {
+                                element.Add(Size(valueAsDouble));
+                                continue;
+                            }
+
+                            element.Add(Size(value));
                             continue;
                         }
                     }

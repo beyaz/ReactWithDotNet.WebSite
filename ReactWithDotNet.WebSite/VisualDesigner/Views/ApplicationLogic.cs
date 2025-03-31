@@ -50,15 +50,20 @@ static class ApplicationLogic
         return GetAllProjects().Select(x => x.Name).ToList();
     }
 
-    public static ComponentEntity GetSelectedComponent(ApplicationState state)
+    public static async Task<ComponentEntity> GetSelectedComponent(ApplicationState state)
     {
-        var query = $"SELECT * FROM Component WHERE Id = @{nameof(state.ComponentId)}";
+        const string query = $"SELECT * FROM Component WHERE Id = @{nameof(state.ComponentId)}";
 
-        var dbRecords = DbOperation(async connection => (await connection.QueryAsync<ComponentEntity>(query, new { state.ComponentId })).ToList()).GetAwaiter().GetResult();
-
-        
+        var dbRecords = await DbOperation(async connection => (await connection.QueryAsync<ComponentEntity>(query, new { state.ComponentId })).ToList());
         
         return dbRecords.FirstOrDefault(x=>x.UserName == state.UserName) ?? dbRecords.FirstOrDefault();
+    }
+    
+    public static Task<string> GetSelectedComponentName(ApplicationState state)
+    {
+        const string query = $"SELECT Name FROM Component WHERE Id = @{nameof(state.ComponentId)}";
+
+        return DbOperation(db => db.ExecuteScalarAsync<string>(query, new { state.ComponentId }));
     }
     
     public static Task UpdateLastUsageInfo(ApplicationState state)
