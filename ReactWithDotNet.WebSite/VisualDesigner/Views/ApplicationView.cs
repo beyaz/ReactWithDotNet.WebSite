@@ -64,11 +64,10 @@ sealed class ApplicationView : Component<ApplicationState>
             if (lastUsage is not null)
             {
                 state = DeserializeFromJson<ApplicationState>(lastUsage.StateAsJson);
-            
+
                 return;
             }
         }
-
 
         // create new state
 
@@ -80,16 +79,15 @@ sealed class ApplicationView : Component<ApplicationState>
             {
                 Width  = 600,
                 Height = 100,
-                Scale        = 100
+                Scale  = 100
             }
         };
 
-        var projectId =await GetFirstProjectId();
+        var projectId = await GetFirstProjectId();
         if (projectId.HasValue)
         {
-            await ChangeSelectedProject(projectId.Value);    
+            await ChangeSelectedProject(projectId.Value);
         }
-        
     }
 
     protected override Task OverrideStateFromPropsBeforeRender()
@@ -131,18 +129,18 @@ sealed class ApplicationView : Component<ApplicationState>
     static FlexRowCentered CreateIcon(Icon name, int size, Modifier[] modifiers = null)
     {
         Style style = [Size(size), BorderRadius(16), BorderWidth(1), BorderStyle(solid), BorderColor(Gray200), Color(Gray200)];
-        
+
         if (name == Icon.add)
         {
             return new(style)
             {
                 new IconPlus(),
-                
+
                 Hover(BorderColor(Blue300), Color(Blue300)),
                 modifiers
             };
         }
-        
+
         if (name == Icon.remove)
         {
             return new(style)
@@ -209,6 +207,46 @@ sealed class ApplicationView : Component<ApplicationState>
         state.SelectedVisualElementTreeItemPath = null;
 
         return Task.CompletedTask;
+    }
+
+    async Task ChangeSelectedProject(int projectId)
+    {
+        var userName = Environment.UserName; // future: get userName from cookie or url
+
+        // try take from db cache
+        {
+            var lastUsage = (await GetLastUsageInfoByUserName(userName)).FirstOrDefault();
+            if (lastUsage is not null)
+            {
+                state = DeserializeFromJson<ApplicationState>(lastUsage.StateAsJson);
+
+                return;
+            }
+        }
+
+        state = new()
+        {
+            UserName = state.UserName,
+
+            ProjectId = projectId,
+
+            Preview = state.Preview,
+
+            LeftPanelSelectedTab = LeftPanelTab.ElementTree
+        };
+
+        // try select first component
+        {
+            var component = await GetFirstComponentInProject(projectId);
+            if (component is null)
+            {
+                return;
+            }
+
+            state.ComponentId = component.Id;
+
+            state.ComponentRootElement = DeserializeFromJson<VisualElementModel>(component.RootElementAsJson ?? string.Empty);
+        }
     }
 
     Element createHorizontalRuler()
@@ -382,46 +420,6 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
-    async Task ChangeSelectedProject(int projectId)
-    {
-        var userName = Environment.UserName; // future: get userName from cookie or url
-        
-        // try take from db cache
-        {
-            var lastUsage = (await GetLastUsageInfoByUserName(userName)).FirstOrDefault();
-            if (lastUsage is not null)
-            {
-                state = DeserializeFromJson<ApplicationState>(lastUsage.StateAsJson);
-            
-                return;
-            }
-        }
-        
-        state = new()
-        {
-            UserName = state.UserName,
-            
-            ProjectId = projectId,
-            
-            Preview = state.Preview,
-            
-            LeftPanelSelectedTab = LeftPanelTab.ElementTree
-        };
-        
-        // try select first component
-        {
-            var component = await GetFirstComponentInProject(projectId);
-            if (component is null)
-            {
-                return;
-            }
-            
-            state.ComponentId = component.Id;
-            
-            state.ComponentRootElement = DeserializeFromJson<VisualElementModel>(component.RootElementAsJson ?? string.Empty);
-        }
-    }
-    
     Task OnCommonSizeClicked(MouseEvent e)
     {
         state.Preview.Width = e.currentTarget.data["value"] switch
@@ -816,7 +814,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
                 Suggestions = GetProjectNames(state),
                 Value       = GetAllProjects().FirstOrDefault(p => p.Id == state.ProjectId)?.Name,
-                OnChange    = async (_, projectName) =>
+                OnChange = async (_, projectName) =>
                 {
                     var projectEntity = GetAllProjects().FirstOrDefault(x => x.Name == projectName);
                     if (projectEntity is null)
@@ -828,7 +826,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
                     await ChangeSelectedProject(projectEntity.Id);
                 },
-                FitContent  = true
+                FitContent = true
             }
         };
     }
