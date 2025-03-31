@@ -38,7 +38,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
         state.SelectedStyleGroupIndex = location.StyleGroupIndex;
 
-        state.SelectedPropertyIndexInStyleGroup = location.PropertyIndexAtGroup;
+        state.SelectedPropertyIndexInStyleGroup = location.PropertyIndexInGroup;
 
         return Task.CompletedTask;
     }
@@ -418,7 +418,7 @@ sealed class ApplicationView : Component<ApplicationState>
         StyleInputLocation location = senderName;
 
         state.SelectedStyleGroupIndex           = location.StyleGroupIndex;
-        state.SelectedPropertyIndexInStyleGroup = location.PropertyIndexAtGroup;
+        state.SelectedPropertyIndexInStyleGroup = location.PropertyIndexInGroup;
 
         CurrentStyleProperty.Name = newValue;
 
@@ -964,7 +964,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         OnFocus = On_CurrentPropertyIndexInStyle_Changed,
 
-                        Name             = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = true, StyleGroupIndex = styleGroupIndex, IsValue = false },
+                        Name             = new StyleInputLocation { PropertyIndexInGroup = index, IsName = true, StyleGroupIndex = styleGroupIndex, IsValue = false },
                         Value            = property.Name,
                         OnChange         = On_CurrentPropertyNameInStyle_Changed,
                         IsBold           = true,
@@ -979,7 +979,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 {
                     new MagicInput
                     {
-                        Name    = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true },
+                        Name    = new StyleInputLocation { PropertyIndexInGroup = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true },
                         Value   = property.Value,
                         OnFocus = On_CurrentPropertyIndexInStyle_Changed,
                         OnChange = (_, newValue) =>
@@ -1209,7 +1209,7 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         public required bool IsName { get; init; }
         public required bool IsValue { get; init; }
-        public required int PropertyIndexAtGroup { get; init; }
+        public required int PropertyIndexInGroup { get; init; }
         public required int StyleGroupIndex { get; init; }
 
         public static implicit operator StyleInputLocation(string input)
@@ -1224,7 +1224,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
         public override string ToString()
         {
-            return $"{StyleGroupIndex},{PropertyIndexAtGroup},{IsName},{IsValue}";
+            return $"{StyleGroupIndex},{PropertyIndexInGroup},{IsName},{IsValue}";
         }
 
         static StyleInputLocation Parse(string input)
@@ -1238,7 +1238,7 @@ sealed class ApplicationView : Component<ApplicationState>
             return new()
             {
                 StyleGroupIndex      = int.Parse(parts[0]),
-                PropertyIndexAtGroup = int.Parse(parts[1]),
+                PropertyIndexInGroup = int.Parse(parts[1]),
                 IsName               = bool.Parse(parts[2]),
                 IsValue              = bool.Parse(parts[3])
             };
