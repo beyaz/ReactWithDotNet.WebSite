@@ -61,41 +61,37 @@ static class ApplicationLogic
     
     public static Task UpdateLastUsageInfo(ApplicationState state)
     {
+        if (state.ComponentId <= 0)
+        {
+            return Task.CompletedTask;
+        }
+        
         const string query = $"SELECT * FROM LastUsageInfo WHERE UserName = @{nameof(state.UserName)}";
 
         return DbOperation(async db =>
         {
             var dbRecords = await db.QueryAsync<LastUsageInfoEntity>(query, new { state.UserName });
 
-            var dbRecord = dbRecords.FirstOrDefault(x => x.ComponentId == state.ComponentId);
+            var dbRecord = dbRecords.FirstOrDefault(x => x.ProjectId == state.ProjectId);
             if (dbRecord is not null)
             {
                 await db.UpdateAsync(dbRecord with
                 {
-                    Scale = state.Scale,
-                    ScreenWidth = state.ScreenWidth,
-                    AccessTime = DateTime.Now
+                    AccessTime = DateTime.Now,
+                    StateAsJson = SerializeToJson(state)
                 });
             }
             else
             {
                 await db.InsertAsync(new LastUsageInfoEntity
                 {
-                    UserName = state.UserName, 
-                    ProjectId = state.ProjectId,
-                    ComponentId = state.ComponentId,
-                    
-                    Scale = state.Scale,
-                    ScreenWidth = state.ScreenWidth,
-                    AccessTime = DateTime.Now
+                    UserName    = state.UserName, 
+                    ProjectId   = state.ProjectId,
+                    AccessTime  = DateTime.Now,
+                    StateAsJson = SerializeToJson(state)
                 });
             }
-            
-            
-
         });
-
-
     }
 
     public static IReadOnlyList<string> GetStyleGroupConditionSuggestions(ApplicationState state)

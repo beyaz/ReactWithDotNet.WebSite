@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Xml;
 using Newtonsoft.Json;
 using Formatting = Newtonsoft.Json.Formatting;
 
@@ -351,6 +350,30 @@ static class Extensions
             jsonWriter.WriteToken(jsonReader);
             return stringWriter.ToString();
         }
+    }
+
+    public static string SerializeToJson(object obj)
+    {
+        if (obj is null)
+        {
+            return null;
+        }
+        
+        return JsonConvert.SerializeObject(obj, new JsonSerializerSettings
+        {
+            Formatting           = Formatting.Indented,
+            DefaultValueHandling = DefaultValueHandling.Ignore
+        });
+    }
+    
+    public static T DeserializeFromJson<T>(string json) where T : class
+    {
+        if (json is null)
+        {
+            return null;
+        }
+        
+        return JsonConvert.DeserializeObject<T>(json);
     }
     
     public static double CalculateTextWidth(string text)
