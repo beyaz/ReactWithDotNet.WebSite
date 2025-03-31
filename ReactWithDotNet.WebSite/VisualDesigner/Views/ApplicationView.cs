@@ -33,7 +33,6 @@ sealed class ApplicationView : Component<ApplicationState>
         get { return StyleProperties.Select(x => x.Name).ToList(); }
     }
 
-
     public Task On_CurrentPropertyIndexInStyle_Changed(string senderName)
     {
         StyleInputLocation location = senderName;
@@ -44,10 +43,6 @@ sealed class ApplicationView : Component<ApplicationState>
 
         return Task.CompletedTask;
     }
-
-    
-
-    
 
     protected override async Task constructor()
     {
@@ -71,17 +66,17 @@ sealed class ApplicationView : Component<ApplicationState>
                 ComponentId = 1,
                 ScreenWidth = 600,
                 Scale       = 100,
-                AccessTime  = DateTime.Now,
+                AccessTime  = DateTime.Now
             };
         }
-        
+
         state = new()
         {
             UserName = lastUsage.UserName,
-            
+
             ProjectId   = lastUsage.ProjectId,
-            ComponentId = lastUsage.ComponentId,    
-            
+            ComponentId = lastUsage.ComponentId,
+
             ScreenWidth          = lastUsage.ScreenWidth,
             ScreenHeight         = 100,
             Scale                = lastUsage.Scale,
@@ -92,8 +87,6 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             await ChangeSelectedComponent(state.ComponentId);
         }
-        
-        
     }
 
     protected override Task OverrideStateFromPropsBeforeRender()
@@ -142,6 +135,35 @@ sealed class ApplicationView : Component<ApplicationState>
         };
     }
 
+    Task AddNewLayerClicked(MouseEvent e)
+    {
+        // add as root
+        if (state.ComponentRootElement is null)
+        {
+            state.ComponentRootElement = new()
+            {
+                Tag = "div"
+            };
+
+            state.SelectedVisualElementTreeItemPath = "0";
+            state.HoveredVisualElementTreeItemPath  = null;
+
+            return Task.CompletedTask;
+        }
+
+        var node = FindTreeNodeByTreePath(state.ComponentRootElement, state.SelectedVisualElementTreeItemPath);
+
+        (node.Children ??= []).Add(new()
+        {
+            Tag = "div"
+        });
+
+        state.SelectedVisualElementTreeItemPath = state.SelectedVisualElementTreeItemPath + "," + (node.Children.Count - 1);
+        state.HoveredVisualElementTreeItemPath  = null;
+
+        return Task.CompletedTask;
+    }
+
     Task AddNewPropsClicked(MouseEvent e)
     {
         var properties = CurrentVisualElement.Properties ??= [];
@@ -149,6 +171,23 @@ sealed class ApplicationView : Component<ApplicationState>
         properties.Add(new());
 
         state.SelectedPropertyIndexInProps = properties.Count - 1;
+
+        return Task.CompletedTask;
+    }
+
+    Task ChangeSelectedComponent(int componentId)
+    {
+        state.JsonText = null;
+
+        state.LeftPanelSelectedTab = LeftPanelTab.ElementTree;
+
+        state.ComponentId = componentId;
+
+        var componentModel = GetSelectedComponent(state);
+
+        state.ComponentRootElement = JsonConvert.DeserializeObject<VisualElementModel>(componentModel.RootElementAsJson ?? string.Empty);
+
+        state.SelectedVisualElementTreeItemPath = null;
 
         return Task.CompletedTask;
     }
@@ -237,9 +276,6 @@ sealed class ApplicationView : Component<ApplicationState>
         }
     }
 
-    
-
-
     Task JsonTextInComponentSettingsUpdatedByUser()
     {
         state.JsonText = JsonPrettify(state.JsonText);
@@ -247,14 +283,39 @@ sealed class ApplicationView : Component<ApplicationState>
         switch (state.LeftPanelSelectedTab)
         {
             case LeftPanelTab.Props:
-                return DbSave(state, x =>  x with { PropsAsJson = state.JsonText } );
+                return DbSave(state, x => x with { PropsAsJson = state.JsonText });
 
             case LeftPanelTab.State:
-                return DbSave(state, x =>  x with { StateAsJson = state.JsonText } );
+                return DbSave(state, x => x with { StateAsJson = state.JsonText });
 
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    Task LayersTabRemoveSelectedItemClicked(MouseEvent e)
+    {
+        var intArray = state.SelectedVisualElementTreeItemPath.Split(',');
+        if (intArray.Length == 1)
+        {
+            state.ComponentRootElement = null;
+        }
+        else
+        {
+            var node = state.ComponentRootElement;
+
+            for (var i = 1; i < intArray.Length - 1; i++)
+            {
+                node = node.Children[int.Parse(intArray[i])];
+            }
+
+            node.Children.RemoveAt(int.Parse(intArray[^1]));
+        }
+
+        state.SelectedVisualElementTreeItemPath = null;
+        state.HoveredVisualElementTreeItemPath  = null;
+
+        return Task.CompletedTask;
     }
 
     Element MainContent()
@@ -302,6 +363,22 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
+    Task On_Project_Changed(string newValue)
+    {
+        var projectEntity = GetAllProjects().FirstOrDefault(x => x.Name == newValue);
+        if (projectEntity is null)
+        {
+            this.FailNotification("Project not found. @" + newValue);
+
+            return Task.CompletedTask;
+        }
+
+        state.ProjectId = projectEntity.Id;
+
+        // TODO: reload project state
+
+        return Task.CompletedTask;
+    }
 
     Task OnCommonSizeClicked(MouseEvent e)
     {
@@ -319,145 +396,21 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
-   
-    
-   
-    
-    
-    Task On_Project_Changed(string newValue)
-    {
-        var projectEntity = GetAllProjects().FirstOrDefault(x=>x.Name == newValue);
-        if (projectEntity is null)
-        {
-            this.FailNotification("Project not found. @" + newValue);
-            
-            return Task.CompletedTask;
-        }
-
-        state.ProjectId = projectEntity.Id;
-        
-        // TODO: reload project state
-
-        return Task.CompletedTask;
-    }
-
-    Task ChangeSelectedComponent(int componentId)
-    {
-        state.JsonText = null;
-        
-        state.LeftPanelSelectedTab = LeftPanelTab.ElementTree;
-        
-        state.ComponentId = componentId;
-
-        var componentModel = GetSelectedComponent(state);
-        
-        state.ComponentRootElement = JsonConvert.DeserializeObject<VisualElementModel>(componentModel.RootElementAsJson ?? string.Empty);
-        
-        state.SelectedVisualElementTreeItemPath = null;
-
-        return Task.CompletedTask;
-    }
-    
     Task OnComponentNameChanged(string newValue)
     {
         return ChangeSelectedComponent(GetAllComponentsInProject(state).First(x => x.Name == newValue).Id);
     }
 
-    
-
-
-
-
-
-    
-
-    Element PartProject()
-    {
-        return new FlexRowCentered(Gap(4))
-        {
-            new FlexRowCentered
-            {
-                new IconPlus() + Size(24) + Color(state.IsProjectSettingsPopupVisible ? Gray600 : Gray300) + Hover(Color(Gray600)),
-
-                OnClick(_ =>
-                {
-                    state.IsProjectSettingsPopupVisible = !state.IsProjectSettingsPopupVisible;
-
-                    return Task.CompletedTask;
-                }),
-
-
-                state.IsProjectSettingsPopupVisible ? PositionRelative : null,
-                state.IsProjectSettingsPopupVisible ? new FlexColumn(PositionAbsolute, Top(24), Left(16), Zindex2)
-                {
-                    Background(White), Border(Solid(1, Theme.BorderColor)), BorderRadius(4), Padding(8),
-
-                    Width(300),
-
-                    new MagicInput
-                    {
-                        Placeholder = "New component name",
-                        Name        = string.Empty,
-                        Value       = string.Empty,
-                        AutoFocus   = true,
-                        OnChange = async (_, newValue) =>
-                        {
-
-                            if (newValue.HasNoValue())
-                            {
-                                this.FailNotification("Component name is empty.");
-                                    
-                                return;
-                            }
-
-                            if (GetAllComponentsInProject(state).Any(x=>x.Name == newValue))
-                            {
-                                this.FailNotification("Has already same named component.");
-                                    
-                                return;
-                            }
-
-
-                            var newDbRecord = new ComponentEntity
-                            {
-                                Name      = newValue,
-                                ProjectId = state.ProjectId,
-                                UserName    = state.UserName
-                            };
-
-                            await DbOperation(db => db.InsertAsync(newDbRecord));
-
-                            await OnComponentNameChanged(newValue);
-
-                            state.IsProjectSettingsPopupVisible = false;
-                        }
-                    }
-
-                } : null
-
-            },
-
-            new MagicInput
-            {
-                Name = string.Empty,
-
-                Suggestions = GetProjectNames(state),
-                Value       = GetAllProjects().FirstOrDefault(p=>p.Id == state.ProjectId)?.Name,
-                OnChange    = (_,projectName)=>On_Project_Changed(projectName),
-                FitContent  = true
-            }
-        };
-    }
     Element PartApplicationTopPanel()
     {
         return new FlexRow(UserSelect(none))
         {
-           new FlexRowCentered(Gap(16))
-           {
-               new h3 { "React Visual Designer" },
+            new FlexRowCentered(Gap(16))
+            {
+                new h3 { "React Visual Designer" },
 
-               PartProject
-           },
+                PartProject
+            },
             new FlexRowCentered(Gap(24))
             {
                 new FlexRowCentered(Gap(4))
@@ -510,13 +463,13 @@ sealed class ApplicationView : Component<ApplicationState>
 
             Suggestions       = GetSuggestionsForComponentSelection(state),
             Value             = GetSelectedComponent(state).Name,
-            OnChange          = (_,componentName) => OnComponentNameChanged(componentName),
+            OnChange          = (_, componentName) => OnComponentNameChanged(componentName),
             IsTextAlignCenter = true,
             IsBold            = true
         };
 
         var removeIconInLayersTab = CreateIcon(Icon.remove, 16);
-        if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree  && state.SelectedVisualElementTreeItemPath.HasValue())
+        if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree && state.SelectedVisualElementTreeItemPath.HasValue())
         {
             removeIconInLayersTab.Add(Hover(Color(Blue300), BorderColor(Blue300)), OnClick(LayersTabRemoveSelectedItemClicked));
         }
@@ -524,8 +477,8 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             removeIconInLayersTab.Add(VisibilityCollapse);
         }
-        
-        var addIconInLayersTab =CreateIcon(Icon.add, 16);
+
+        var addIconInLayersTab = CreateIcon(Icon.add, 16);
         if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree && (state.ComponentRootElement is null || state.SelectedVisualElementTreeItemPath.HasValue()))
         {
             addIconInLayersTab.Add(Hover(Color(Blue300), BorderColor(Blue300)), OnClick(AddNewLayerClicked));
@@ -534,7 +487,7 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             addIconInLayersTab.Add(VisibilityCollapse);
         }
-        
+
         return new FlexColumn(WidthFull, AlignItemsCenter, BorderRight(1, dotted, "#d9d9d9"), Background(White))
         {
             componentSelector,
@@ -545,32 +498,31 @@ sealed class ApplicationView : Component<ApplicationState>
                 new FlexRowCentered(WidthFull)
                 {
                     removeIconInLayersTab,
-                    
+
                     new FlexRowCentered(WidthFull)
                     {
                         new IconLayers() + Size(18) + (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree ? Color(Gray500) : null),
-                    
+
                         OnClick(_ =>
                         {
-                            state.LeftPanelSelectedTab = LeftPanelTab.ElementTree; 
-                        
+                            state.LeftPanelSelectedTab = LeftPanelTab.ElementTree;
+
                             return Task.CompletedTask;
                         })
                     },
-                    
+
                     addIconInLayersTab
                 },
-                
-                
+
                 new FlexRowCentered(WidthFull, When(state.LeftPanelSelectedTab == LeftPanelTab.Props, Color(Gray500)))
                 {
                     "Props",
                     PaddingX(8), OnClick(async _ =>
                     {
                         state.LeftPanelSelectedTab = LeftPanelTab.Props;
-                        
+
                         state.JsonText = GetSelectedComponent(state).PropsAsJson;
-                        
+
                         await DbOperationForCurrentComponent(state, x => { state.JsonText = x.PropsAsJson; });
                     })
                 },
@@ -580,11 +532,10 @@ sealed class ApplicationView : Component<ApplicationState>
                     PaddingX(8), OnClick(async _ =>
                     {
                         state.LeftPanelSelectedTab = LeftPanelTab.State;
-                        
+
                         state.JsonText = GetSelectedComponent(state).StateAsJson;
 
                         await DbOperationForCurrentComponent(state, x => { state.JsonText = x.StateAsJson; });
-
                     })
                 }
             },
@@ -607,11 +558,11 @@ sealed class ApplicationView : Component<ApplicationState>
                     state.SelectedVisualElementTreeItemPath = treeItemPath;
                     return Task.CompletedTask;
                 },
-                SelectedPath     = state.SelectedVisualElementTreeItemPath,
-                Model            = state.ComponentRootElement
+                SelectedPath = state.SelectedVisualElementTreeItemPath,
+                Model        = state.ComponentRootElement
             }),
-            
-            When(state.LeftPanelSelectedTab == LeftPanelTab.Props ||state.LeftPanelSelectedTab == LeftPanelTab.State, ()=>new FlexColumnCentered(SizeFull)
+
+            When(state.LeftPanelSelectedTab == LeftPanelTab.Props || state.LeftPanelSelectedTab == LeftPanelTab.State, () => new FlexColumnCentered(SizeFull)
             {
                 new Editor
                 {
@@ -631,64 +582,8 @@ sealed class ApplicationView : Component<ApplicationState>
                         lineNumbers         = false
                     }
                 }
-            }),
-           
+            })
         };
-    }
-
-    Task LayersTabRemoveSelectedItemClicked(MouseEvent e)
-    {
-        var intArray = state.SelectedVisualElementTreeItemPath.Split(',');
-        if (intArray.Length == 1)
-        {
-            state.ComponentRootElement = null;
-        }
-        else
-        {
-            var node = state.ComponentRootElement;
-            
-            for (var i = 1; i < intArray.Length - 1; i++)
-            {
-                node = node.Children[int.Parse(intArray[i])];
-            }
-
-            node.Children.RemoveAt(int.Parse(intArray[^1]));
-        }
-        
-        state.SelectedVisualElementTreeItemPath    = null;
-        state.HoveredVisualElementTreeItemPath = null;
-        
-        
-        return Task.CompletedTask;
-    }
-    
-    Task AddNewLayerClicked(MouseEvent e)
-    {
-        // add as root
-        if (state.ComponentRootElement is null)
-        {
-            state.ComponentRootElement = new()
-            {
-                Tag = "div"
-            };
-            
-            state.SelectedVisualElementTreeItemPath = "0";
-            state.HoveredVisualElementTreeItemPath  = null;
-            
-            return Task.CompletedTask;
-        }
-
-        var node = FindTreeNodeByTreePath(state.ComponentRootElement, state.SelectedVisualElementTreeItemPath);
-        
-        (node.Children ??= []).Add(new()
-        {
-            Tag = "div"
-        });
-        
-        state.SelectedVisualElementTreeItemPath = state.SelectedVisualElementTreeItemPath + "," + (node.Children.Count -1);
-        state.HoveredVisualElementTreeItemPath  = null;
-        
-        return Task.CompletedTask;
     }
 
     Element PartMediaSizeButtons()
@@ -812,6 +707,79 @@ sealed class ApplicationView : Component<ApplicationState>
         }
     }
 
+    Element PartProject()
+    {
+        return new FlexRowCentered(Gap(4))
+        {
+            new FlexRowCentered
+            {
+                new IconPlus() + Size(24) + Color(state.IsProjectSettingsPopupVisible ? Gray600 : Gray300) + Hover(Color(Gray600)),
+
+                OnClick(_ =>
+                {
+                    state.IsProjectSettingsPopupVisible = !state.IsProjectSettingsPopupVisible;
+
+                    return Task.CompletedTask;
+                }),
+
+                state.IsProjectSettingsPopupVisible ? PositionRelative : null,
+                state.IsProjectSettingsPopupVisible ? new FlexColumn(PositionAbsolute, Top(24), Left(16), Zindex2)
+                {
+                    Background(White), Border(Solid(1, Theme.BorderColor)), BorderRadius(4), Padding(8),
+
+                    Width(300),
+
+                    new MagicInput
+                    {
+                        Placeholder = "New component name",
+                        Name        = string.Empty,
+                        Value       = string.Empty,
+                        AutoFocus   = true,
+                        OnChange = async (_, newValue) =>
+                        {
+                            if (newValue.HasNoValue())
+                            {
+                                this.FailNotification("Component name is empty.");
+
+                                return;
+                            }
+
+                            if (GetAllComponentsInProject(state).Any(x => x.Name == newValue))
+                            {
+                                this.FailNotification("Has already same named component.");
+
+                                return;
+                            }
+
+                            var newDbRecord = new ComponentEntity
+                            {
+                                Name      = newValue,
+                                ProjectId = state.ProjectId,
+                                UserName  = state.UserName
+                            };
+
+                            await DbOperation(db => db.InsertAsync(newDbRecord));
+
+                            await OnComponentNameChanged(newValue);
+
+                            state.IsProjectSettingsPopupVisible = false;
+                        }
+                    }
+                } : null
+            },
+
+            new MagicInput
+            {
+                Name = string.Empty,
+
+                Suggestions = GetProjectNames(state),
+                Value       = GetAllProjects().FirstOrDefault(p => p.Id == state.ProjectId)?.Name,
+                OnChange    = (_, projectName) => On_Project_Changed(projectName),
+                FitContent  = true
+            }
+        };
+    }
+
     Element PartRightPanel()
     {
         if (!state.SelectedVisualElementTreeItemPath.HasValue())
@@ -832,7 +800,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     Name        = string.Empty,
                     Value       = visualElementModel.Tag,
                     Suggestions = GetTagSuggestions(state),
-                    OnChange    = (_, newValue) =>
+                    OnChange = (_, newValue) =>
                     {
                         CurrentVisualElement.Tag = newValue;
 
@@ -847,9 +815,9 @@ sealed class ApplicationView : Component<ApplicationState>
                 " : ",
                 new MagicInput
                 {
-                    Name        = string.Empty,
-                    Value       = visualElementModel.Text,
-                    OnChange    = (_, newValue) =>
+                    Name  = string.Empty,
+                    Value = visualElementModel.Text,
+                    OnChange = (_, newValue) =>
                     {
                         CurrentVisualElement.Text = newValue;
 
@@ -904,8 +872,8 @@ sealed class ApplicationView : Component<ApplicationState>
 
                             new MagicInput
                             {
-                                Name              = styleGroupIndex.ToString(),
-                                OnFocus           = senderNameAsStyleGroupIndex=>
+                                Name = styleGroupIndex.ToString(),
+                                OnFocus = senderNameAsStyleGroupIndex =>
                                 {
                                     state.SelectedStyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex);
 
@@ -947,14 +915,14 @@ sealed class ApplicationView : Component<ApplicationState>
                             {
                                 new MagicInput
                                 {
-                                    Name        = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true },
-                                    Value       = property.Value,
-                                    OnFocus     = On_CurrentPropertyIndexInStyle_Changed,
-                                    OnChange    = (_, newValue) =>
+                                    Name    = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true },
+                                    Value   = property.Value,
+                                    OnFocus = On_CurrentPropertyIndexInStyle_Changed,
+                                    OnChange = (_, newValue) =>
                                     {
-                                         CurrentStyleProperty.Value = newValue;
+                                        CurrentStyleProperty.Value = newValue;
 
- return Task.CompletedTask;
+                                        return Task.CompletedTask;
                                     },
                                     Placeholder = "red"
                                 }
@@ -1020,15 +988,15 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         new MagicInput
                         {
-                            Name        = new PropInputLocation { Index = index, IsName = false, IsValue = true },
-                            Value       = property.Value,
-                            OnFocus     = senderName =>
+                            Name  = new PropInputLocation { Index = index, IsName = false, IsValue = true },
+                            Value = property.Value,
+                            OnFocus = senderName =>
                             {
                                 state.SelectedPropertyIndexInProps = ((PropInputLocation)senderName).Index;
 
                                 return Task.CompletedTask;
                             },
-                            OnChange    = (_,newValue)=>
+                            OnChange = (_, newValue) =>
                             {
                                 CurrentVisualElement.Properties[state.SelectedPropertyIndexInProps!.Value].Value = newValue;
 
@@ -1080,9 +1048,6 @@ sealed class ApplicationView : Component<ApplicationState>
             }
         };
     }
-
-    
-
 
     Task StyleGroupAddClicked(MouseEvent e)
     {
