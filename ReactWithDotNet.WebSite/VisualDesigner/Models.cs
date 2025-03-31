@@ -42,8 +42,6 @@ public sealed record VisualElementModel
     public List<PropertyModel> Properties { get; set; }
     
     public List<VisualElementModel> Children { get; set; }
-
-    internal bool HasChild => Children?.Count > 0;
     
     // @formatter:on
 }

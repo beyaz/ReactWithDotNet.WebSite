@@ -72,7 +72,7 @@ sealed class VisualElementTreeView : Component
             }
         };
 
-        if (node.HasChild is false)
+        if (node.HasNoChild())
         {
             return returnList;
         }

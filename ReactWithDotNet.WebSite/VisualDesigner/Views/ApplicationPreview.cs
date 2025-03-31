@@ -156,7 +156,7 @@ sealed class ApplicationPreview : Component
                 }
             }
 
-            if (model.HasChild is false)
+            if (model.HasNoChild())
             {
                 return element;
             }

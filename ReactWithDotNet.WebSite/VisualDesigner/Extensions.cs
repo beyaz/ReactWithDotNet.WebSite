@@ -13,6 +13,10 @@ static class Theme
 
 static class Extensions
 {
+    public static bool HasNoChild(this VisualElementModel model)
+    {
+        return model.Children is null || model.Children.Count == 0;
+    }
     
     public static void RefreshComponentPreview(this Client client)
     {
