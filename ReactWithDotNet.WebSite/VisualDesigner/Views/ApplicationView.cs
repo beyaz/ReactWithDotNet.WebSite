@@ -940,46 +940,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 {
                     return new FlexColumn(WidthFull, Gap(4))
                     {
-                        new FlexRow(WidthFull, AlignItemsCenter, Gap(4), PaddingX(2))
-                        {
-                            CreateIcon(Icon.remove, 28, state.SelectedPropertyIndexInStyleGroup.HasValue && state.SelectedStyleGroupIndex == styleGroupIndex ?
-                                           [
-                                               OnClick(_ =>
-                                               {
-                                                   CurrentStyleGroup.Items_old.Remove(CurrentStyleProperty);
-
-                                                   state.SelectedPropertyIndexInStyleGroup = null;
-
-                                                   return Task.CompletedTask;
-                                               }),
-                                               Hover(Color(Blue300))
-                                           ] :
-                                           [
-                                               Color(Gray100),
-                                               BorderColor(Gray100)
-                                           ]),
-
-                            new MagicInput
-                            {
-                                Name = styleGroupIndex.ToString(),
-                                OnFocus = senderNameAsStyleGroupIndex =>
-                                {
-                                    state.SelectedStyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex);
-
-                                    return Task.CompletedTask;
-                                },
-                                Value             = styleGroup.Condition,
-                                IsTextAlignCenter = true,
-                                Suggestions       = GetStyleGroupConditionSuggestions(state)
-                            } + FlexGrow(1),
-
-                            CreateIcon(Icon.add, 28) + OnClick(_ =>
-                            {
-                                CurrentStyleGroup.Items_old.Add(new());
-
-                                return Task.CompletedTask;
-                            })
-                        },
+                        newStyleGroupHeader(styleGroup,styleGroupIndex),
 
                         styleGroup.Items_old.Select((property, index) => new FlexRow(Gap(4))
                         {
@@ -1073,6 +1034,51 @@ sealed class ApplicationView : Component<ApplicationState>
                 })
             }
         };
+
+
+        Element newStyleGroupHeader(PropertyGroupModel styleGroup, int styleGroupIndex)
+        {
+            return new FlexRow(WidthFull, AlignItemsCenter, Gap(4), PaddingX(2))
+            {
+                CreateIcon(Icon.remove, 28, state.SelectedPropertyIndexInStyleGroup.HasValue && state.SelectedStyleGroupIndex == styleGroupIndex ?
+                               [
+                                   OnClick(_ =>
+                                   {
+                                       CurrentStyleGroup.Items_old.Remove(CurrentStyleProperty);
+
+                                       state.SelectedPropertyIndexInStyleGroup = null;
+
+                                       return Task.CompletedTask;
+                                   }),
+                                   Hover(Color(Blue300))
+                               ] :
+                               [
+                                   Color(Gray100),
+                                   BorderColor(Gray100)
+                               ]),
+
+                new MagicInput
+                {
+                    Name = styleGroupIndex.ToString(),
+                    OnFocus = senderNameAsStyleGroupIndex =>
+                    {
+                        state.SelectedStyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex);
+
+                        return Task.CompletedTask;
+                    },
+                    Value             = styleGroup.Condition,
+                    IsTextAlignCenter = true,
+                    Suggestions       = GetStyleGroupConditionSuggestions(state)
+                } + FlexGrow(1),
+
+                CreateIcon(Icon.add, 28) + OnClick(_ =>
+                {
+                    CurrentStyleGroup.Items_old.Add(new());
+
+                    return Task.CompletedTask;
+                })
+            };
+        }
     }
 
     Element PartScale()
