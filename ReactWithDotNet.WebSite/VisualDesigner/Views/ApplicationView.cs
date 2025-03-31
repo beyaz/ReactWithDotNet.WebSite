@@ -33,14 +33,6 @@ sealed class ApplicationView : Component<ApplicationState>
         get { return StyleProperties.Select(x => x.Name).ToList(); }
     }
 
-    public Task On_CurrentPropertyIndexInProps_Changed(string senderName)
-    {
-        PropInputLocation location = senderName;
-
-        state.SelectedPropertyIndexInProps = location.Index;
-
-        return Task.CompletedTask;
-    }
 
     public Task On_CurrentPropertyIndexInStyle_Changed(string senderName)
     {
@@ -1017,7 +1009,12 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         new MagicInput
                         {
-                            OnFocus = On_CurrentPropertyIndexInProps_Changed,
+                            OnFocus = senderName =>
+                            {
+                                state.SelectedPropertyIndexInProps = ((PropInputLocation)senderName).Index;
+
+                                return Task.CompletedTask;
+                            },
 
                             Name             = new PropInputLocation { Index = index, IsName = true, IsValue = false },
                             Value            = property.Name,
@@ -1036,7 +1033,12 @@ sealed class ApplicationView : Component<ApplicationState>
                         {
                             Name        = new PropInputLocation { Index = index, IsName = false, IsValue = true },
                             Value       = property.Value,
-                            OnFocus     = On_CurrentPropertyIndexInProps_Changed,
+                            OnFocus     = senderName =>
+                            {
+                                state.SelectedPropertyIndexInProps = ((PropInputLocation)senderName).Index;
+
+                                return Task.CompletedTask;
+                            },
                             OnChange    = On_CurrentPropertyValueInProps_Changed,
                             Placeholder = "? ? ?"
                         }
