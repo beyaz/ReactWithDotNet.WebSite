@@ -968,7 +968,14 @@ sealed class ApplicationView : Component<ApplicationState>
             {
                 CreateIcon(Icon.remove, 32, state.SelectedPropertyIndexInProps.HasValue ?
                                [
-                                   OnClick(RemoveCurrentPropertyInProps),
+                                   OnClick(_ =>
+                                   {
+                                       CurrentVisualElement.Properties.RemoveAt(state.SelectedPropertyIndexInProps!.Value);
+
+                                       state.SelectedPropertyIndexInProps = null;
+
+                                       return Task.CompletedTask;
+                                   }),
                                    Hover(Color(Blue300))
                                ] :
                                [
@@ -1076,14 +1083,6 @@ sealed class ApplicationView : Component<ApplicationState>
 
     
 
-    Task RemoveCurrentPropertyInProps(MouseEvent e)
-    {
-        CurrentVisualElement.Properties.RemoveAt(state.SelectedPropertyIndexInProps!.Value);
-
-        state.SelectedPropertyIndexInProps = null;
-
-        return Task.CompletedTask;
-    }
 
     Task StyleGroupAddClicked(MouseEvent e)
     {
