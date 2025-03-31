@@ -194,17 +194,24 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Task ChangeSelectedComponent(int componentId)
     {
-        state.JsonText = null;
-
-        state.LeftPanelSelectedTab = LeftPanelTab.ElementTree;
-
-        state.ComponentId = componentId;
-
         var componentModel = GetSelectedComponent(state);
 
-        state.ComponentRootElement = DeserializeFromJson<VisualElementModel>(componentModel.RootElementAsJson ?? string.Empty);
+        var componentRootElement = DeserializeFromJson<VisualElementModel>(componentModel.RootElementAsJson ?? string.Empty);
 
-        state.SelectedVisualElementTreeItemPath = null;
+        state = new()
+        {
+            UserName = state.UserName,
+
+            ProjectId = state.ProjectId,
+
+            Preview = state.Preview,
+
+            LeftPanelSelectedTab = LeftPanelTab.ElementTree,
+
+            ComponentId = componentId,
+
+            ComponentRootElement = componentRootElement
+        };
 
         return Task.CompletedTask;
     }
@@ -243,9 +250,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 return;
             }
 
-            state.ComponentId = component.Id;
-
-            state.ComponentRootElement = DeserializeFromJson<VisualElementModel>(component.RootElementAsJson ?? string.Empty);
+            await ChangeSelectedComponent(component.Id);
         }
     }
 
