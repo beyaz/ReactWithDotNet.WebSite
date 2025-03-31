@@ -9,16 +9,21 @@ public enum LeftPanelTab
     State
 }
 
+public sealed class ApplicationPreviewInfo
+{
+    public int Scale { get; set; }
+    
+    public int Height { get; init; }
+
+    public int Width { get; set; }
+}
+
 public sealed class ApplicationState
 {
     // @formatter:off
 
     // APPLICATION STATE
-    public int Scale { get; set; }
-
-    public int ScreenHeight { get; init; }
-
-    public int ScreenWidth { get; set; }
+    public required ApplicationPreviewInfo Preview { get; init; }
     
     public int ProjectId { get; set; }
     

@@ -60,8 +60,8 @@ sealed class ApplicationView : Component<ApplicationState>
 
         // try take from db cache
         {
-            var lastUsage = GetLastUsageInfoByUserName(userName).FirstOrDefault();
-            if (lastUsage is not null && lastUsage.StateAsJson is not null)
+            var lastUsage = (await GetLastUsageInfoByUserName(userName)).FirstOrDefault();
+            if (lastUsage is not null)
             {
                 state = DeserializeFromJson<ApplicationState>(lastUsage.StateAsJson);
             
@@ -76,11 +76,12 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             UserName = userName,
 
-            ScreenWidth  = 600,
-            ScreenHeight = 100,
-            Scale        = 100,
-
-            LeftPanelSelectedTab = LeftPanelTab.ElementTree
+            Preview = new()
+            {
+                Width  = 600,
+                Height = 100,
+                Scale        = 100
+            }
         };
 
         await ChangeSelectedProject(1);
@@ -208,7 +209,7 @@ sealed class ApplicationView : Component<ApplicationState>
     Element createHorizontalRuler()
     {
         const int step = 50;
-        var max = state.ScreenWidth / step + 1;
+        var max = state.Preview.Width / step + 1;
 
         return new FlexRow(PositionRelative, WidthFull, Height(20))
         {
@@ -241,13 +242,13 @@ sealed class ApplicationView : Component<ApplicationState>
 
             var cursor = 0;
             var distance = miniStep;
-            while (distance <= state.ScreenWidth)
+            while (distance <= state.Preview.Width)
             {
                 cursor++;
 
                 distance = cursor * miniStep;
 
-                if (distance % step == 0 || distance > state.ScreenWidth)
+                if (distance % step == 0 || distance > state.Preview.Width)
                 {
                     continue;
                 }
@@ -333,7 +334,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Element MainContent()
     {
-        var scaleStyle = TransformOrigin("0 0") + Transform($"scale({state.Scale / (double)100})");
+        var scaleStyle = TransformOrigin("0 0") + Transform($"scale({state.Preview.Scale / (double)100})");
 
         return new SplitRow
         {
@@ -342,9 +343,9 @@ sealed class ApplicationView : Component<ApplicationState>
             {
                 PartLeftPanel() + BorderBottomLeftRadius(8) + OverflowAuto,
 
-                new FlexColumn(state.ScreenWidth < 768 ? AlignItemsCenter : AlignItemsFlexStart, FlexGrow(1), Padding(7), MarginLeft(40), scaleStyle, OverflowXAuto)
+                new FlexColumn(state.Preview.Width < 768 ? AlignItemsCenter : AlignItemsFlexStart, FlexGrow(1), Padding(7), MarginLeft(40), scaleStyle, OverflowXAuto)
                 {
-                    createHorizontalRuler() + Width(state.ScreenWidth) + MarginTop(12),
+                    createHorizontalRuler() + Width(state.Preview.Width) + MarginTop(12),
                     PartPreview
                 },
 
@@ -376,18 +377,53 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
-    Task ChangeSelectedProject(int projectId)
+    async Task ChangeSelectedProject(int projectId)
     {
+        state.LeftPanelSelectedTab = LeftPanelTab.ElementTree;
+
+        state = new()
+        {
+            UserName = state.UserName,
+            ProjectId = projectId,
+            Preview = state.Preview,
+            
+            LeftPanelSelectedTab = LeftPanelTab.ElementTree
+        };
+        
+        var userName = Environment.UserName; // future: get userName from cookie or url
+        
         state.ProjectId = projectId;
+        
+        // try take from db cache
+        {
+            var lastUsage = (await GetLastUsageInfoByUserName(userName)).FirstOrDefault();
+            if (lastUsage is not null)
+            {
+                state = DeserializeFromJson<ApplicationState>(lastUsage.StateAsJson);
+            
+                return;
+            }
+        }
+        
+        // try select first component
+        {
+            var component = await GetFirstComponentInProject(projectId);
+            if (component is null)
+            {
+                return;
+            }
+            
+            state.ComponentId = component.Id;
+            state.ComponentRootElement = DeserializeFromJson<VisualElementModel>(component.RootElementAsJson ?? string.Empty);
+        }
 
         // TODO: reload project state
 
-        return Task.CompletedTask;
     }
     
     Task OnCommonSizeClicked(MouseEvent e)
     {
-        state.ScreenWidth = e.currentTarget.data["value"] switch
+        state.Preview.Width = e.currentTarget.data["value"] switch
         {
             "M"   => 320,
             "SM"  => 640,
@@ -424,19 +460,19 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         OnClick(_ =>
                         {
-                            state.ScreenWidth -= 10;
+                            state.Preview.Width -= 10;
 
                             return Task.CompletedTask;
                         }),
 
                         new IconMinus()
                     },
-                    $"{state.ScreenWidth}px",
+                    $"{state.Preview.Width}px",
                     new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
                     {
                         OnClick(_ =>
                         {
-                            state.ScreenWidth += 10;
+                            state.Preview.Width += 10;
 
                             return Task.CompletedTask;
                         }),
@@ -608,12 +644,12 @@ sealed class ApplicationView : Component<ApplicationState>
                 OnClick(OnCommonSizeClicked),
                 Hover(Color("#2196f3")),
 
-                (x == "M" && state.ScreenWidth == 320) ||
-                (x == "SM" && state.ScreenWidth == 640) ||
-                (x == "MD" && state.ScreenWidth == 768) ||
-                (x == "LG" && state.ScreenWidth == 1024) ||
-                (x == "XL" && state.ScreenWidth == 1280) ||
-                (x == "XXL" && state.ScreenWidth == 1536)
+                (x == "M" && state.Preview.Width == 320) ||
+                (x == "SM" && state.Preview.Width == 640) ||
+                (x == "MD" && state.Preview.Width == 768) ||
+                (x == "LG" && state.Preview.Width == 1024) ||
+                (x == "XL" && state.Preview.Width == 1280) ||
+                (x == "XXL" && state.Preview.Width == 1536)
                     ? FontWeight500 + Color("#2196f3")
                     : null
             })
@@ -630,8 +666,8 @@ sealed class ApplicationView : Component<ApplicationState>
             createVerticleRuler,
             createElement(),
 
-            Width(state.ScreenWidth),
-            Height(state.ScreenHeight * percent),
+            Width(state.Preview.Width),
+            Height(state.Preview.Height * percent),
             BoxShadow(0, 4, 12, 0, rgba(0, 0, 0, 0.1))
         };
 
@@ -1034,29 +1070,29 @@ sealed class ApplicationView : Component<ApplicationState>
             {
                 OnClick(_ =>
                 {
-                    if (state.Scale <= 20)
+                    if (state.Preview.Scale <= 20)
                     {
                         return Task.CompletedTask;
                     }
 
-                    state.Scale -= 10;
+                    state.Preview.Scale -= 10;
 
                     return Task.CompletedTask;
                 }),
                 new IconMinus()
             },
 
-            $"%{state.Scale}",
+            $"%{state.Preview.Scale}",
             new FlexRowCentered(BorderRadius(100), Padding(3), Background(Blue200), Hover(Background(Blue300)))
             {
                 OnClick(_ =>
                 {
-                    if (state.Scale >= 100)
+                    if (state.Preview.Scale >= 100)
                     {
                         return Task.CompletedTask;
                     }
 
-                    state.Scale += 10;
+                    state.Preview.Scale += 10;
 
                     return Task.CompletedTask;
                 }),
