@@ -321,10 +321,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
    
     
-    Task On_Project_Changed(string senderName, string newValue)
-    {
-        return On_Project_Changed(newValue);
-    }
+   
     
     
     Task On_Project_Changed(string newValue)
@@ -465,7 +462,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
                 Suggestions = GetProjectNames(state),
                 Value       = GetAllProjects().FirstOrDefault(p=>p.Id == state.ProjectId)?.Name,
-                OnChange    = On_Project_Changed,
+                OnChange    = (_,projectName)=>On_Project_Changed(projectName),
                 FitContent  = true
             }
         };
