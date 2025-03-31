@@ -424,12 +424,7 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
-    Task OnVisualElementTreeItemHovered(string treeItemPath)
-    {
-        state.HoveredVisualElementTreeItemPath = treeItemPath;
-
-        return Task.CompletedTask;
-    }
+    
 
     Task OnVisualElementTreeSelected(string treePath)
     {
@@ -658,7 +653,12 @@ sealed class ApplicationView : Component<ApplicationState>
 
             When(state.LeftPanelSelectedTab == LeftPanelTab.ElementTree, () => new VisualElementTreeView
             {
-                TreeItemHover = OnVisualElementTreeItemHovered,
+                TreeItemHover = treeItemPath =>
+                {
+                    state.HoveredVisualElementTreeItemPath = treeItemPath;
+
+                    return Task.CompletedTask;
+                },
                 MouseLeave = () =>
                 {
                     state.HoveredVisualElementTreeItemPath = null;
