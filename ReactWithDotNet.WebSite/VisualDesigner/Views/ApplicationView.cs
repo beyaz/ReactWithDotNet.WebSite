@@ -13,7 +13,7 @@ sealed class ApplicationView : Component<ApplicationState>
         remove
     }
 
-    PropertyGroupModel CurrentStyleGroup => CurrentVisualElement.StyleGroups__old[state.SelectedStyleGroupIndex!.Value];
+    PropertyGroupModel CurrentStyleGroup => CurrentVisualElement.StyleGroups[state.SelectedStyleGroupIndex!.Value];
 
     PropertyModel CurrentStyleProperty
     {
@@ -21,7 +21,7 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             Debug.Assert(state.SelectedPropertyIndexInStyleGroup != null, "state.CurrentPropertyIndex != null");
 
-            return CurrentStyleGroup.Items[state.SelectedPropertyIndexInStyleGroup.Value];
+            return CurrentStyleGroup.Items_old[state.SelectedPropertyIndexInStyleGroup.Value];
         }
     }
 
@@ -904,7 +904,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
             new FlexColumnCentered(WidthFull)
             {
-                visualElementModel.StyleGroups__old?.Select((styleGroup, styleGroupIndex) =>
+                visualElementModel.StyleGroups?.Select((styleGroup, styleGroupIndex) =>
                 {
                     return new FlexColumn(WidthFull, Gap(4))
                     {
@@ -914,7 +914,7 @@ sealed class ApplicationView : Component<ApplicationState>
                                            [
                                                OnClick(_ =>
                                                {
-                                                   CurrentStyleGroup.Items.Remove(CurrentStyleProperty);
+                                                   CurrentStyleGroup.Items_old.Remove(CurrentStyleProperty);
 
                                                    state.SelectedPropertyIndexInStyleGroup = null;
 
@@ -943,13 +943,13 @@ sealed class ApplicationView : Component<ApplicationState>
 
                             CreateIcon(Icon.add, 28) + OnClick(_ =>
                             {
-                                CurrentStyleGroup.Items.Add(new());
+                                CurrentStyleGroup.Items_old.Add(new());
 
                                 return Task.CompletedTask;
                             })
                         },
 
-                        styleGroup.Items.Select((property, index) => new FlexRow(Gap(4))
+                        styleGroup.Items_old.Select((property, index) => new FlexRow(Gap(4))
                         {
                             new FlexRow(JustifyContentFlexEnd, Width(4, 10))
                             {
@@ -1108,7 +1108,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Task StyleGroupAddClicked(MouseEvent e)
     {
-        var styleGroups = CurrentVisualElement.StyleGroups__old ??= [];
+        var styleGroups = CurrentVisualElement.StyleGroups ??= [];
 
         PropertyGroupModel newStyleGroup;
         if (styleGroups.Count == 0)
@@ -1116,7 +1116,7 @@ sealed class ApplicationView : Component<ApplicationState>
             newStyleGroup = new()
             {
                 Condition = "*",
-                Items     = [new PropertyModel()]
+                Items_old     = [new PropertyModel()]
             };
         }
         else
@@ -1124,7 +1124,7 @@ sealed class ApplicationView : Component<ApplicationState>
             newStyleGroup = new()
             {
                 Condition = "? ? ? ?",
-                Items     = [new PropertyModel()]
+                Items_old     = [new PropertyModel()]
             };
         }
 
@@ -1137,7 +1137,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Task StyleGroupRemoveClicked(MouseEvent e)
     {
-        CurrentVisualElement.StyleGroups__old.Remove(CurrentStyleGroup);
+        CurrentVisualElement.StyleGroups.Remove(CurrentStyleGroup);
 
         state.SelectedStyleGroupIndex           = null;
         state.SelectedPropertyIndexInStyleGroup = null;

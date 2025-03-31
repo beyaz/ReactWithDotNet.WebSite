@@ -58,9 +58,9 @@ sealed class ApplicationPreview : Component
                 element.text = model.Text;
             }
 
-            foreach (var styleGroup in model.StyleGroups__old ?? [])
+            foreach (var styleGroup in model.StyleGroups ?? [])
             {
-                foreach (var styleAttribute in styleGroup.Items ?? [])
+                foreach (var styleAttribute in styleGroup.Items_old ?? [])
                 {
                     var value = styleAttribute.Value;
 

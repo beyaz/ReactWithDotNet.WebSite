@@ -24,7 +24,9 @@ public sealed record PropertyGroupModel
     
     public string Condition { get; set; }
 
-    public List<PropertyModel> Items { get; set; }
+    public List<PropertyModel> Items_old { get; set; }
+    
+    public List<string> Items { get; set; }
     
     // @formatter:on
 }
@@ -37,7 +39,7 @@ public sealed record VisualElementModel
     
     public string Text { get; set; }
     
-    public List<PropertyGroupModel> StyleGroups__old { get; set; }
+    public List<PropertyGroupModel> StyleGroups { get; set; }
     
     public List<PropertyModel> Properties { get; set; }
     
