@@ -1207,8 +1207,8 @@ sealed class ApplicationView : Component<ApplicationState>
 
     class StyleInputLocation
     {
-        public required bool IsName { get; init; }
-        public required bool IsValue { get; init; }
+        public  bool IsName { get; init; }
+        public  bool IsValue { get; init; }
         public required int PropertyIndexInGroup { get; init; }
         public required int StyleGroupIndex { get; init; }
 
