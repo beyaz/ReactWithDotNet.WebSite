@@ -127,9 +127,11 @@ sealed class ApplicationView : Component<ApplicationState>
 
     static FlexRowCentered CreateIcon(Icon name, int size, Modifier[] modifiers = null)
     {
+        Style style = [Size(size), BorderRadius(16), BorderWidth(1), BorderStyle(solid), BorderColor(Gray200), Color(Gray200)];
+        
         if (name == Icon.add)
         {
-            return new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Color(Gray200))
+            return new(style)
             {
                 new IconPlus(),
                 
@@ -140,7 +142,7 @@ sealed class ApplicationView : Component<ApplicationState>
         
         if (name == Icon.remove)
         {
-            return new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Color(Gray200))
+            return new(style)
             {
                 new IconMinus(), modifiers
             };
