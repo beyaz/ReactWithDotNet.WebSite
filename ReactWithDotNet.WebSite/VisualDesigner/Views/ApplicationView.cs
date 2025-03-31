@@ -47,12 +47,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
     
 
-    public Task OnStyleGroupSelected(string senderNameAsStyleGroupIndex)
-    {
-        state.SelectedStyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex);
-
-        return Task.CompletedTask;
-    }
+    
 
     protected override async Task constructor()
     {
@@ -933,7 +928,12 @@ sealed class ApplicationView : Component<ApplicationState>
                             new MagicInput
                             {
                                 Name              = styleGroupIndex.ToString(),
-                                OnFocus           = OnStyleGroupSelected,
+                                OnFocus           = senderNameAsStyleGroupIndex=>
+                                {
+                                    state.SelectedStyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex);
+
+                                    return Task.CompletedTask;
+                                },
                                 Value             = styleGroup.Condition,
                                 IsTextAlignCenter = true,
                                 Suggestions       = GetStyleGroupConditionSuggestions(state)
