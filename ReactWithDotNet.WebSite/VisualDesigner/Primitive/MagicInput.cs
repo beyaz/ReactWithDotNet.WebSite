@@ -42,7 +42,8 @@ sealed class MagicInput : Component<MagicInput.State>
     public bool IsTextAlignCenter { get; init; }
 
     public bool AutoFocus { get; init; }
-    
+    public string Id { get; set; }
+
     protected override Element render()
     {
         return new FlexColumn(FitContent is false ? FlexGrow(1) : null)
@@ -58,6 +59,7 @@ sealed class MagicInput : Component<MagicInput.State>
                 placeholder = Placeholder,
                 onFocus = OnFocused,
                 onBlur = OnBlur,
+                id=Id,
                 style =
                 {
                     OutlineNone,
