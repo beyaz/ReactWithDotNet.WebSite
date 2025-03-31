@@ -56,7 +56,9 @@ static class ApplicationLogic
 
         var dbRecords = DbOperation(async connection => (await connection.QueryAsync<ComponentEntity>(query, new { state.ComponentId })).ToList()).GetAwaiter().GetResult();
 
-        return dbRecords.First();
+        
+        
+        return dbRecords.FirstOrDefault(x=>x.UserName == state.UserName) ?? dbRecords.FirstOrDefault();
     }
     
     public static Task UpdateLastUsageInfo(ApplicationState state)
