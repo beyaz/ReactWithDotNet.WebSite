@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using Dapper.Contrib.Extensions;
-using Newtonsoft.Json;
 using ReactWithDotNet.ThirdPartyLibraries.MonacoEditorReact;
 using Page = ReactWithDotNet.WebSite.Page;
 
@@ -64,7 +63,7 @@ sealed class ApplicationView : Component<ApplicationState>
             var lastUsage = GetLastUsageInfoByUserName(userName).FirstOrDefault();
             if (lastUsage is not null && lastUsage.StateAsJson is not null)
             {
-                state = JsonConvert.DeserializeObject<ApplicationState>(lastUsage.StateAsJson);
+                state = DeserializeFromJson<ApplicationState>(lastUsage.StateAsJson);
             
                 return;
             }
@@ -199,7 +198,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
         var componentModel = GetSelectedComponent(state);
 
-        state.ComponentRootElement = JsonConvert.DeserializeObject<VisualElementModel>(componentModel.RootElementAsJson ?? string.Empty);
+        state.ComponentRootElement = DeserializeFromJson<VisualElementModel>(componentModel.RootElementAsJson ?? string.Empty);
 
         state.SelectedVisualElementTreeItemPath = null;
 
