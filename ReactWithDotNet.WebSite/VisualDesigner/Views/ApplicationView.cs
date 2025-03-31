@@ -942,42 +942,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         newStyleGroupHeader(styleGroup,styleGroupIndex),
 
-                        styleGroup.Items_old.Select((property, index) => new FlexRow(Gap(4))
-                        {
-                            new FlexRow(JustifyContentFlexEnd, Width(4, 10))
-                            {
-                                new MagicInput
-                                {
-                                    OnFocus = On_CurrentPropertyIndexInStyle_Changed,
-
-                                    Name             = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = true, StyleGroupIndex = styleGroupIndex, IsValue = false },
-                                    Value            = property.Name,
-                                    OnChange         = On_CurrentPropertyNameInStyle_Changed,
-                                    IsBold           = true,
-                                    IsTextAlignRight = true,
-                                    Suggestions      = StyleAttributeNameSuggestions,
-                                    Placeholder      = "color",
-                                    AutoFocus        = property.Name.HasNoValue()
-                                }
-                            },
-                            " : ",
-                            new FlexRow(Width(6, 10))
-                            {
-                                new MagicInput
-                                {
-                                    Name    = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true },
-                                    Value   = property.Value,
-                                    OnFocus = On_CurrentPropertyIndexInStyle_Changed,
-                                    OnChange = (_, newValue) =>
-                                    {
-                                        CurrentStyleProperty.Value = newValue;
-
-                                        return Task.CompletedTask;
-                                    },
-                                    Placeholder = "red"
-                                }
-                            }
-                        })
+                        styleGroup.Items_old.Select((property, index) => newStylePropertyEditor(index, styleGroupIndex, property))
                     };
                 })
             },
@@ -1035,6 +1000,45 @@ sealed class ApplicationView : Component<ApplicationState>
             }
         };
 
+        FlexRow newStylePropertyEditor(int index, int styleGroupIndex, PropertyModel property)
+        {
+            return new FlexRow(Gap(4))
+            {
+                new FlexRow(JustifyContentFlexEnd, Width(4, 10))
+                {
+                    new MagicInput
+                    {
+                        OnFocus = On_CurrentPropertyIndexInStyle_Changed,
+
+                        Name             = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = true, StyleGroupIndex = styleGroupIndex, IsValue = false },
+                        Value            = property.Name,
+                        OnChange         = On_CurrentPropertyNameInStyle_Changed,
+                        IsBold           = true,
+                        IsTextAlignRight = true,
+                        Suggestions      = StyleAttributeNameSuggestions,
+                        Placeholder      = "color",
+                        AutoFocus        = property.Name.HasNoValue()
+                    }
+                },
+                " : ",
+                new FlexRow(Width(6, 10))
+                {
+                    new MagicInput
+                    {
+                        Name    = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true },
+                        Value   = property.Value,
+                        OnFocus = On_CurrentPropertyIndexInStyle_Changed,
+                        OnChange = (_, newValue) =>
+                        {
+                            CurrentStyleProperty.Value = newValue;
+
+                            return Task.CompletedTask;
+                        },
+                        Placeholder = "red"
+                    }
+                }
+            };
+        }
 
         Element newStyleGroupHeader(PropertyGroupModel styleGroup, int styleGroupIndex)
         {
