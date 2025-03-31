@@ -846,61 +846,67 @@ sealed class ApplicationView : Component<ApplicationState>
 
         var visualElementModel = CurrentVisualElement;
 
+        var inputTag = new FlexRow(WidthFull, Gap(4))
+        {
+            new label { "Tag", FontWeightBold, Width(4, 10), TextAlignRight },
+            " : ",
+            new MagicInput
+            {
+                Name        = string.Empty,
+                Value       = visualElementModel.Tag,
+                Suggestions = GetTagSuggestions(state),
+                OnChange = (_, newValue) =>
+                {
+                    CurrentVisualElement.Tag = newValue;
+
+                    return Task.CompletedTask;
+                }
+            } + Width(6, 10)
+        };
+
+        var inputText = new FlexRow(WidthFull, Gap(4))
+        {
+            new label { "Text", FontWeightBold, Width(4, 10), TextAlignRight },
+            " : ",
+            new MagicInput
+            {
+                Name  = string.Empty,
+                Value = visualElementModel.Text,
+                OnChange = (_, newValue) =>
+                {
+                    CurrentVisualElement.Text = newValue;
+
+                    return Task.CompletedTask;
+                }
+            } + Width(6, 10)
+        };
+
+        var stylesHeader = new FlexRow(WidthFull, AlignItemsCenter)
+        {
+            CreateIcon(Icon.remove, 32, state.SelectedStyleGroupIndex.HasValue ?
+                           [
+                               OnClick(StyleGroupRemoveClicked),
+                               Hover(Color(Blue300))
+                           ] :
+                           [
+                               Color(Gray100),
+                               BorderColor(Gray100)
+                           ]),
+
+            new div { Height(1), FlexGrow(1), Background(Gray200) },
+            new span { "S T Y L E", WhiteSpaceNoWrap, UserSelect(none), PaddingX(4) },
+            new div { Height(1), FlexGrow(1), Background(Gray200) },
+
+            CreateIcon(Icon.add, 32) + OnClick(StyleGroupAddClicked)
+        };
+        
         return new FlexColumn(BorderLeft(1, dotted, "#d9d9d9"), PaddingX(2), Gap(8), OverflowYAuto, Background(White))
         {
-            new FlexRow(WidthFull, Gap(4))
-            {
-                new label { "Tag", FontWeightBold, Width(4, 10), TextAlignRight },
-                " : ",
-                new MagicInput
-                {
-                    Name        = string.Empty,
-                    Value       = visualElementModel.Tag,
-                    Suggestions = GetTagSuggestions(state),
-                    OnChange = (_, newValue) =>
-                    {
-                        CurrentVisualElement.Tag = newValue;
+            inputTag,
 
-                        return Task.CompletedTask;
-                    }
-                } + Width(6, 10)
-            },
+            inputText,
 
-            new FlexRow(WidthFull, Gap(4))
-            {
-                new label { "Text", FontWeightBold, Width(4, 10), TextAlignRight },
-                " : ",
-                new MagicInput
-                {
-                    Name  = string.Empty,
-                    Value = visualElementModel.Text,
-                    OnChange = (_, newValue) =>
-                    {
-                        CurrentVisualElement.Text = newValue;
-
-                        return Task.CompletedTask;
-                    }
-                } + Width(6, 10)
-            },
-
-            new FlexRow(WidthFull, AlignItemsCenter)
-            {
-                CreateIcon(Icon.remove, 32, state.SelectedStyleGroupIndex.HasValue ?
-                               [
-                                   OnClick(StyleGroupRemoveClicked),
-                                   Hover(Color(Blue300))
-                               ] :
-                               [
-                                   Color(Gray100),
-                                   BorderColor(Gray100)
-                               ]),
-
-                new div { Height(1), FlexGrow(1), Background(Gray200) },
-                new span { "S T Y L E", WhiteSpaceNoWrap, UserSelect(none), PaddingX(4) },
-                new div { Height(1), FlexGrow(1), Background(Gray200) },
-
-                CreateIcon(Icon.add, 32) + OnClick(StyleGroupAddClicked)
-            },
+            stylesHeader,
 
             new FlexColumnCentered(WidthFull)
             {
