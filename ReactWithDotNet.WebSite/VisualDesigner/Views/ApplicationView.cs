@@ -45,12 +45,7 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
-    public Task On_CurrentPropertyValueInProps_Changed(string senderName, string newValue)
-    {
-        CurrentVisualElement.Properties[state.SelectedPropertyIndexInProps!.Value].Value = newValue;
-
-        return Task.CompletedTask;
-    }
+    
 
     public Task OnStyleGroupSelected(string senderNameAsStyleGroupIndex)
     {
@@ -1039,7 +1034,12 @@ sealed class ApplicationView : Component<ApplicationState>
 
                                 return Task.CompletedTask;
                             },
-                            OnChange    = On_CurrentPropertyValueInProps_Changed,
+                            OnChange    = (_,newValue)=>
+                            {
+                                CurrentVisualElement.Properties[state.SelectedPropertyIndexInProps!.Value].Value = newValue;
+
+                                return Task.CompletedTask;
+                            },
                             Placeholder = "? ? ?"
                         }
                     }
