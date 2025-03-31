@@ -66,4 +66,11 @@ static class ApplicationDatabase
 
         return await DbOperation(async db =>  await db.QueryFirstAsync<ComponentEntity>(query, new{ projectId}));
     }
+    
+    public static async Task<int?> GetFirstProjectId()
+    {
+        const string query = "select * from Project LIMIT 1";
+
+        return (await DbOperation(async db =>  await db.QueryFirstAsync<ProjectEntity>(query)))?.Id;
+    }
 }

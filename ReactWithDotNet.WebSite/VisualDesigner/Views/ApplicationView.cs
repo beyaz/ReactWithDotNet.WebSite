@@ -84,7 +84,12 @@ sealed class ApplicationView : Component<ApplicationState>
             }
         };
 
-        await ChangeSelectedProject(1);
+        var projectId =await GetFirstProjectId();
+        if (projectId.HasValue)
+        {
+            await ChangeSelectedProject(projectId.Value);    
+        }
+        
     }
 
     protected override Task OverrideStateFromPropsBeforeRender()
