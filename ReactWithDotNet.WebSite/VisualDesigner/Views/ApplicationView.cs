@@ -457,7 +457,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
                 PartProject
             },
-            new FlexRowCentered(Gap(24))
+            new FlexRowCentered(Gap(32))
             {
                 new FlexRowCentered(Gap(4))
                 {
