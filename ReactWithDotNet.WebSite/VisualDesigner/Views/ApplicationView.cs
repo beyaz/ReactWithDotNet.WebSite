@@ -367,19 +367,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
 
 
-    Task OnTagNameChanged(string senderName, string newValue)
-    {
-        CurrentVisualElement.Tag = newValue;
 
-        return Task.CompletedTask;
-    }
-
-    Task OnTextChanged(string _, string text)
-    {
-        CurrentVisualElement.Text = text;
-
-        return Task.CompletedTask;
-    }
 
     
 
@@ -847,7 +835,12 @@ sealed class ApplicationView : Component<ApplicationState>
                     Name        = string.Empty,
                     Value       = visualElementModel.Tag,
                     Suggestions = GetTagSuggestions(state),
-                    OnChange    = OnTagNameChanged
+                    OnChange    = (_, newValue) =>
+                    {
+                        CurrentVisualElement.Tag = newValue;
+
+                        return Task.CompletedTask;
+                    }
                 } + Width(6, 10)
             },
 
@@ -859,7 +852,12 @@ sealed class ApplicationView : Component<ApplicationState>
                 {
                     Name        = string.Empty,
                     Value       = visualElementModel.Text,
-                    OnChange    = OnTextChanged
+                    OnChange    = (_, newValue) =>
+                    {
+                        CurrentVisualElement.Text = newValue;
+
+                        return Task.CompletedTask;
+                    }
                 } + Width(6, 10)
             },
 
