@@ -319,10 +319,7 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
-    Task OnComponentNameChanged(string senderName, string newValue)
-    {
-        return OnComponentNameChanged(newValue);
-    }
+   
     
     Task On_Project_Changed(string senderName, string newValue)
     {
@@ -535,7 +532,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
             Suggestions       = GetSuggestionsForComponentSelection(state),
             Value             = GetSelectedComponent(state).Name,
-            OnChange          = OnComponentNameChanged,
+            OnChange          = (_,componentName) => OnComponentNameChanged(componentName),
             IsTextAlignCenter = true,
             IsBold            = true
         };
