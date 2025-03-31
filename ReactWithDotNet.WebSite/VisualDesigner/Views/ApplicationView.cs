@@ -127,12 +127,26 @@ sealed class ApplicationView : Component<ApplicationState>
 
     static FlexRowCentered CreateIcon(Icon name, int size, Modifier[] modifiers = null)
     {
-        return name switch
+        if (name == Icon.add)
         {
-            Icon.add    => new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Color(Gray200), Hover(BorderColor(Blue300), Color(Blue300))) { new IconPlus(), modifiers },
-            Icon.remove => new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Color(Gray200)) { new IconMinus(), modifiers },
-            _           => throw new NotImplementedException(name.ToString())
-        };
+            return new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Color(Gray200))
+            {
+                new IconPlus(),
+                
+                Hover(BorderColor(Blue300), Color(Blue300)),
+                modifiers
+            };
+        }
+        
+        if (name == Icon.remove)
+        {
+            return new(Size(size), BorderRadius(16), Border(1, solid, Gray200), Color(Gray200))
+            {
+                new IconMinus(), modifiers
+            };
+        }
+
+        throw new NotImplementedException(name.ToString());
     }
 
     Task AddNewLayerClicked(MouseEvent e)
