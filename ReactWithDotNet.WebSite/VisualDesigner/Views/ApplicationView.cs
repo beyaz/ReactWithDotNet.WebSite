@@ -385,20 +385,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
         return Task.CompletedTask;
     }
-
-    async Task On_Project_Changed(string newValue)
-    {
-        var projectEntity = GetAllProjects().FirstOrDefault(x => x.Name == newValue);
-        if (projectEntity is null)
-        {
-            this.FailNotification("Project not found. @" + newValue);
-
-            return;
-        }
-
-        await ChangeSelectedProject(projectEntity.Id);
-    }
-
+    
     Task OnCommonSizeClicked(MouseEvent e)
     {
         state.ScreenWidth = e.currentTarget.data["value"] switch
@@ -793,7 +780,18 @@ sealed class ApplicationView : Component<ApplicationState>
 
                 Suggestions = GetProjectNames(state),
                 Value       = GetAllProjects().FirstOrDefault(p => p.Id == state.ProjectId)?.Name,
-                OnChange    = (_, projectName) => On_Project_Changed(projectName),
+                OnChange    = async (_, projectName) =>
+                {
+                    var projectEntity = GetAllProjects().FirstOrDefault(x => x.Name == projectName);
+                    if (projectEntity is null)
+                    {
+                        this.FailNotification("Project not found. @" + projectName);
+
+                        return;
+                    }
+
+                    await ChangeSelectedProject(projectEntity.Id);
+                },
                 FitContent  = true
             }
         };
