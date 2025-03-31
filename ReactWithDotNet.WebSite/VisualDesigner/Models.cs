@@ -35,41 +35,15 @@ public sealed record VisualElementModel
     
     public string Tag { get; set; }
     
-    public List<PropertyGroupModel> StyleGroups { get; set; } = [];
-    
-    public List<PropertyModel> Properties { get; set; } = [];
-    
     public string Text { get; set; }
+    
+    public List<PropertyGroupModel> StyleGroups { get; set; }
+    
+    public List<PropertyModel> Properties { get; set; }
     
     public List<VisualElementModel> Children { get; set; }
 
     internal bool HasChild => Children?.Count > 0;
-    
-    // @formatter:on
-}
-
-public sealed class ComponentModel
-{
-    // @formatter:off
-    
-    public string Name { get; set; }
-
-    public string PropsAsJson { get; set; }
-
-    public string StateAsJson { get; set; }
-    
-    public VisualElementModel RootElement { get; set; }
-    
-    // @formatter:on
-}
-
-public sealed class ProjectModel
-{
-    // @formatter:off
-    
-    public string Name { get; set; }
-    
-    public List<ComponentModel> Components { get; set; } = [];
     
     // @formatter:on
 }
