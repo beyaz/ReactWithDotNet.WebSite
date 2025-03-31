@@ -37,7 +37,7 @@ public sealed record VisualElementModel
     
     public string Text { get; set; }
     
-    public List<PropertyGroupModel> StyleGroups { get; set; }
+    public List<PropertyGroupModel> StyleGroups__old { get; set; }
     
     public List<PropertyModel> Properties { get; set; }
     
