@@ -384,20 +384,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
     async Task ChangeSelectedProject(int projectId)
     {
-        state.LeftPanelSelectedTab = LeftPanelTab.ElementTree;
-
-        state = new()
-        {
-            UserName = state.UserName,
-            ProjectId = projectId,
-            Preview = state.Preview,
-            
-            LeftPanelSelectedTab = LeftPanelTab.ElementTree
-        };
-        
         var userName = Environment.UserName; // future: get userName from cookie or url
-        
-        state.ProjectId = projectId;
         
         // try take from db cache
         {
@@ -410,6 +397,17 @@ sealed class ApplicationView : Component<ApplicationState>
             }
         }
         
+        state = new()
+        {
+            UserName = state.UserName,
+            
+            ProjectId = projectId,
+            
+            Preview = state.Preview,
+            
+            LeftPanelSelectedTab = LeftPanelTab.ElementTree
+        };
+        
         // try select first component
         {
             var component = await GetFirstComponentInProject(projectId);
@@ -419,11 +417,9 @@ sealed class ApplicationView : Component<ApplicationState>
             }
             
             state.ComponentId = component.Id;
+            
             state.ComponentRootElement = DeserializeFromJson<VisualElementModel>(component.RootElementAsJson ?? string.Empty);
         }
-
-        // TODO: reload project state
-
     }
     
     Task OnCommonSizeClicked(MouseEvent e)
