@@ -48,45 +48,43 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         var userName = Environment.UserName; // future: get userName from cookie or url
 
-        var userLastState = GetUserLastState(userName);
-        if (userLastState is not null)
+        // try take from memory cache
         {
-            state = userLastState;
-
-            return;
-        }
-
-        var lastUsage = GetLastUsageInfoByUserName(userName).FirstOrDefault();
-        if (lastUsage == null)
-        {
-            lastUsage = new()
+            var userLastState = GetUserLastState(userName);
+            if (userLastState is not null)
             {
-                UserName    = userName,
-                ProjectId   = 1,
-                ComponentId = 1,
-                ScreenWidth = 600,
-                Scale       = 100,
-                AccessTime  = DateTime.Now
-            };
+                state = userLastState;
+
+                return;
+            }
         }
+
+        // try take from db cache
+        {
+            var lastUsage = GetLastUsageInfoByUserName(userName).FirstOrDefault();
+            if (lastUsage is not null && lastUsage.StateAsJson is not null)
+            {
+                state = JsonConvert.DeserializeObject<ApplicationState>(lastUsage.StateAsJson);
+            
+                return;
+            }
+        }
+
+
+        // create new state
 
         state = new()
         {
-            UserName = lastUsage.UserName,
+            UserName = userName,
 
-            ProjectId   = lastUsage.ProjectId,
-            ComponentId = lastUsage.ComponentId,
+            ScreenWidth  = 600,
+            ScreenHeight = 100,
+            Scale        = 100,
 
-            ScreenWidth          = lastUsage.ScreenWidth,
-            ScreenHeight         = 100,
-            Scale                = lastUsage.Scale,
             LeftPanelSelectedTab = LeftPanelTab.ElementTree
         };
 
-        if (state.ComponentId > 0)
-        {
-            await ChangeSelectedComponent(state.ComponentId);
-        }
+        await ChangeSelectedProject(1);
     }
 
     protected override Task OverrideStateFromPropsBeforeRender()
@@ -379,21 +377,26 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
-    Task On_Project_Changed(string newValue)
+    Task ChangeSelectedProject(int projectId)
+    {
+        state.ProjectId = projectId;
+
+        // TODO: reload project state
+
+        return Task.CompletedTask;
+    }
+
+    async Task On_Project_Changed(string newValue)
     {
         var projectEntity = GetAllProjects().FirstOrDefault(x => x.Name == newValue);
         if (projectEntity is null)
         {
             this.FailNotification("Project not found. @" + newValue);
 
-            return Task.CompletedTask;
+            return;
         }
 
-        state.ProjectId = projectEntity.Id;
-
-        // TODO: reload project state
-
-        return Task.CompletedTask;
+        await ChangeSelectedProject(projectEntity.Id);
     }
 
     Task OnCommonSizeClicked(MouseEvent e)

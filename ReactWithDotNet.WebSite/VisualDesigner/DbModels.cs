@@ -47,14 +47,10 @@ public sealed record LastUsageInfoEntity
     public string UserName { get; init; }
     
     public int ProjectId { get; init; }
-    
-    public int ComponentId { get; init; }
-    
-    public int Scale { get; init; }
-
-    public int ScreenWidth { get; init; }
 
     public DateTime AccessTime { get; init; }
+    
+    public string StateAsJson { get; init; }
     
     // @formatter:on
 }
