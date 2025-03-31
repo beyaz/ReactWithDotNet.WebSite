@@ -237,21 +237,8 @@ sealed class ApplicationView : Component<ApplicationState>
         }
     }
 
-    Task CurrentStyleGroup_CurrentProperty_Add_Clicked(MouseEvent _)
-    {
-        CurrentStyleGroup.Items.Add(new());
+    
 
-        return Task.CompletedTask;
-    }
-
-    Task CurrentStyleGroup_CurrentProperty_Delete_Clicked(MouseEvent _)
-    {
-        CurrentStyleGroup.Items.Remove(CurrentStyleProperty);
-
-        state.SelectedPropertyIndexInStyleGroup = null;
-
-        return Task.CompletedTask;
-    }
 
     Task JsonTextInComponentSettingsUpdatedByUser()
     {
@@ -917,7 +904,14 @@ sealed class ApplicationView : Component<ApplicationState>
                         {
                             CreateIcon(Icon.remove, 28, state.SelectedPropertyIndexInStyleGroup.HasValue && state.SelectedStyleGroupIndex == styleGroupIndex ?
                                            [
-                                               OnClick(CurrentStyleGroup_CurrentProperty_Delete_Clicked),
+                                               OnClick(_ =>
+                                               {
+                                                   CurrentStyleGroup.Items.Remove(CurrentStyleProperty);
+
+                                                   state.SelectedPropertyIndexInStyleGroup = null;
+
+                                                   return Task.CompletedTask;
+                                               }),
                                                Hover(Color(Blue300))
                                            ] :
                                            [
@@ -939,7 +933,12 @@ sealed class ApplicationView : Component<ApplicationState>
                                 Suggestions       = GetStyleGroupConditionSuggestions(state)
                             } + FlexGrow(1),
 
-                            CreateIcon(Icon.add, 28) + OnClick(CurrentStyleGroup_CurrentProperty_Add_Clicked)
+                            CreateIcon(Icon.add, 28) + OnClick(_ =>
+                            {
+                                CurrentStyleGroup.Items.Add(new());
+
+                                return Task.CompletedTask;
+                            })
                         },
 
                         styleGroup.Items.Select((property, index) => new FlexRow(Gap(4))
