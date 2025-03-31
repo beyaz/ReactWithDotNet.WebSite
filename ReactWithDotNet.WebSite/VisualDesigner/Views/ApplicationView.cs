@@ -302,12 +302,6 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
-    Task On_CurrentPropertyValueInStyle_Changed(string senderName, string newValue)
-    {
-        CurrentStyleProperty.Value = newValue;
-
-        return Task.CompletedTask;
-    }
 
     Task OnCommonSizeClicked(MouseEvent e)
     {
@@ -967,7 +961,12 @@ sealed class ApplicationView : Component<ApplicationState>
                                     Name        = new StyleInputLocation { PropertyIndexAtGroup = index, IsName = false, StyleGroupIndex = styleGroupIndex, IsValue = true },
                                     Value       = property.Value,
                                     OnFocus     = On_CurrentPropertyIndexInStyle_Changed,
-                                    OnChange    = On_CurrentPropertyValueInStyle_Changed,
+                                    OnChange    = (_, newValue) =>
+                                    {
+                                         CurrentStyleProperty.Value = newValue;
+
+ return Task.CompletedTask;
+                                    },
                                     Placeholder = "red"
                                 }
                             }
