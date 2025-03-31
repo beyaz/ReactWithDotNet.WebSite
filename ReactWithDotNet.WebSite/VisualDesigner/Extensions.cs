@@ -434,31 +434,23 @@ static class Extensions
         return string.IsNullOrWhiteSpace(value);
     }
 
-    public static PropertyModel TryParsePropertyValue(string nameValueCombined)
+    public static (bool success, string name, string value) TryParsePropertyValue(string nameValueCombined)
     {
         if (string.IsNullOrWhiteSpace(nameValueCombined))
         {
-            return null;
+            return default;
         }
 
         var colonIndex = nameValueCombined.IndexOf(':');
         if (colonIndex < 0)
         {
-            return new()
-            {
-                Name  = nameValueCombined,
-                Value = null
-            };
+            return default;
         }
 
         var name = nameValueCombined[..colonIndex];
 
         var value = nameValueCombined[(colonIndex + 1)..];
 
-        return new()
-        {
-            Name  = name,
-            Value = value
-        };
+        return (success: true, name, value);
     }
 }
