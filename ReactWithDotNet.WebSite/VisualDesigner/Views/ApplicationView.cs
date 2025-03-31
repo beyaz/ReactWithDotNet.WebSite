@@ -899,6 +899,32 @@ sealed class ApplicationView : Component<ApplicationState>
 
             CreateIcon(Icon.add, 32) + OnClick(StyleGroupAddClicked)
         };
+
+        var propsHeader = new FlexRow(WidthFull, AlignItemsCenter)
+        {
+            CreateIcon(Icon.remove, 32, state.SelectedPropertyIndexInProps.HasValue ?
+                           [
+                               OnClick(_ =>
+                               {
+                                   CurrentVisualElement.Properties.RemoveAt(state.SelectedPropertyIndexInProps!.Value);
+
+                                   state.SelectedPropertyIndexInProps = null;
+
+                                   return Task.CompletedTask;
+                               }),
+                               Hover(Color(Blue300))
+                           ] :
+                           [
+                               Color(Gray100),
+                               BorderColor(Gray100)
+                           ]),
+
+            new div { Height(1), FlexGrow(1), Background(Gray200) },
+            new span { "P R O P S", WhiteSpaceNoWrap, UserSelect(none), PaddingX(4) },
+            new div { Height(1), FlexGrow(1), Background(Gray200) },
+
+            CreateIcon(Icon.add, 32) + OnClick(AddNewPropsClicked)
+        };
         
         return new FlexColumn(BorderLeft(1, dotted, "#d9d9d9"), PaddingX(2), Gap(8), OverflowYAuto, Background(White))
         {
@@ -995,31 +1021,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 })
             },
 
-            new FlexRow(WidthFull, AlignItemsCenter)
-            {
-                CreateIcon(Icon.remove, 32, state.SelectedPropertyIndexInProps.HasValue ?
-                               [
-                                   OnClick(_ =>
-                                   {
-                                       CurrentVisualElement.Properties.RemoveAt(state.SelectedPropertyIndexInProps!.Value);
-
-                                       state.SelectedPropertyIndexInProps = null;
-
-                                       return Task.CompletedTask;
-                                   }),
-                                   Hover(Color(Blue300))
-                               ] :
-                               [
-                                   Color(Gray100),
-                                   BorderColor(Gray100)
-                               ]),
-
-                new div { Height(1), FlexGrow(1), Background(Gray200) },
-                new span { "P R O P S", WhiteSpaceNoWrap, UserSelect(none), PaddingX(4) },
-                new div { Height(1), FlexGrow(1), Background(Gray200) },
-
-                CreateIcon(Icon.add, 32) + OnClick(AddNewPropsClicked)
-            },
+            propsHeader,
 
             new FlexColumnCentered(WidthFull)
             {
