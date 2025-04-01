@@ -1093,7 +1093,10 @@ sealed class ApplicationView : Component<ApplicationState>
     class StyleInputLocation
     {
         public int PropertyIndexInGroup { get; init; }
+        
         public required int StyleGroupIndex { get; init; }
+
+        public string Prefix { get; init; } = "style-input-location";
 
         public static implicit operator StyleInputLocation(string input)
         {
@@ -1107,21 +1110,22 @@ sealed class ApplicationView : Component<ApplicationState>
 
         public override string ToString()
         {
-            return $"{StyleGroupIndex},{PropertyIndexInGroup}";
+            return $"{Prefix},{StyleGroupIndex},{PropertyIndexInGroup}";
         }
 
         static StyleInputLocation Parse(string input)
         {
             var parts = input.Split(',');
-            if (parts.Length != 2)
+            if (parts.Length != 3)
             {
                 throw new FormatException("Invalid input format");
             }
 
             return new()
             {
-                StyleGroupIndex      = int.Parse(parts[0]),
-                PropertyIndexInGroup = int.Parse(parts[1])
+                Prefix = parts[0],
+                StyleGroupIndex      = int.Parse(parts[1]),
+                PropertyIndexInGroup = int.Parse(parts[2])
             };
         }
     }
