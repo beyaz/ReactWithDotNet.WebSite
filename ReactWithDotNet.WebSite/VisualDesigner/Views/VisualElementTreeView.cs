@@ -163,7 +163,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
             };
         }
 
-        Element flexIdentifier = null;
+        Element icon = null;
         
         var commonStyles = node.StyleGroups?.FirstOrDefault(x => x.Condition == "*");
         if (commonStyles is not null)
@@ -186,7 +186,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 
             if (hasFlex)
             {
-                flexIdentifier = new span { PaddingLeft(8), FontSize12, "row" };
+                icon = new span { PaddingLeft(8), FontSize12, "row" };
             }
         }
         
@@ -204,7 +204,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                     
                     new span{ node.Tag },
                     
-                    flexIdentifier
+                    icon
                     
                 },
 

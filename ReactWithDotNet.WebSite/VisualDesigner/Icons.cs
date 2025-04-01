@@ -151,3 +151,39 @@ sealed class IconExport : PureComponent
         };
     }
 }
+
+sealed class IconFlexRow : PureComponent
+{
+    protected override Element render()
+    {
+        return new svg( Fill(none), ViewBox(0, 0, 24, 24),  Size(16))
+        {
+            new path
+            {
+                stroke         = "currentColor",
+                strokeLinecap  = "round",
+                strokeLinejoin = "round",
+                strokeWidth    = 1.5,
+                d              = "M5.75 19.25h3.5a1 1 0 001-1V5.75a1 1 0 00-1-1h-3.5a1 1 0 00-1 1v12.5a1 1 0 001 1zm9 0h3.5a1 1 0 001-1V5.75a1 1 0 00-1-1h-3.5a1 1 0 00-1 1v12.5a1 1 0 001 1z"
+            }
+        };
+    }
+}
+
+sealed class IconFlexColumn : PureComponent
+{
+    protected override Element render()
+    {
+        return new svg( Fill(none), ViewBox(0, 0, 24, 24),  Size(16))
+        {
+            new path
+            {
+                stroke         = "currentColor",
+                strokeLinecap  = "round",
+                strokeLinejoin = "round",
+                strokeWidth    = 1.5,
+                d              = "M5.75 10.25h12.5a1 1 0 001-1v-3.5a1 1 0 00-1-1H5.75a1 1 0 00-1 1v3.5a1 1 0 001 1zm0 9h12.5a1 1 0 001-1v-3.5a1 1 0 00-1-1H5.75a1 1 0 00-1 1v3.5a1 1 0 001 1z"
+            }
+        };
+    }
+}
