@@ -2,7 +2,9 @@
 
 delegate Task OnTreeItemHover(string treeItemPath);
 
-sealed class VisualElementTreeView : Component
+delegate Task OnTreeItemMove(string treeItemPathSourge, string treeItemPathTarget);
+
+sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 {
     public VisualElementModel Model { get; init; }
 
@@ -17,18 +19,50 @@ sealed class VisualElementTreeView : Component
     [CustomEvent]
     public OnTreeItemHover TreeItemHover { get; init; }
 
+    [CustomEvent]
+    public OnTreeItemMove TreeItemMove { get; init; }
+
     protected override Element render()
     {
         if (Model is null)
         {
-            return new FlexRowCentered (SizeFull){ "Empty" };
+            return new FlexRowCentered(SizeFull) { "Empty" };
         }
-        
-        return new div(CursorPointer, Padding(5), OnMouseLeave(OnMouseLeaveHandler))
+
+        return new div(CursorDefault, Padding(5), OnMouseLeave(OnMouseLeaveHandler))
         {
             ToVisual(Model, 0, "0"),
             WidthFull, HeightFull
         };
+    }
+
+    Task OnDragEntered(DragEvent e)
+    {
+        state.CurrentDragOveredPath = e.currentTarget.id;
+        return Task.CompletedTask;
+    }
+
+    Task OnDragStarted(DragEvent e)
+    {
+        state.DragStartedTreeItemPath = e.currentTarget.id;
+
+        return Task.CompletedTask;
+    }
+
+    Task OnDroped(DragEvent e)
+    {
+        var treeItemPathTarget = e.currentTarget.id;
+
+        if (treeItemPathTarget != state.DragStartedTreeItemPath)
+        {
+            DispatchEvent(TreeItemMove, [state.DragStartedTreeItemPath, treeItemPathTarget]);
+        }
+
+        state.CurrentDragOveredPath = null;
+
+        state.DragStartedTreeItemPath = null;
+
+        return Task.CompletedTask;
     }
 
     Task OnMouseEnterHandler(MouseEvent e)
@@ -68,7 +102,14 @@ sealed class VisualElementTreeView : Component
 
                 isSelected ? BackgroundImage(linear_gradient(90, rgb(136, 195, 242), rgb(242, 246, 249))) + BorderRadius(3) : null,
 
-                !isSelected ? Hover(BackgroundImage(linear_gradient(90, rgb(190, 220, 244), rgb(242, 246, 249))) + BorderRadius(3)) : null
+                !isSelected ? Hover(BackgroundImage(linear_gradient(90, rgb(190, 220, 244), rgb(242, 246, 249))) + BorderRadius(3)) : null,
+
+                DraggableTrue,
+                OnDragStart(OnDragStarted),
+                OnDragEnter(OnDragEntered),
+                OnDrop(OnDroped),
+
+                When(path == state.CurrentDragOveredPath && path != state.DragStartedTreeItemPath, Outline($"3px {dotted} {Gray300}"))
             }
         };
 
@@ -85,5 +126,12 @@ sealed class VisualElementTreeView : Component
         }
 
         return returnList;
+    }
+
+    internal class State
+    {
+        public string CurrentDragOveredPath { get; set; }
+
+        public string DragStartedTreeItemPath { get; set; }
     }
 }
