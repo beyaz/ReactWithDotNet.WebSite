@@ -139,7 +139,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
         Element beforePositionElement = null;
         if (isDragHoveredElement)
         {
-            beforePositionElement = new FlexRow(WidthFull, Height(4), DraggableTrue)
+            beforePositionElement = new FlexRow(WidthFull, Height(6), DraggableTrue)
             {
                 OnDragEnter(ToggleDragPositionBefore),
                 OnDragLeave(ToggleDragPositionBefore),
@@ -155,7 +155,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
         Element afterPositionElement = null;
         if (isDragHoveredElement)
         {
-            afterPositionElement = new FlexRow(WidthFull, Height(4), DraggableTrue)
+            afterPositionElement = new FlexRow(WidthFull, Height(6), DraggableTrue)
             {
                 OnDragEnter(ToggleDragPositionAfter),
                 OnDragLeave(ToggleDragPositionAfter),
