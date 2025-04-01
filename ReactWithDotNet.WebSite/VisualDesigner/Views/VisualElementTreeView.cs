@@ -2,7 +2,14 @@
 
 delegate Task OnTreeItemHover(string treeItemPath);
 
-delegate Task OnTreeItemMove(string treeItemPathSourge, string treeItemPathTarget);
+enum DragPosition
+{
+    Before,
+    After,
+    Inside
+}
+
+delegate Task OnTreeItemMove(string treeItemPathSourge, string treeItemPathTarget, DragPosition position);
 
 sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 {
@@ -55,7 +62,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 
         if (treeItemPathTarget != state.DragStartedTreeItemPath)
         {
-            DispatchEvent(TreeItemMove, [state.DragStartedTreeItemPath, treeItemPathTarget]);
+            DispatchEvent(TreeItemMove, [state.DragStartedTreeItemPath, treeItemPathTarget, state.DragPosition]);
         }
 
         state.CurrentDragOveredPath = null;
@@ -90,16 +97,54 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
         return Task.CompletedTask;
     }
 
+    Task ToggleDragPositionAfter(DragEvent e)
+    {
+        if (state.DragPosition == DragPosition.After)
+        {
+            state.DragPosition = DragPosition.Inside;
+        }
+        else
+        {
+            state.DragPosition = DragPosition.After;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    Task ToggleDragPositionBefore(DragEvent e)
+    {
+        if (state.DragPosition == DragPosition.Before)
+        {
+            state.DragPosition = DragPosition.Inside;
+        }
+        else
+        {
+            state.DragPosition = DragPosition.Before;
+        }
+
+        return Task.CompletedTask;
+    }
+
     IReadOnlyList<Element> ToVisual(VisualElementModel node, int indent, string path)
     {
         var isSelected = SelectedPath == path;
 
         var isDragHoveredElement = path == state.CurrentDragOveredPath && path != state.DragStartedTreeItemPath;
-        
+
         var returnList = new List<Element>
         {
-            new FlexRow(AlignItemsCenter, PaddingLeft(indent * 16), Id(path), OnClick(OnTreeItemClicked), OnMouseEnter(OnMouseEnterHandler))
+            new FlexColumn(PaddingLeft(indent * 16), Id(path), OnClick(OnTreeItemClicked), OnMouseEnter(OnMouseEnterHandler))
             {
+                isDragHoveredElement ? new FlexRow(WidthFull, Height(8), DraggableTrue, Background(Gray100))
+                {
+                    OnDragEnter(ToggleDragPositionBefore),
+                    OnDragLeave(ToggleDragPositionBefore),
+
+                    BorderBottomLeftRadius(16), BorderBottomRightRadius(16),
+
+                    When(state.DragPosition == DragPosition.Before, Background(Blue300))
+                } : null,
+
                 new div { Text(node.Tag), MarginLeft(5), FontSize13 },
 
                 isSelected ? BackgroundImage(linear_gradient(90, rgb(136, 195, 242), rgb(242, 246, 249))) + BorderRadius(3) : null,
@@ -111,7 +156,17 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                 OnDragEnter(OnDragEntered),
                 OnDrop(OnDroped),
 
-                When(isDragHoveredElement, Outline($"3px {dotted} {Gray300}"))
+                When(isDragHoveredElement, Outline($"3px {dotted} {Gray300}")),
+
+                isDragHoveredElement ? new FlexRow(WidthFull, Height(8), DraggableTrue, Background(Gray100))
+                {
+                    OnDragEnter(ToggleDragPositionAfter),
+                    OnDragLeave(ToggleDragPositionAfter),
+
+                    BorderTopLeftRadius(16), BorderTopRightRadius(16),
+
+                    When(state.DragPosition == DragPosition.After, Background(Blue300))
+                } : null
             }
         };
 
@@ -133,6 +188,8 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
     internal class State
     {
         public string CurrentDragOveredPath { get; set; }
+
+        public DragPosition DragPosition { get; set; }
 
         public string DragStartedTreeItemPath { get; set; }
     }

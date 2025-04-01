@@ -550,7 +550,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     return Task.CompletedTask;
                 },
                 
-                TreeItemMove = (source, target) =>
+                TreeItemMove = (source, target, position) =>
                 {
                     VisualElementModel sourceNodeParent;
                     int sourceNodeIndex;
