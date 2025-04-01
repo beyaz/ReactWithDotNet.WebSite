@@ -139,28 +139,32 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
         Element beforePositionElement = null;
         if (isDragHoveredElement)
         {
-            beforePositionElement = new FlexRow(WidthFull, Height(8), DraggableTrue, Background(Gray100))
+            beforePositionElement = new FlexRow(WidthFull, Height(4), DraggableTrue, Background(Gray100))
             {
                 OnDragEnter(ToggleDragPositionBefore),
                 OnDragLeave(ToggleDragPositionBefore),
 
                 BorderBottomLeftRadius(16), BorderBottomRightRadius(16),
 
-                When(state.DragPosition == DragPosition.Before, Background(Blue300))
+                When(state.DragPosition == DragPosition.Before, Background(Blue300)),
+
+                PositionAbsolute, Top(0)
             };
         }
         
         Element afterPositionElement = null;
         if (isDragHoveredElement)
         {
-            afterPositionElement = new FlexRow(WidthFull, Height(8), DraggableTrue, Background(Gray100))
+            afterPositionElement = new FlexRow(WidthFull, Height(4), DraggableTrue, Background(Gray100))
             {
                 OnDragEnter(ToggleDragPositionAfter),
                 OnDragLeave(ToggleDragPositionAfter),
 
                 BorderTopLeftRadius(16), BorderTopRightRadius(16),
 
-                When(state.DragPosition == DragPosition.After, Background(Blue300))
+                When(state.DragPosition == DragPosition.After, Background(Blue300)),
+                
+                PositionAbsolute, Bottom(0)
             };
         }
         
@@ -168,13 +172,15 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
         {
             new FlexColumn(PaddingLeft(indent * 16), Id(path), OnClick(OnTreeItemClicked), OnMouseEnter(OnMouseEnterHandler))
             {
+                PositionRelative,
+                
                 beforePositionElement,
 
                 new div { Text(node.Tag), MarginLeft(5), FontSize13 },
 
-                isSelected ? Background(Blue100) + BorderRadius(3) : null,
+                state.DragStartedTreeItemPath.HasNoValue() && isSelected ? Background(Blue100) + BorderRadius(3) : null,
 
-                !isSelected ? Hover(Background(Blue50), BorderRadius(3)) : null,
+                state.DragStartedTreeItemPath.HasNoValue() && !isSelected ? Hover(Background(Blue50), BorderRadius(3)) : null,
 
                 DraggableTrue,
                 OnDragStart(OnDragStarted),
