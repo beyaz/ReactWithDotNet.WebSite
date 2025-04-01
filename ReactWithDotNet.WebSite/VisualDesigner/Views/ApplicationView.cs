@@ -527,6 +527,12 @@ sealed class ApplicationView : Component<ApplicationState>
 
             When(state.LeftPanelSelectedTab == LeftPanelTab.ElementTree, () => new VisualElementTreeView
             {
+                Model = state.ComponentRootElement,
+                
+                SelectedPath = state.SelectedVisualElementTreeItemPath,
+                
+                
+                
                 TreeItemHover = treeItemPath =>
                 {
                     state.HoveredVisualElementTreeItemPath = treeItemPath;
@@ -543,8 +549,54 @@ sealed class ApplicationView : Component<ApplicationState>
                     state.SelectedVisualElementTreeItemPath = treeItemPath;
                     return Task.CompletedTask;
                 },
-                SelectedPath = state.SelectedVisualElementTreeItemPath,
-                Model        = state.ComponentRootElement
+                
+                TreeItemMove = (source, target) =>
+                {
+                    VisualElementModel sourceNodeParent;
+                    int sourceNodeIndex;
+                    {
+                        var temp = state.ComponentRootElement;
+                        
+                        var indexArray = source.Split(',');
+
+                        var length = indexArray.Length - 1;
+                        for (var i = 1; i < length; i++)
+                        {
+                            temp = temp.Children[int.Parse(indexArray[i])];
+                        }
+
+                        sourceNodeIndex = int.Parse(indexArray[length]);
+
+                        sourceNodeParent = temp;
+                    }
+
+                    VisualElementModel parentNodeParent;
+                    int parentNodeIndex;
+                    {
+                        var temp = state.ComponentRootElement;
+                        
+                        var indexArray = target.Split(',');
+
+                        var length = indexArray.Length - 1;
+                        for (var i = 1; i < length; i++)
+                        {
+                            temp = temp.Children[int.Parse(indexArray[i])];
+                        }
+
+                        parentNodeIndex = int.Parse(indexArray[length]);
+
+                        parentNodeParent = temp;
+                    }
+                    
+                    // 
+                    
+
+                    
+                        
+                    return Task.CompletedTask;
+                    
+                }
+               
             }),
 
             When(state.LeftPanelSelectedTab == LeftPanelTab.Props || state.LeftPanelSelectedTab == LeftPanelTab.State, () => new FlexColumnCentered(SizeFull)
