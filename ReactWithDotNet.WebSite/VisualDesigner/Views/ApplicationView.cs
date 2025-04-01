@@ -552,6 +552,29 @@ sealed class ApplicationView : Component<ApplicationState>
                 
                 TreeItemMove = (source, target, position) =>
                 {
+
+                    // root check
+                    {
+                        if (source == "0")
+                        {
+                            this.FailNotification("Root node cannot move.");
+                            
+                            return Task.CompletedTask;
+                            
+                        }
+                    }
+                    
+                    // parent - child control
+                    {
+                        if (target.StartsWith(source,StringComparison.OrdinalIgnoreCase))
+                        {
+                            this.FailNotification("Parent node cannot add to child.");
+                            
+                            return Task.CompletedTask;
+                            
+                        }
+                    }
+                    
                     VisualElementModel sourceNodeParent;
                     int sourceNodeIndex;
                     {
@@ -590,14 +613,27 @@ sealed class ApplicationView : Component<ApplicationState>
 
                     if (position == DragPosition.Inside)
                     {
+                        if (parentNodeParent.Children[parentNodeIndex].HasNoChild())
+                        {
+                            (parentNodeParent.Children ??=[]).Add(sourceNodeParent.Children[sourceNodeIndex]);
+
+                            sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
+                            
+                            return Task.CompletedTask;
+                        }
                         
+                        this.FailNotification("Select valid location");
+                        
+                        return Task.CompletedTask;
                     }
                     
-
-                    
+                    var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
+                        
+                    parentNodeParent.Children.Insert(parentNodeIndex  + position == DragPosition.After ? 1:0, sourceNode);
+                        
+                    sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
                         
                     return Task.CompletedTask;
-                    
                 }
                
             }),

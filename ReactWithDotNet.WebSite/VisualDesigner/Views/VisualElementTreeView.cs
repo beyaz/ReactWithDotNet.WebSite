@@ -51,11 +51,6 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 
     Task OnDragStarted(DragEvent e)
     {
-        if (e.currentTarget.id == "0")
-        {
-            return Task.CompletedTask;
-        }
-        
         state.DragStartedTreeItemPath = e.currentTarget.id;
 
         return Task.CompletedTask;
