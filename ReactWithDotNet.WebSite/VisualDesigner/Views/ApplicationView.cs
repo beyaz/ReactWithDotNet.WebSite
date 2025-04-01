@@ -619,7 +619,7 @@ sealed class ApplicationView : Component<ApplicationState>
                         {
                             var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
                             
-                            targetNode.Children.Add( sourceNode);
+                            (targetNode.Children ??=[]).Add( sourceNode);
 
                             sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
                             
