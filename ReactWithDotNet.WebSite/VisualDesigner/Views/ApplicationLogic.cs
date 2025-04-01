@@ -20,9 +20,24 @@ static class ApplicationLogic
                 {
                     items.Add($"w-{i}vw");
                 }
-               
             }
+        }
+        
+        
+        // paddings
+        {
+            string[] names = ["padding", "padding-left", "padding-right", "padding-top", "padding-bottom"];
             
+            foreach (var name in names)
+            {
+                for (var i = 1; i <= 1000; i++)
+                {
+                    if (i % 4 == 0)
+                    {
+                        items.Add($"{name}: {i}");
+                    }
+                }    
+            }
             
         }
         

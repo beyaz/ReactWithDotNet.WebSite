@@ -52,7 +52,7 @@ sealed class MagicInput : Component<MagicInput.State>
             {
                 type                     = "text",
                 valueBind                = () => state.Value,
-                valueBindDebounceTimeout = 700,
+                valueBindDebounceTimeout = 300,
                 valueBindDebounceHandler = OnTypingFinished,
                 onKeyDown                = OnKeyDown,
                 onClick                  = OnInputClicked,

@@ -95,7 +95,8 @@ sealed class ApplicationPreview : Component
                             element.Add(Background(value));
                             continue;
                         }
-
+                        
+                        case "w":
                         case "width":
                         {
                             if (isValueDouble)
@@ -166,6 +167,64 @@ sealed class ApplicationPreview : Component
                             }
 
                             element.Add(Size(value));
+                            continue;
+                        }
+                        
+                        case "color":
+                        {
+                            element.Add(Color(value));
+                            continue;
+                        }
+                        
+                        case "pl":
+                        case "padding-left":
+                        {
+                            if (isValueDouble)
+                            {
+                                element.Add(PaddingLeft(valueAsDouble));
+                                continue;
+                            }
+
+                            element.Add(PaddingLeft(value));
+                            continue;
+                        }
+                        
+                        case "pr":
+                        case "padding-right":
+                        {
+                            if (isValueDouble)
+                            {
+                                element.Add(PaddingRight(valueAsDouble));
+                                continue;
+                            }
+
+                            element.Add(PaddingRight(value));
+                            continue;
+                        }
+                        
+                        case "pt":
+                        case "padding-top":
+                        {
+                            if (isValueDouble)
+                            {
+                                element.Add(PaddingTop(valueAsDouble));
+                                continue;
+                            }
+
+                            element.Add(PaddingTop(value));
+                            continue;
+                        }
+                        
+                        case "pb":
+                        case "padding-bottom":
+                        {
+                            if (isValueDouble)
+                            {
+                                element.Add(PaddingBottom(valueAsDouble));
+                                continue;
+                            }
+
+                            element.Add(PaddingBottom(value));
                             continue;
                         }
                     }
