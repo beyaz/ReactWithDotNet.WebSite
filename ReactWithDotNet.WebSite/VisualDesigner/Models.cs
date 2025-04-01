@@ -7,26 +7,13 @@ public sealed record PropertyInfo
     public IReadOnlyList<string> Suggestions { get; init; }
 }
 
-public sealed record PropertyModel
-{
-    // @formatter:off
-    
-    public string Name { get; set; }
-
-    public string Value { get; set; }
-    
-    // @formatter:on
-}
-
 public sealed record PropertyGroupModel
 {
     // @formatter:off
     
     public string Condition { get; set; }
 
-    public List<PropertyModel> Items_old { get; set; }
-    
-    public List<string> Items { get; set; }
+    public required List<string> Items { get; init; }
     
     // @formatter:on
 }
@@ -41,7 +28,7 @@ public sealed record VisualElementModel
     
     public List<PropertyGroupModel> StyleGroups { get; set; }
     
-    public List<PropertyModel> Properties { get; set; }
+    public List<string> Properties { get; set; }
     
     public List<VisualElementModel> Children { get; set; }
     

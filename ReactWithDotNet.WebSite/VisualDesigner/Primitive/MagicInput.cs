@@ -28,7 +28,7 @@ sealed class MagicInput : Component<MagicInput.State>
 
     protected override Task OverrideStateFromPropsBeforeRender()
     {
-        if (Value != state.InitialValue)
+        if (Value != state.InitialValue || Name != state.InitialName)
         {
             InitializeState();
         }
@@ -107,6 +107,8 @@ sealed class MagicInput : Component<MagicInput.State>
     {
         state = new()
         {
+            InitialName = Name,
+            
             InitialValue = Value,
 
             Value = Value,
@@ -224,7 +226,7 @@ sealed class MagicInput : Component<MagicInput.State>
 
         state.SelectedSuggestionOffset = null;
 
-        state.FilteredSuggestions = Suggestions.Where(x => x.Contains((state.Value + string.Empty).Trim(), StringComparison.OrdinalIgnoreCase))
+        state.FilteredSuggestions = Suggestions.Where(x => x.Replace(" ",string.Empty).Contains((state.Value + string.Empty).Replace(" ",string.Empty), StringComparison.OrdinalIgnoreCase))
             .Take(5).ToList();
 
         return Task.CompletedTask;
@@ -283,6 +285,8 @@ sealed class MagicInput : Component<MagicInput.State>
         public IReadOnlyList<string> FilteredSuggestions { get; set; }
 
         public string InitialValue { get; init; }
+        
+        public required string InitialName { get; init; }
 
         public int? SelectedSuggestionOffset { get; set; }
 

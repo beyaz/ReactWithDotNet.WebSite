@@ -4,6 +4,49 @@ namespace ReactWithDotNet.VisualDesigner.Views;
 
 static class ApplicationLogic
 {
+    public static IReadOnlyList<string> GetStyleAttributeNameSuggestions(ApplicationState state)
+    {
+        var items = new List<string>();
+
+        // w
+        {
+            items.Add("w-full");
+            items.Add("w-fit");
+            items.Add("w-screen");
+            items.Add("w-screen");
+            for (var i = 1; i <= 100; i++)
+            {
+                if (i%5 == 0)
+                {
+                    items.Add($"w-{i}vw");
+                }
+               
+            }
+            
+            
+        }
+        
+        foreach (var propertyInfo in StyleProperties)
+        {
+            var attributeName = propertyInfo.Name;
+
+            if (attributeName == "gap")
+            { 
+                for (var i = 1; i < 100; i++)
+                {
+                    items.Add($"{attributeName}: {i*4}");
+                }
+            }
+            
+            foreach (var suggestion in propertyInfo.Suggestions)
+            {
+                items.Add($"{attributeName}: {suggestion}");
+            }
+        }
+
+        return items;
+    }
+    
     public static Task DbOperationForCurrentComponent(ApplicationState state, Func<ComponentEntity, Task> operation)
     {
         return DbOperation(async connection =>

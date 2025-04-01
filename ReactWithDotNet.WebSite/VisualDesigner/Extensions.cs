@@ -451,6 +451,6 @@ static class Extensions
 
         var value = nameValueCombined[(colonIndex + 1)..];
 
-        return (success: true, name, value);
+        return (success: true, name.Trim(), value.Trim());
     }
 }

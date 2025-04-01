@@ -60,13 +60,17 @@ sealed class ApplicationPreview : Component
 
             foreach (var styleGroup in model.StyleGroups ?? [])
             {
-                foreach (var styleAttribute in styleGroup.Items_old ?? [])
+                foreach (var styleAttribute in styleGroup.Items ?? [])
                 {
-                    var value = styleAttribute.Value;
-
+                    var (success, name, value) = TryParsePropertyValue(styleAttribute);
+                    if (!success)
+                    {
+                        continue;
+                    }
+                    
                     var isValueDouble = double.TryParse(value, out var valueAsDouble);
 
-                    switch (styleAttribute.Name)
+                    switch (name)
                     {
                         case "display":
                         {
