@@ -51,6 +51,11 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 
     Task OnDragStarted(DragEvent e)
     {
+        if (e.currentTarget.id == "0")
+        {
+            return Task.CompletedTask;
+        }
+        
         state.DragStartedTreeItemPath = e.currentTarget.id;
 
         return Task.CompletedTask;
@@ -167,16 +172,16 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 
                 new div { Text(node.Tag), MarginLeft(5), FontSize13 },
 
-                isSelected ? BackgroundImage(linear_gradient(90, rgb(136, 195, 242), rgb(242, 246, 249))) + BorderRadius(3) : null,
+                isSelected ? Background(Blue100) + BorderRadius(3) : null,
 
-                !isSelected ? Hover(BackgroundImage(linear_gradient(90, rgb(190, 220, 244), rgb(242, 246, 249))) + BorderRadius(3)) : null,
+                !isSelected ? Hover(Background(Blue50), BorderRadius(3)) : null,
 
                 DraggableTrue,
                 OnDragStart(OnDragStarted),
                 OnDragEnter(OnDragEntered),
                 OnDrop(OnDroped),
 
-                When(isDragHoveredElement, Outline($"3px {dotted} {Gray300}")),
+                //When(isDragHoveredElement, Outline($"3px {dotted} {Gray300}")),
 
                 afterPositionElement
             }
