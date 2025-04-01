@@ -1,6 +1,4 @@
-﻿using System.Xml.Linq;
-
-namespace ReactWithDotNet.VisualDesigner.Views;
+﻿namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationPreview : Component
 {
