@@ -225,6 +225,12 @@ sealed class ApplicationPreview : Component
                             element.Add(PaddingBottom(value));
                             continue;
                         }
+                        
+                        case "flex-direction":
+                        {
+                            element.Add(FlexDirection(value));
+                            continue;
+                        }
                     }
                 }
             }

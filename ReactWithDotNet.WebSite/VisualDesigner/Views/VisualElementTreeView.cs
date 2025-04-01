@@ -162,6 +162,33 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                 PositionAbsolute, Bottom(0)
             };
         }
+
+        Element flexIdentifier = null;
+        
+        var commonStyles = node.StyleGroups?.FirstOrDefault(x => x.Condition == "*");
+        if (commonStyles is not null)
+        {
+            var hasFlex = commonStyles.Items.Any(x =>
+            {
+                var (success, name, value) = TryParsePropertyValue(x);
+                if (!success)
+                {
+                    return false;
+                }
+
+                if (name == "display")
+                {
+                    return true;
+                }
+
+                return false;
+            });
+
+            if (hasFlex)
+            {
+                flexIdentifier = new span { PaddingLeft(8), FontSize12, "row" };
+            }
+        }
         
         var returnList = new List<Element>
         {
@@ -171,7 +198,15 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                 
                 beforePositionElement,
 
-                new div { Text(node.Tag), MarginLeft(5), FontSize13 },
+                new FlexRow(JustifyContentSpaceBetween)
+                {
+                    MarginLeft(4), FontSize13,
+                    
+                    new span{ node.Tag },
+                    
+                    flexIdentifier
+                    
+                },
 
                 state.DragStartedTreeItemPath.HasNoValue() && isSelected ? Background(Blue100) + BorderRadius(3) : null,
 
