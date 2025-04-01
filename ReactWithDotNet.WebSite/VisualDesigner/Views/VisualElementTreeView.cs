@@ -144,7 +144,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                 OnDragEnter(ToggleDragPositionBefore),
                 OnDragLeave(ToggleDragPositionBefore),
 
-                BorderBottomLeftRadius(16), BorderBottomRightRadius(16),
+                BorderBottomLeftRadius(16), BorderTopLeftRadius(16),
 
                 When(state.DragPosition == DragPosition.Before, Background(Blue300)),
 
@@ -160,7 +160,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                 OnDragEnter(ToggleDragPositionAfter),
                 OnDragLeave(ToggleDragPositionAfter),
 
-                BorderTopLeftRadius(16), BorderTopRightRadius(16),
+                BorderBottomLeftRadius(16), BorderTopLeftRadius(16),
 
                 When(state.DragPosition == DragPosition.After, Background(Blue300)),
                 
