@@ -963,7 +963,7 @@ sealed class ApplicationView : Component<ApplicationState>
                         // calculate text selection in edit input
                         {
                             var nameValue = CurrentVisualElement.StyleGroups[location.StyleGroupIndex].Items[state.SelectedPropertyIndexInStyleGroup.Value];
-                            var (success, name, parsedValue) = TryParsePropertyValue(nameValue);
+                            var (success, _, parsedValue) = TryParsePropertyValue(nameValue);
                             if (success)
                             {
                                 var startIndex = nameValue.LastIndexOf(parsedValue,StringComparison.OrdinalIgnoreCase);
@@ -997,26 +997,26 @@ sealed class ApplicationView : Component<ApplicationState>
                 Suggestions = GetStyleAttributeNameSuggestions(state),
                 Id = new StyleInputLocation
                 {
-                    StyleGroupIndex = styleGroupIndex,
-                    
+                    StyleGroupIndex = styleGroupIndex
                 },
                 Name  = new StyleInputLocation
                 {
                     StyleGroupIndex      = styleGroupIndex,
-                    PropertyIndexInGroup = CurrentStyleGroup.Items.Count
+                    PropertyIndexInGroup = state.SelectedPropertyIndexInStyleGroup ?? CurrentStyleGroup.Items.Count
                 },
-                OnChange = (senderName, newValue) =>
+                OnChange = (_, newValue) =>
                 {
-                    StyleInputLocation location = senderName;
-                 
-                    state.SelectedStyleGroupIndex = location.StyleGroupIndex;
+                    if (state.SelectedStyleGroupIndex.HasValue && state.SelectedPropertyIndexInStyleGroup.HasValue)
+                    {
+                        CurrentStyleGroup.Items[state.SelectedPropertyIndexInStyleGroup.Value] = newValue;
+                    }
+                    else
+                    {
+                        CurrentStyleGroup.Items.Add(newValue);
+                    }
                     
-                    state.SelectedPropertyIndexInStyleGroup = location.PropertyIndexInGroup;
-
-                    CurrentStyleGroup.Items.Add(newValue);
-
                     state.SelectedPropertyIndexInStyleGroup = null;
-                 
+                    
                     return Task.CompletedTask;
                 },
                 Value = value
