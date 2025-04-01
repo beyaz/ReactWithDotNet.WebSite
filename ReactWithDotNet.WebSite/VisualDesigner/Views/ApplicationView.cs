@@ -15,11 +15,8 @@ sealed class ApplicationView : Component<ApplicationState>
 
     PropertyGroupModel CurrentStyleGroup => CurrentVisualElement.StyleGroups[state.SelectedStyleGroupIndex!.Value];
 
-
     VisualElementModel CurrentVisualElement => FindTreeNodeByTreePath(state.ComponentRootElement, state.SelectedVisualElementTreeItemPath);
 
-    
-    
     protected override async Task constructor()
     {
         var userName = Environment.UserName; // future: get userName from cookie or url
@@ -157,7 +154,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
         return Task.CompletedTask;
     }
-    
+
     async Task ChangeSelectedComponent(int componentId)
     {
         state.ComponentId = componentId;
@@ -367,7 +364,7 @@ sealed class ApplicationView : Component<ApplicationState>
             }
         };
     }
-    
+
     Task OnCommonSizeClicked(MouseEvent e)
     {
         state.Preview.Width = e.currentTarget.data["value"] switch
@@ -810,8 +807,8 @@ sealed class ApplicationView : Component<ApplicationState>
             new MagicInput
             {
                 Placeholder = "text..",
-                Name  = string.Empty,
-                Value = visualElementModel.Text,
+                Name        = string.Empty,
+                Value       = visualElementModel.Text,
                 OnChange = (_, newValue) =>
                 {
                     CurrentVisualElement.Text = newValue;
@@ -844,8 +841,7 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             new div { Height(1), FlexGrow(1), Background(Gray200) },
             new span { "P R O P S", WhiteSpaceNoWrap, UserSelect(none), PaddingX(4) },
-            new div { Height(1), FlexGrow(1), Background(Gray200) },
-
+            new div { Height(1), FlexGrow(1), Background(Gray200) }
         };
 
         return new FlexColumn(BorderLeft(1, dotted, "#d9d9d9"), PaddingX(2), Gap(8), OverflowYAuto, Background(White))
@@ -870,8 +866,8 @@ sealed class ApplicationView : Component<ApplicationState>
                             {
                                 addStyleAttributeInput(styleGroupIndex, styleGroup)
                             },
-    
-                            styleGroup.Items?.Select((value, index)=>styleAttributeView(index, value, styleGroupIndex))
+
+                            styleGroup.Items?.Select((value, index) => styleAttributeView(index, value, styleGroupIndex))
                         }
                     };
                 })
@@ -880,13 +876,10 @@ sealed class ApplicationView : Component<ApplicationState>
             propsHeader
         };
 
-
         Element newStyleGroupHeader(PropertyGroupModel styleGroup, int styleGroupIndex)
         {
             return new FlexRow(WidthFull, AlignItemsCenter, Gap(4), PaddingX(2))
             {
-                
-
                 new MagicInput
                 {
                     Name = styleGroupIndex.ToString(),
@@ -899,8 +892,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     Value             = styleGroup.Condition,
                     IsTextAlignCenter = true,
                     Suggestions       = GetStyleGroupConditionSuggestions(state)
-                } + FlexGrow(1),
-
+                } + FlexGrow(1)
             };
         }
 
@@ -909,15 +901,13 @@ sealed class ApplicationView : Component<ApplicationState>
             var isSelected = index == state.SelectedPropertyIndexInStyleGroup &&
                              styleGroupIndex == state.SelectedStyleGroupIndex;
 
-
-            var closeIcon = new FlexRowCentered(Size(20), PositionAbsolute, Top(-8), Right(-8), Padding(4), Background(White), 
+            var closeIcon = new FlexRowCentered(Size(20), PositionAbsolute, Top(-8), Right(-8), Padding(4), Background(White),
                                                 Border(0.5, solid, Theme.BorderColor), BorderRadius(24))
             {
-                
                 Color(Gray500), Hover(Color(Blue300), BorderColor(Blue300)),
-                
+
                 new IconClose() + Size(16),
-                
+
                 OnClick([StopPropagation](_) =>
                 {
                     CurrentStyleGroup.Items.RemoveAt(state.SelectedPropertyIndexInStyleGroup!.Value);
@@ -927,15 +917,14 @@ sealed class ApplicationView : Component<ApplicationState>
                     return Task.CompletedTask;
                 })
             };
-            
-            return new FlexRowCentered(CursorDefault, Padding(4,8),BorderRadius(16))
+
+            return new(CursorDefault, Padding(4, 8), BorderRadius(16))
             {
                 Background(isSelected ? Gray200 : Gray50),
 
                 isSelected ? PositionRelative : null,
-                isSelected ? closeIcon: null,
-                
-                                
+                isSelected ? closeIcon : null,
+
                 value,
                 Id(new StyleInputLocation
                 {
@@ -948,7 +937,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
                     state.SelectedStyleGroupIndex           = location.StyleGroupIndex;
                     state.SelectedPropertyIndexInStyleGroup = location.PropertyIndexInGroup;
-                                    
+
                     var id = new StyleInputLocation
                     {
                         StyleGroupIndex = location.StyleGroupIndex
@@ -957,7 +946,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     // calculate js code for focus to input editor
                     {
                         var jsCode = new StringBuilder();
-                    
+
                         jsCode.AppendLine($"document.getElementById('{id}').focus();");
 
                         // calculate text selection in edit input
@@ -966,17 +955,16 @@ sealed class ApplicationView : Component<ApplicationState>
                             var (success, _, parsedValue) = TryParsePropertyValue(nameValue);
                             if (success)
                             {
-                                var startIndex = nameValue.LastIndexOf(parsedValue,StringComparison.OrdinalIgnoreCase);
+                                var startIndex = nameValue.LastIndexOf(parsedValue, StringComparison.OrdinalIgnoreCase);
                                 var endIndex = nameValue.Length;
-                                
-                                
+
                                 jsCode.AppendLine($"document.getElementById('{id}').setSelectionRange({startIndex}, {endIndex});");
                             }
                         }
-                        
+
                         Client.RunJavascript(jsCode.ToString());
                     }
-             
+
                     return Task.CompletedTask;
                 })
             };
@@ -990,7 +978,7 @@ sealed class ApplicationView : Component<ApplicationState>
             {
                 value = styleGroup.Items[state.SelectedPropertyIndexInStyleGroup.Value];
             }
-            
+
             return new MagicInput
             {
                 Placeholder = "Add style attribute",
@@ -999,7 +987,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 {
                     StyleGroupIndex = styleGroupIndex
                 },
-                Name  = new StyleInputLocation
+                Name = new StyleInputLocation
                 {
                     StyleGroupIndex      = styleGroupIndex,
                     PropertyIndexInGroup = state.SelectedPropertyIndexInStyleGroup ?? CurrentStyleGroup.Items.Count
@@ -1014,9 +1002,9 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         CurrentStyleGroup.Items.Add(newValue);
                     }
-                    
+
                     state.SelectedPropertyIndexInStyleGroup = null;
-                    
+
                     return Task.CompletedTask;
                 },
                 Value = value
@@ -1073,7 +1061,7 @@ sealed class ApplicationView : Component<ApplicationState>
             newStyleGroup = new()
             {
                 Condition = "*",
-                Items = []
+                Items     = []
             };
         }
         else
@@ -1081,7 +1069,7 @@ sealed class ApplicationView : Component<ApplicationState>
             newStyleGroup = new()
             {
                 Condition = "? ? ? ?",
-                Items = []
+                Items     = []
             };
         }
 
@@ -1101,10 +1089,10 @@ sealed class ApplicationView : Component<ApplicationState>
 
         return Task.CompletedTask;
     }
-    
+
     class StyleInputLocation
     {
-        public  int PropertyIndexInGroup { get; init; }
+        public int PropertyIndexInGroup { get; init; }
         public required int StyleGroupIndex { get; init; }
 
         public static implicit operator StyleInputLocation(string input)
