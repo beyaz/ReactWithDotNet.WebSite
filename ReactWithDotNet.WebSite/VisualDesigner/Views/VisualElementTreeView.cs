@@ -181,8 +181,6 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                 OnDragEnter(OnDragEntered),
                 OnDrop(OnDroped),
 
-                //When(isDragHoveredElement, Outline($"3px {dotted} {Gray300}")),
-
                 afterPositionElement
             }
         };
