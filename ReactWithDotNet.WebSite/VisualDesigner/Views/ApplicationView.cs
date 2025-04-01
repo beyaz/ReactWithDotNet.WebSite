@@ -613,9 +613,13 @@ sealed class ApplicationView : Component<ApplicationState>
 
                     if (position == DragPosition.Inside)
                     {
-                        if (parentNodeParent.Children[parentNodeIndex].HasNoChild())
+                        var targetNode = parentNodeParent.Children[parentNodeIndex];
+                        
+                        if (targetNode.HasNoChild())
                         {
-                            (parentNodeParent.Children ??=[]).Add(sourceNodeParent.Children[sourceNodeIndex]);
+                            var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
+                            
+                            targetNode.Children.Add( sourceNode);
 
                             sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
                             
@@ -626,12 +630,14 @@ sealed class ApplicationView : Component<ApplicationState>
                         
                         return Task.CompletedTask;
                     }
-                    
-                    var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
+
+                    {
+                        var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
                         
-                    parentNodeParent.Children.Insert(parentNodeIndex  + position == DragPosition.After ? 1:0, sourceNode);
+                        parentNodeParent.Children.Insert(parentNodeIndex  + position == DragPosition.After ? 1:0, sourceNode);
                         
-                    sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
+                        sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
+                    }
                         
                     return Task.CompletedTask;
                 }
