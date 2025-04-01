@@ -587,8 +587,11 @@ sealed class ApplicationView : Component<ApplicationState>
 
                         parentNodeParent = temp;
                     }
-                    
-                    // 
+
+                    if (position == DragPosition.Inside)
+                    {
+                        
+                    }
                     
 
                     
