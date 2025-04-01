@@ -187,3 +187,21 @@ sealed class IconFlexColumn : PureComponent
         };
     }
 }
+
+sealed class IconText : PureComponent
+{
+    protected override Element render()
+    {
+        return new svg( Fill(none), ViewBox(0, 0, 24, 24),  Size(16))
+        {
+            new path
+            {
+                stroke         = "currentColor",
+                strokeLinecap  = "round",
+                strokeLinejoin = "round",
+                strokeWidth    = 1.5,
+                d              = "M18.25 7.25v-1.5H5.75v1.5M12 6v12.25m0 0h-1.25m1.25 0h1.25"
+            }
+        };
+    }
+}

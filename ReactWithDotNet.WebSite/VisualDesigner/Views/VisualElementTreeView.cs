@@ -176,7 +176,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                     return false;
                 }
 
-                if (name == "display")
+                if (name == "display" && value == "flex")
                 {
                     return true;
                 }
@@ -184,9 +184,53 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                 return false;
             });
 
-            if (hasFlex)
+            var hasFlexDirectionColumn = commonStyles.Items.Any(x =>
             {
-                icon = new span { PaddingLeft(8), FontSize12, "row" };
+                var (success, name, value) = TryParsePropertyValue(x);
+                if (!success)
+                {
+                    return false;
+                }
+
+                if (name == "flex-direction" && value == "column")
+                {
+                    return true;
+                }
+
+                return false;
+            });
+            
+            var hasFlexDirectionRow = commonStyles.Items.Any(x =>
+            {
+                var (success, name, value) = TryParsePropertyValue(x);
+                if (!success)
+                {
+                    return false;
+                }
+
+                if (name == "flex-direction" && value == "row")
+                {
+                    return true;
+                }
+
+                return false;
+            });
+            
+            if (hasFlexDirectionColumn)
+            {
+                icon = new IconFlexColumn() + Size(16) + Color(Gray300);
+            }
+            else if (hasFlexDirectionRow || hasFlex)
+            {
+                icon = new IconFlexRow() + Size(16) + Color(Gray300);
+            }
+        }
+
+        if (icon is null)
+        {
+            if (node.Text.HasValue())
+            {
+                icon = new IconText() + Size(16) + Color(Gray300);
             }
         }
         
@@ -198,13 +242,16 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                 
                 beforePositionElement,
 
-                new FlexRow(JustifyContentSpaceBetween)
+                new FlexRow(Gap(4), AlignItemsCenter)
                 {
                     MarginLeft(4), FontSize13,
                     
+                    
+                    
                     new span{ node.Tag },
                     
-                    icon
+                    icon,
+                    
                     
                 },
 
