@@ -1,4 +1,6 @@
-﻿namespace ReactWithDotNet.VisualDesigner.Views;
+﻿using System.Xml.Linq;
+
+namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationPreview : Component
 {
@@ -62,6 +64,15 @@ sealed class ApplicationPreview : Component
             {
                 foreach (var styleAttribute in styleGroup.Items ?? [])
                 {
+                    switch (styleAttribute)
+                    {
+                        case "w-full":
+                        {
+                            element.Add(Width("100%"));
+                            continue;
+                        }
+                    }
+                    
                     var (success, name, value) = TryParsePropertyValue(styleAttribute);
                     if (!success)
                     {
@@ -97,6 +108,7 @@ sealed class ApplicationPreview : Component
                             continue;
                         }
 
+                        case "h":
                         case "height":
                         {
                             if (isValueDouble)
