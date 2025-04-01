@@ -94,6 +94,8 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
     {
         var isSelected = SelectedPath == path;
 
+        var isDragHoveredElement = path == state.CurrentDragOveredPath && path != state.DragStartedTreeItemPath;
+        
         var returnList = new List<Element>
         {
             new FlexRow(AlignItemsCenter, PaddingLeft(indent * 16), Id(path), OnClick(OnTreeItemClicked), OnMouseEnter(OnMouseEnterHandler))
@@ -109,7 +111,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                 OnDragEnter(OnDragEntered),
                 OnDrop(OnDroped),
 
-                When(path == state.CurrentDragOveredPath && path != state.DragStartedTreeItemPath, Outline($"3px {dotted} {Gray300}"))
+                When(isDragHoveredElement, Outline($"3px {dotted} {Gray300}"))
             }
         };
 
