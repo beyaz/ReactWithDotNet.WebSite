@@ -131,19 +131,39 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 
         var isDragHoveredElement = path == state.CurrentDragOveredPath && path != state.DragStartedTreeItemPath;
 
+        Element beforePositionElement = null;
+        if (isDragHoveredElement)
+        {
+            beforePositionElement = new FlexRow(WidthFull, Height(8), DraggableTrue, Background(Gray100))
+            {
+                OnDragEnter(ToggleDragPositionBefore),
+                OnDragLeave(ToggleDragPositionBefore),
+
+                BorderBottomLeftRadius(16), BorderBottomRightRadius(16),
+
+                When(state.DragPosition == DragPosition.Before, Background(Blue300))
+            };
+        }
+        
+        Element afterPositionElement = null;
+        if (isDragHoveredElement)
+        {
+            afterPositionElement = new FlexRow(WidthFull, Height(8), DraggableTrue, Background(Gray100))
+            {
+                OnDragEnter(ToggleDragPositionAfter),
+                OnDragLeave(ToggleDragPositionAfter),
+
+                BorderTopLeftRadius(16), BorderTopRightRadius(16),
+
+                When(state.DragPosition == DragPosition.After, Background(Blue300))
+            };
+        }
+        
         var returnList = new List<Element>
         {
             new FlexColumn(PaddingLeft(indent * 16), Id(path), OnClick(OnTreeItemClicked), OnMouseEnter(OnMouseEnterHandler))
             {
-                isDragHoveredElement ? new FlexRow(WidthFull, Height(8), DraggableTrue, Background(Gray100))
-                {
-                    OnDragEnter(ToggleDragPositionBefore),
-                    OnDragLeave(ToggleDragPositionBefore),
-
-                    BorderBottomLeftRadius(16), BorderBottomRightRadius(16),
-
-                    When(state.DragPosition == DragPosition.Before, Background(Blue300))
-                } : null,
+                beforePositionElement,
 
                 new div { Text(node.Tag), MarginLeft(5), FontSize13 },
 
@@ -158,15 +178,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 
                 When(isDragHoveredElement, Outline($"3px {dotted} {Gray300}")),
 
-                isDragHoveredElement ? new FlexRow(WidthFull, Height(8), DraggableTrue, Background(Gray100))
-                {
-                    OnDragEnter(ToggleDragPositionAfter),
-                    OnDragLeave(ToggleDragPositionAfter),
-
-                    BorderTopLeftRadius(16), BorderTopRightRadius(16),
-
-                    When(state.DragPosition == DragPosition.After, Background(Blue300))
-                } : null
+                afterPositionElement
             }
         };
 
