@@ -584,7 +584,7 @@ sealed class ApplicationView : Component<ApplicationState>
                             return Task.CompletedTask;
                         }
                     }
-                    
+
                     // same target control
                     {
                         if (source == target)
@@ -632,9 +632,16 @@ sealed class ApplicationView : Component<ApplicationState>
                     if (position == DragPosition.Inside)
                     {
                         var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
-                        
+
                         var targetNode = targetNodeParent.Children[targetNodeIndex];
-                        
+
+                        if (targetNode.Children.Count > 0)
+                        {
+                            this.FailNotification("Select valid location");
+
+                            return Task.CompletedTask;
+                        }
+
                         // remove from source
                         sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
 
@@ -646,12 +653,6 @@ sealed class ApplicationView : Component<ApplicationState>
 
                             return Task.CompletedTask;
                         }
-
-                        this.FailNotification("Select valid location");
-
-                        return Task.CompletedTask;
-                        
-                        
                     }
 
                     // is same parent
@@ -661,7 +662,7 @@ sealed class ApplicationView : Component<ApplicationState>
                         {
                             return Task.CompletedTask;
                         }
-                        
+
                         if (position == DragPosition.Before && targetNodeIndex - sourceNodeIndex == 1)
                         {
                             return Task.CompletedTask;
@@ -670,36 +671,36 @@ sealed class ApplicationView : Component<ApplicationState>
 
                     {
                         var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
-                        
+
                         // remove from source
                         sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
-                        
+
                         if (sourceNodeParent == targetNodeParent)
                         {
                             // is adding end
                             if (position == DragPosition.After && targetNodeIndex == targetNodeParent.Children.Count)
                             {
                                 targetNodeParent.Children.Insert(targetNodeIndex, sourceNode);
-                                    
+
                                 state.Selection = new();
-                                
+
                                 return Task.CompletedTask;
                             }
-                            
+
                             if (position == DragPosition.After && targetNodeIndex == 0)
                             {
                                 targetNodeIndex++;
                             }
-                            
+
                             if (position == DragPosition.Before && targetNodeIndex == targetNodeParent.Children.Count)
                             {
                                 targetNodeIndex--;
-                            }    
+                            }
                         }
-                        
+
                         // insert into target
                         targetNodeParent.Children.Insert(targetNodeIndex, sourceNode);
-                        
+
                         state.Selection = new();
                     }
 
