@@ -216,6 +216,38 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                 return false;
             });
             
+            var hasHeightWithConstantValue = commonStyles.Items.Any(x =>
+            {
+                var (success, name, value) = TryParsePropertyValue(x);
+                if (!success)
+                {
+                    return false;
+                }
+                
+                if (double.TryParse(value, out _))
+                {
+                    return name == "h" || name == "height";
+                }
+
+                return false;
+            });
+            
+            var hasWidhtWithConstantValue = commonStyles.Items.Any(x =>
+            {
+                var (success, name, value) = TryParsePropertyValue(x);
+                if (!success)
+                {
+                    return false;
+                }
+                
+                if (double.TryParse(value, out _))
+                {
+                    return name == "w" || name == "width";
+                }
+
+                return false;
+            });
+            
             if (hasFlexDirectionColumn)
             {
                 icon = new IconFlexColumn() + Size(16) + Color(Gray300);
@@ -224,12 +256,15 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
             {
                 icon = new IconFlexRow() + Size(16) + Color(Gray300);
             }
-
-            if (true)
+            else if(node.Text.HasNoValue() && commonStyles.Items.Count == 1 && hasHeightWithConstantValue)
             {
-                icon = new IconSpaceHorizontal();
                 icon = new IconSpaceVertical();
             }
+            else if(node.Text.HasNoValue() && commonStyles.Items.Count == 1 && hasWidhtWithConstantValue)
+            {
+                icon = new IconSpaceHorizontal();
+            }
+
         }
 
         if (icon is null)
