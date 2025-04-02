@@ -13,9 +13,9 @@ sealed class ApplicationView : Component<ApplicationState>
         remove
     }
 
-    PropertyGroupModel CurrentStyleGroup => CurrentVisualElement.StyleGroups[state.SelectedStyleGroupIndex!.Value];
+    PropertyGroupModel CurrentStyleGroup => CurrentVisualElement.StyleGroups[state.Selection.SelectedStyleGroupIndex!.Value];
 
-    VisualElementModel CurrentVisualElement => FindTreeNodeByTreePath(state.ComponentRootElement, state.SelectedVisualElementTreeItemPath);
+    VisualElementModel CurrentVisualElement => FindTreeNodeByTreePath(state.ComponentRootElement, state.Selection.SelectedVisualElementTreeItemPath);
 
     protected override async Task constructor()
     {
@@ -54,7 +54,9 @@ sealed class ApplicationView : Component<ApplicationState>
                 Width  = 600,
                 Height = 100,
                 Scale  = 100
-            }
+            },
+            
+            Selection = new()
         };
 
         var projectId = await GetFirstProjectId();
@@ -136,24 +138,31 @@ sealed class ApplicationView : Component<ApplicationState>
                 Tag = "div"
             };
 
-            state.SelectedVisualElementTreeItemPath = "0";
-            state.HoveredVisualElementTreeItemPath  = null;
-
+            state.Selection = new()
+            {
+                SelectedVisualElementTreeItemPath = "0"
+            };
+            
             return Task.CompletedTask;
         }
 
-        var node = FindTreeNodeByTreePath(state.ComponentRootElement, state.SelectedVisualElementTreeItemPath);
+        var selection = state.Selection;
+        
+        var node = FindTreeNodeByTreePath(state.ComponentRootElement, selection.SelectedVisualElementTreeItemPath);
 
         (node.Children ??= []).Add(new()
         {
             Tag = "div"
         });
 
-        state.SelectedVisualElementTreeItemPath = state.SelectedVisualElementTreeItemPath + "," + (node.Children.Count - 1);
-        state.HoveredVisualElementTreeItemPath  = null;
+        state.Selection = new()
+        {
+            SelectedVisualElementTreeItemPath = selection.SelectedVisualElementTreeItemPath + "," + (node.Children.Count - 1)
+        };
 
         return Task.CompletedTask;
     }
+
 
     async Task ChangeSelectedComponent(int componentId)
     {
@@ -175,7 +184,9 @@ sealed class ApplicationView : Component<ApplicationState>
 
             ComponentId = componentId,
 
-            ComponentRootElement = componentRootElement
+            ComponentRootElement = componentRootElement,
+            
+            Selection = new()
         };
     }
 
@@ -202,7 +213,9 @@ sealed class ApplicationView : Component<ApplicationState>
 
             Preview = state.Preview,
 
-            LeftPanelSelectedTab = LeftPanelTab.ElementTree
+            LeftPanelSelectedTab = LeftPanelTab.ElementTree,
+            
+            Selection = new()
         };
 
         // try select first component
@@ -320,7 +333,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Task LayersTabRemoveSelectedItemClicked(MouseEvent e)
     {
-        var intArray = state.SelectedVisualElementTreeItemPath.Split(',');
+        var intArray = state.Selection.SelectedVisualElementTreeItemPath.Split(',');
         if (intArray.Length == 1)
         {
             state.ComponentRootElement = null;
@@ -337,8 +350,7 @@ sealed class ApplicationView : Component<ApplicationState>
             node.Children.RemoveAt(int.Parse(intArray[^1]));
         }
 
-        state.SelectedVisualElementTreeItemPath = null;
-        state.HoveredVisualElementTreeItemPath  = null;
+        state.Selection = new();
 
         return Task.CompletedTask;
     }
@@ -454,7 +466,7 @@ sealed class ApplicationView : Component<ApplicationState>
         };
 
         var removeIconInLayersTab = CreateIcon(Icon.remove, 16);
-        if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree && state.SelectedVisualElementTreeItemPath.HasValue())
+        if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree && state.Selection.SelectedVisualElementTreeItemPath.HasValue())
         {
             removeIconInLayersTab.Add(Hover(Color(Blue300), BorderColor(Blue300)), OnClick(LayersTabRemoveSelectedItemClicked));
         }
@@ -464,7 +476,7 @@ sealed class ApplicationView : Component<ApplicationState>
         }
 
         var addIconInLayersTab = CreateIcon(Icon.add, 16);
-        if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree && (state.ComponentRootElement is null || state.SelectedVisualElementTreeItemPath.HasValue()))
+        if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree && (state.ComponentRootElement is null || state.Selection.SelectedVisualElementTreeItemPath.HasValue()))
         {
             addIconInLayersTab.Add(Hover(Color(Blue300), BorderColor(Blue300)), OnClick(AddNewLayerClicked));
         }
@@ -529,24 +541,25 @@ sealed class ApplicationView : Component<ApplicationState>
             {
                 Model = state.ComponentRootElement,
 
-                SelectedPath = state.SelectedVisualElementTreeItemPath,
+                SelectedPath = state.Selection.SelectedVisualElementTreeItemPath,
 
                 TreeItemHover = treeItemPath =>
                 {
-                    state.HoveredVisualElementTreeItemPath = treeItemPath;
+                    state.Selection.HoveredVisualElementTreeItemPath = treeItemPath;
 
                     return Task.CompletedTask;
                 },
                 MouseLeave = () =>
                 {
-                    state.HoveredVisualElementTreeItemPath = null;
+                    state.Selection.HoveredVisualElementTreeItemPath = null;
                     return Task.CompletedTask;
                 },
                 SelectionChanged = treeItemPath =>
                 {
-                    state.SelectedVisualElementTreeItemPath = treeItemPath;
-
-                    state.SelectedPropertyIndexInStyleGroup = null;
+                    state.Selection = new()
+                    {
+                        SelectedVisualElementTreeItemPath = treeItemPath
+                    };
                     
                     return Task.CompletedTask;
                 },
@@ -874,9 +887,9 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         VisualElementModel visualElementModel = null;
         
-        if (state.SelectedVisualElementTreeItemPath.HasValue())
+        if (state.Selection.SelectedVisualElementTreeItemPath.HasValue())
         {
-            visualElementModel = FindTreeNodeByTreePath(state.ComponentRootElement, state.SelectedVisualElementTreeItemPath);
+            visualElementModel = FindTreeNodeByTreePath(state.ComponentRootElement, state.Selection.SelectedVisualElementTreeItemPath);
         }
 
         if (visualElementModel is null)
@@ -919,7 +932,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
         var stylesHeader = new FlexRow(WidthFull, AlignItemsCenter)
         {
-            CreateIcon(Icon.remove, 32, state.SelectedStyleGroupIndex.HasValue ?
+            CreateIcon(Icon.remove, 32, state.Selection.SelectedStyleGroupIndex.HasValue ?
                            [
                                OnClick(StyleGroupRemoveClicked),
                                Hover(Color(Blue300))
@@ -984,7 +997,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     Name = styleGroupIndex.ToString(),
                     OnFocus = senderNameAsStyleGroupIndex =>
                     {
-                        state.SelectedStyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex);
+                        state.Selection.SelectedStyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex);
 
                         return Task.CompletedTask;
                     },
@@ -997,8 +1010,8 @@ sealed class ApplicationView : Component<ApplicationState>
 
         FlexRowCentered styleAttributeView(int index, string value, int styleGroupIndex)
         {
-            var isSelected = index == state.SelectedPropertyIndexInStyleGroup &&
-                             styleGroupIndex == state.SelectedStyleGroupIndex;
+            var isSelected = index == state.Selection.SelectedPropertyIndexInStyleGroup &&
+                             styleGroupIndex == state.Selection.SelectedStyleGroupIndex;
 
             var closeIcon = new FlexRowCentered(Size(20), PositionAbsolute, Top(-8), Right(-8), Padding(4), Background(White),
                                                 Border(0.5, solid, Theme.BorderColor), BorderRadius(24))
@@ -1009,9 +1022,9 @@ sealed class ApplicationView : Component<ApplicationState>
 
                 OnClick([StopPropagation](_) =>
                 {
-                    CurrentStyleGroup.Items.RemoveAt(state.SelectedPropertyIndexInStyleGroup!.Value);
+                    CurrentStyleGroup.Items.RemoveAt(state.Selection.SelectedPropertyIndexInStyleGroup!.Value);
 
-                    state.SelectedPropertyIndexInStyleGroup = null;
+                    state.Selection.SelectedPropertyIndexInStyleGroup = null;
 
                     return Task.CompletedTask;
                 })
@@ -1034,8 +1047,8 @@ sealed class ApplicationView : Component<ApplicationState>
                 {
                     StyleInputLocation location = e.target.id;
 
-                    state.SelectedStyleGroupIndex           = location.StyleGroupIndex;
-                    state.SelectedPropertyIndexInStyleGroup = location.PropertyIndexInGroup;
+                    state.Selection.SelectedStyleGroupIndex           = location.StyleGroupIndex;
+                    state.Selection.SelectedPropertyIndexInStyleGroup = location.PropertyIndexInGroup;
 
                     var id = new StyleInputLocation
                     {
@@ -1050,7 +1063,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
                         // calculate text selection in edit input
                         {
-                            var nameValue = CurrentVisualElement.StyleGroups[location.StyleGroupIndex].Items[state.SelectedPropertyIndexInStyleGroup.Value];
+                            var nameValue = CurrentVisualElement.StyleGroups[location.StyleGroupIndex].Items[state.Selection.SelectedPropertyIndexInStyleGroup.Value];
                             var (success, _, parsedValue) = TryParsePropertyValue(nameValue);
                             if (success)
                             {
@@ -1073,9 +1086,9 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             string value = null;
 
-            if (state.SelectedStyleGroupIndex == styleGroupIndex && state.SelectedPropertyIndexInStyleGroup >= 0)
+            if (state.Selection.SelectedStyleGroupIndex == styleGroupIndex && state.Selection.SelectedPropertyIndexInStyleGroup >= 0)
             {
-                value = styleGroup.Items[state.SelectedPropertyIndexInStyleGroup.Value];
+                value = styleGroup.Items[state.Selection.SelectedPropertyIndexInStyleGroup.Value];
             }
 
             return new MagicInput
@@ -1089,22 +1102,22 @@ sealed class ApplicationView : Component<ApplicationState>
                 Name = new StyleInputLocation
                 {
                     StyleGroupIndex      = styleGroupIndex,
-                    PropertyIndexInGroup = state.SelectedPropertyIndexInStyleGroup ?? CurrentVisualElement.StyleGroups[styleGroupIndex].Items.Count
+                    PropertyIndexInGroup = state.Selection.SelectedPropertyIndexInStyleGroup ?? CurrentVisualElement.StyleGroups[styleGroupIndex].Items.Count
                 },
                 OnChange = (_, newValue) =>
                 {
                     newValue = TryBeautifyPropertyValue(newValue);
 
-                    if (state.SelectedStyleGroupIndex.HasValue && state.SelectedPropertyIndexInStyleGroup.HasValue)
+                    if (state.Selection.SelectedStyleGroupIndex.HasValue && state.Selection.SelectedPropertyIndexInStyleGroup.HasValue)
                     {
-                        CurrentStyleGroup.Items[state.SelectedPropertyIndexInStyleGroup.Value] = newValue;
+                        CurrentStyleGroup.Items[state.Selection.SelectedPropertyIndexInStyleGroup.Value] = newValue;
                     }
                     else
                     {
                         CurrentStyleGroup.Items.Add(newValue);
                     }
 
-                    state.SelectedPropertyIndexInStyleGroup = null;
+                    state.Selection.SelectedPropertyIndexInStyleGroup = null;
 
                     return Task.CompletedTask;
                 },
@@ -1176,24 +1189,25 @@ sealed class ApplicationView : Component<ApplicationState>
 
         styleGroups.Add(newStyleGroup);
 
-        state.SelectedStyleGroupIndex = styleGroups.Count - 1;
+        state.Selection.SelectedStyleGroupIndex = styleGroups.Count - 1;
 
         return Task.CompletedTask;
     }
 
     Task StyleGroupRemoveClicked(MouseEvent e)
     {
-        CurrentVisualElement.StyleGroups.RemoveAt(state.SelectedStyleGroupIndex!.Value);
+        CurrentVisualElement.StyleGroups.RemoveAt(state.Selection.SelectedStyleGroupIndex!.Value);
 
-        state.SelectedStyleGroupIndex           = null;
-        state.SelectedPropertyIndexInStyleGroup = null;
+        state.Selection.SelectedStyleGroupIndex           = null;
+        state.Selection.SelectedPropertyIndexInStyleGroup = null;
 
         return Task.CompletedTask;
     }
 
     class StyleInputLocation
     {
-        public string Prefix { get; init; } = "style-input-location";
+        string Prefix { get; init; } = "style-input-location";
+        
         public int PropertyIndexInGroup { get; init; }
 
         public required int StyleGroupIndex { get; init; }

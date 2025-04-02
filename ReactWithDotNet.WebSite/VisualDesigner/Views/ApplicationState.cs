@@ -18,6 +18,21 @@ public sealed class ApplicationPreviewInfo
     public int Width { get; set; }
 }
 
+public sealed record ApplicationSelectionState
+{
+    public string SelectedVisualElementTreeItemPath { get; set; }
+    
+    public string HoveredVisualElementTreeItemPath { get; set; }
+    
+    // STYLE
+    public int? SelectedStyleGroupIndex { get; set; }
+    
+    public int? SelectedPropertyIndexInStyleGroup { get; set; }
+    
+    // PROPS
+    public int? SelectedPropertyIndexInProps { get; set; }
+}
+
 public sealed class ApplicationState
 {
     // @formatter:off
@@ -36,21 +51,8 @@ public sealed class ApplicationState
     public LeftPanelTab LeftPanelSelectedTab { get; set; }
     
     public string JsonText { get; set; }
-    
-    
-    // VISUAL ELEMENT STATE
-    
-    public string SelectedVisualElementTreeItemPath { get; set; }
-    
-    public string HoveredVisualElementTreeItemPath { get; set; }
-    
-    // STYLE
-    public int? SelectedStyleGroupIndex { get; set; }
-    
-    public int? SelectedPropertyIndexInStyleGroup { get; set; }
-    
-    // PROPS
-    public int? SelectedPropertyIndexInProps { get; set; }
+
+    public required ApplicationSelectionState Selection { get; set; }
     
     public string UserName { get; init; }
 

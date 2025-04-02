@@ -43,15 +43,18 @@ sealed class ApplicationPreview : Component
         }
 
         VisualElementModel highlightedElement = null;
-            
-        if (appState.HoveredVisualElementTreeItemPath.HasValue())
         {
-            highlightedElement = FindTreeNodeByTreePath(rootElement, appState.HoveredVisualElementTreeItemPath);
+            var selection = appState.Selection;
+            if (selection.HoveredVisualElementTreeItemPath.HasValue())
+            {
+                highlightedElement = FindTreeNodeByTreePath(rootElement, selection.HoveredVisualElementTreeItemPath);
+            }
+            else if (selection.SelectedVisualElementTreeItemPath.HasValue())
+            {
+                highlightedElement = FindTreeNodeByTreePath(rootElement, selection.SelectedVisualElementTreeItemPath);
+            }
         }
-        else if (appState.SelectedVisualElementTreeItemPath.HasValue())
-        {
-            highlightedElement = FindTreeNodeByTreePath(rootElement, appState.SelectedVisualElementTreeItemPath);
-        }
+        
 
         return renderElement(rootElement);
 
