@@ -528,11 +528,9 @@ sealed class ApplicationView : Component<ApplicationState>
             When(state.LeftPanelSelectedTab == LeftPanelTab.ElementTree, () => new VisualElementTreeView
             {
                 Model = state.ComponentRootElement,
-                
+
                 SelectedPath = state.SelectedVisualElementTreeItemPath,
-                
-                
-                
+
                 TreeItemHover = treeItemPath =>
                 {
                     state.HoveredVisualElementTreeItemPath = treeItemPath;
@@ -549,37 +547,34 @@ sealed class ApplicationView : Component<ApplicationState>
                     state.SelectedVisualElementTreeItemPath = treeItemPath;
                     return Task.CompletedTask;
                 },
-                
+
                 TreeItemMove = (source, target, position) =>
                 {
-
                     // root check
                     {
                         if (source == "0")
                         {
                             this.FailNotification("Root node cannot move.");
-                            
+
                             return Task.CompletedTask;
-                            
                         }
                     }
-                    
+
                     // parent - child control
                     {
-                        if (target.StartsWith(source,StringComparison.OrdinalIgnoreCase))
+                        if (target.StartsWith(source, StringComparison.OrdinalIgnoreCase))
                         {
                             this.FailNotification("Parent node cannot add to child.");
-                            
+
                             return Task.CompletedTask;
-                            
                         }
                     }
-                    
+
                     VisualElementModel sourceNodeParent;
                     int sourceNodeIndex;
                     {
                         var temp = state.ComponentRootElement;
-                        
+
                         var indexArray = source.Split(',');
 
                         var length = indexArray.Length - 1;
@@ -597,7 +592,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     int parentNodeIndex;
                     {
                         var temp = state.ComponentRootElement;
-                        
+
                         var indexArray = target.Split(',');
 
                         var length = indexArray.Length - 1;
@@ -614,34 +609,33 @@ sealed class ApplicationView : Component<ApplicationState>
                     if (position == DragPosition.Inside)
                     {
                         var targetNode = parentNodeParent.Children[parentNodeIndex];
-                        
+
                         if (targetNode.HasNoChild())
                         {
                             var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
-                            
-                            (targetNode.Children ??=[]).Add( sourceNode);
+
+                            (targetNode.Children ??= []).Add(sourceNode);
 
                             sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
-                            
+
                             return Task.CompletedTask;
                         }
-                        
+
                         this.FailNotification("Select valid location");
-                        
+
                         return Task.CompletedTask;
                     }
 
                     {
                         var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
-                        
-                        parentNodeParent.Children.Insert(parentNodeIndex  + position == DragPosition.After ? 1:0, sourceNode);
-                        
+
+                        parentNodeParent.Children.Insert(parentNodeIndex + position == DragPosition.After ? 1 : 0, sourceNode);
+
                         sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
                     }
-                        
+
                     return Task.CompletedTask;
                 }
-               
             }),
 
             When(state.LeftPanelSelectedTab == LeftPanelTab.Props || state.LeftPanelSelectedTab == LeftPanelTab.State, () => new FlexColumnCentered(SizeFull)
@@ -1092,7 +1086,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 OnChange = (_, newValue) =>
                 {
                     newValue = TryBeautifyPropertyValue(newValue);
-                    
+
                     if (state.SelectedStyleGroupIndex.HasValue && state.SelectedPropertyIndexInStyleGroup.HasValue)
                     {
                         CurrentStyleGroup.Items[state.SelectedPropertyIndexInStyleGroup.Value] = newValue;
@@ -1191,11 +1185,10 @@ sealed class ApplicationView : Component<ApplicationState>
 
     class StyleInputLocation
     {
-        public int PropertyIndexInGroup { get; init; }
-        
-        public required int StyleGroupIndex { get; init; }
-
         public string Prefix { get; init; } = "style-input-location";
+        public int PropertyIndexInGroup { get; init; }
+
+        public required int StyleGroupIndex { get; init; }
 
         public static implicit operator StyleInputLocation(string input)
         {
@@ -1222,7 +1215,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
             return new()
             {
-                Prefix = parts[0],
+                Prefix               = parts[0],
                 StyleGroupIndex      = int.Parse(parts[1]),
                 PropertyIndexInGroup = int.Parse(parts[2])
             };
