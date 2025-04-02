@@ -1175,7 +1175,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Task StyleGroupRemoveClicked(MouseEvent e)
     {
-        CurrentVisualElement.StyleGroups.Remove(CurrentStyleGroup);
+        CurrentVisualElement.StyleGroups.RemoveAt(state.SelectedStyleGroupIndex!.Value);
 
         state.SelectedStyleGroupIndex           = null;
         state.SelectedPropertyIndexInStyleGroup = null;
