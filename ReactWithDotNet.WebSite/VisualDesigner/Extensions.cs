@@ -13,6 +13,16 @@ static class Theme
 
 static class Extensions
 {
+    
+    public static void Replace<T>(this List<T> list, int indexA, int indexB)
+    {
+        if (indexA < 0 || indexB < 0 || indexA >= list.Count || indexB >= list.Count)
+            throw new ArgumentOutOfRangeException("Index out of range");
+
+        (list[indexA], list[indexB]) = (list[indexB], list[indexA]);
+    }
+    
+    
     public static bool HasNoChild(this VisualElementModel model)
     {
         return model.Children is null || model.Children.Count == 0;

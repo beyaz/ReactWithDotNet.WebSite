@@ -55,7 +55,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 Height = 100,
                 Scale  = 100
             },
-            
+
             Selection = new()
         };
 
@@ -142,12 +142,12 @@ sealed class ApplicationView : Component<ApplicationState>
             {
                 VisualElementTreeItemPath = "0"
             };
-            
+
             return Task.CompletedTask;
         }
 
         var selection = state.Selection;
-        
+
         var node = FindTreeNodeByTreePath(state.ComponentRootElement, selection.VisualElementTreeItemPath);
 
         node.Children.Add(new()
@@ -162,7 +162,6 @@ sealed class ApplicationView : Component<ApplicationState>
 
         return Task.CompletedTask;
     }
-
 
     async Task ChangeSelectedComponent(int componentId)
     {
@@ -185,7 +184,7 @@ sealed class ApplicationView : Component<ApplicationState>
             ComponentId = componentId,
 
             ComponentRootElement = componentRootElement,
-            
+
             Selection = new()
         };
     }
@@ -214,7 +213,7 @@ sealed class ApplicationView : Component<ApplicationState>
             Preview = state.Preview,
 
             LeftPanelSelectedTab = LeftPanelTab.Layers,
-            
+
             Selection = new()
         };
 
@@ -560,7 +559,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         VisualElementTreeItemPath = treeItemPath
                     };
-                    
+
                     return Task.CompletedTask;
                 },
 
@@ -604,8 +603,8 @@ sealed class ApplicationView : Component<ApplicationState>
                         sourceNodeParent = temp;
                     }
 
-                    VisualElementModel parentNodeParent;
-                    int parentNodeIndex;
+                    VisualElementModel targetNodeParent;
+                    int targetNodeIndex;
                     {
                         var temp = state.ComponentRootElement;
 
@@ -617,14 +616,14 @@ sealed class ApplicationView : Component<ApplicationState>
                             temp = temp.Children[int.Parse(indexArray[i])];
                         }
 
-                        parentNodeIndex = int.Parse(indexArray[length]);
+                        targetNodeIndex = int.Parse(indexArray[length]);
 
-                        parentNodeParent = temp;
+                        targetNodeParent = temp;
                     }
 
                     if (position == DragPosition.Inside)
                     {
-                        var targetNode = parentNodeParent.Children[parentNodeIndex];
+                        var targetNode = targetNodeParent.Children[targetNodeIndex];
 
                         if (targetNode.HasNoChild())
                         {
@@ -642,10 +641,18 @@ sealed class ApplicationView : Component<ApplicationState>
                         return Task.CompletedTask;
                     }
 
+                    // is same parent
+                    if (sourceNodeParent == targetNodeParent)
+                    {
+                        sourceNodeParent.Children.Replace(sourceNodeIndex, targetNodeIndex);
+
+                        return Task.CompletedTask;
+                    }
+
                     {
                         var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
 
-                        parentNodeParent.Children.Insert(parentNodeIndex + position == DragPosition.After ? 1 : 0, sourceNode);
+                        targetNodeParent.Children.Insert(targetNodeIndex + position == DragPosition.After ? 1 : 0, sourceNode);
 
                         sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
                     }
@@ -886,7 +893,7 @@ sealed class ApplicationView : Component<ApplicationState>
     Element PartRightPanel()
     {
         VisualElementModel visualElementModel = null;
-        
+
         if (state.Selection.VisualElementTreeItemPath.HasValue())
         {
             visualElementModel = FindTreeNodeByTreePath(state.ComponentRootElement, state.Selection.VisualElementTreeItemPath);
@@ -1003,7 +1010,6 @@ sealed class ApplicationView : Component<ApplicationState>
 
                             StyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex)
                         };
-                        
 
                         return Task.CompletedTask;
                     },
@@ -1061,7 +1067,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
                         PropertyIndexInStyleGroup = location.PropertyIndexInGroup
                     };
-                    
+
                     var id = new StyleInputLocation
                     {
                         StyleGroupIndex = location.StyleGroupIndex
@@ -1198,14 +1204,13 @@ sealed class ApplicationView : Component<ApplicationState>
         }
 
         styleGroups.Add(newStyleGroup);
-        
+
         state.Selection = new()
         {
             VisualElementTreeItemPath = state.Selection.VisualElementTreeItemPath,
-            
+
             StyleGroupIndex = styleGroups.Count - 1
         };
-        
 
         return Task.CompletedTask;
     }
@@ -1218,17 +1223,16 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             VisualElementTreeItemPath = state.Selection.VisualElementTreeItemPath
         };
-        
+
         return Task.CompletedTask;
     }
 
     class StyleInputLocation
     {
-        string Prefix { get; init; } = "style-input-location";
-        
         public int PropertyIndexInGroup { get; init; }
 
         public required int StyleGroupIndex { get; init; }
+        string Prefix { get; init; } = "style-input-location";
 
         public static implicit operator StyleInputLocation(string input)
         {
