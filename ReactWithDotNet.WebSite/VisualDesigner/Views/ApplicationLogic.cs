@@ -1,16 +1,19 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using System.IO;
+using Dapper.Contrib.Extensions;
 
 namespace ReactWithDotNet.VisualDesigner.Views;
 
 static class ApplicationLogic
 {
+    public static ProjectCondifModel Project => DeserializeFromJson<ProjectCondifModel>(File.ReadAllText(@"C:\github\ReactWithDotNet.WebSite\ReactWithDotNet.WebSite\VisualDesigner\Project.json"));
+
     public static IReadOnlyList<string> GetStyleAttributeNameSuggestions(ApplicationState state)
     {
         var items = new List<string>();
         
-        items.AddRange(Plugin.GetStyleAttributeSuggestions(state));
+        items.AddRange(Project.Styles.Keys);
         
-        foreach (var colorName in Plugin.Model.NamedEmbeddedColors.Select(x => x.Key))
+        foreach (var colorName in Project.Colors.Select(x => x.Key))
         {
             items.Add("color: "+ colorName);
         }

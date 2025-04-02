@@ -1,0 +1,15 @@
+{
+    "colors": {
+        "content-weak": "#F5F7FA"
+    },
+    "styles": {
+        "bg-strong": "background: #0E121B",
+        "bg-surface": "background: #222530",
+        "bg-sub": "background: #CACFD8",
+        "bg-soft": "background: #E1E4EA",
+        "bg-weak": "background: #F5F7FA",
+        "bg-white": "background: #FFFFFF",
+        "heading-05": "font-family: \"Host Grotesk\"; font-size: 24px; font-style: normal; font-weight: 600; line-height: 32px;"
+    }
+
+}
