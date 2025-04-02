@@ -205,3 +205,57 @@ sealed class IconText : PureComponent
         };
     }
 }
+
+sealed class IconHeader : PureComponent
+{
+    protected override Element render()
+    {
+        return new svg( Fill(none), ViewBox(0, 0, 24, 24),  Size(16))
+        {
+            new path
+            {
+                stroke         = "currentColor",
+                strokeLinecap  = "round",
+                strokeLinejoin = "round",
+                strokeWidth    = 1.5,
+                d              = "M5.75 5.75h1.5m0 0h1m-1 0v6m0 6.5h-1.5m1.5 0h1m-1 0v-6.5m0 0h9.5m0 0v-6m0 6v6.5m1.5-12.5h-1.5m0 0h-1m1 12.5h1.5m-1.5 0h-1"
+            }
+        };
+    }
+}
+
+sealed class IconLink : PureComponent
+{
+    protected override Element render()
+    {
+        return new svg( Fill(none), ViewBox(0, 0, 24, 24),  Size(16))
+        {
+            new path
+            {
+                stroke         = "currentColor",
+                strokeLinecap  = "round",
+                strokeLinejoin = "round",
+                strokeWidth    = 1.5,
+                d              = "M16.75 13.25L18 12a4.243 4.243 0 000-6v0a4.243 4.243 0 00-6 0l-1.25 1.25m-3.5 3.5L6 12a4.243 4.243 0 000 6v0a4.243 4.243 0 006 0l1.25-1.25m1-7l-4.5 4.5"
+            }
+        };
+    }
+}
+
+sealed class IconImage : PureComponent
+{
+    protected override Element render()
+    {
+        return new svg( Fill(none), ViewBox(0, 0, 24, 24),  Size(16))
+        {
+            new path
+            {
+                stroke         = "currentColor",
+                strokeLinecap  = "round",
+                strokeLinejoin = "round",
+                strokeWidth    = 1.5,
+                d              = "M4.75 16l2.746-3.493a2 2 0 013.09-.067L13 15.25m-2.085-2.427a645.29 645.29 0 002.576-3.31 2 2 0 013.094-.073L19 12.25m-12.25 7h10.5a2 2 0 002-2V6.75a2 2 0 00-2-2H6.75a2 2 0 00-2 2v10.5a2 2 0 002 2z"
+            }
+        };
+    }
+}

@@ -230,7 +230,23 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
         {
             if (node.Text.HasValue())
             {
-                icon = new IconText() + Size(16) + Color(Gray300);
+                if (node.Tag[0]== 'h')
+                {
+                    icon = new IconHeader() + Size(16) + Color(Gray300);    
+                }
+                else if (node.Tag == "a")
+                {
+                    icon = new IconLink() + Size(16) + Color(Gray300);    
+                }
+                else if (node.Tag == "img")
+                {
+                    icon = new IconImage() + Size(16) + Color(Gray300);    
+                }
+                else
+                {
+                    icon = new IconText() + Size(16) + Color(Gray300);
+                }
+                
             }
         }
         
