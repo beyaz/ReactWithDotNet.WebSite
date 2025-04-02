@@ -11,15 +11,19 @@ public enum LeftPanelTab
 
 public sealed class ApplicationPreviewInfo
 {
-    public int Scale { get; set; }
+    // @formatter:off
+    
+    public int Width { get; set; }
     
     public int Height { get; init; }
-
-    public int Width { get; set; }
+    
+    public int Scale { get; set; }
+    
+    // @formatter:on
 }
 
 public sealed record ApplicationSelectionState
-{ 
+{
     // @formatter:off
       
     public string VisualElementTreeItemPath { get; set; }
