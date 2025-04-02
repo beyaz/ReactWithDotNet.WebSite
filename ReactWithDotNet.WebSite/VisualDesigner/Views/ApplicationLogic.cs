@@ -5,7 +5,7 @@ namespace ReactWithDotNet.VisualDesigner.Views;
 
 static class ApplicationLogic
 {
-    public static ProjectConfigModel Project => DeserializeFromJson<ProjectConfigModel>(File.ReadAllText(@"C:\github\ReactWithDotNet.WebSite\ReactWithDotNet.WebSite\VisualDesigner\Project.json"));
+    public static ProjectConfigModel Project => DeserializeFromYaml<ProjectConfigModel>(File.ReadAllText(@"C:\github\ReactWithDotNet.WebSite\ReactWithDotNet.WebSite\VisualDesigner\Project.yaml"));
 
     public static StyleModifier TryProcessStyleAttributeByProjectConfig(string styleAttribute)
     {
