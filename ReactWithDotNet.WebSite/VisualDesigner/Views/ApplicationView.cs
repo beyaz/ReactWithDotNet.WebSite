@@ -1091,6 +1091,8 @@ sealed class ApplicationView : Component<ApplicationState>
                 },
                 OnChange = (_, newValue) =>
                 {
+                    newValue = TryBeautifyPropertyValue(newValue);
+                    
                     if (state.SelectedStyleGroupIndex.HasValue && state.SelectedPropertyIndexInStyleGroup.HasValue)
                     {
                         CurrentStyleGroup.Items[state.SelectedPropertyIndexInStyleGroup.Value] = newValue;
