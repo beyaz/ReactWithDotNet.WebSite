@@ -7,6 +7,13 @@ static class ApplicationLogic
     public static IReadOnlyList<string> GetStyleAttributeNameSuggestions(ApplicationState state)
     {
         var items = new List<string>();
+        
+        items.AddRange(Plugin.GetStyleAttributeSuggestions(state));
+        
+        foreach (var colorName in Plugin.Model.NamedEmbeddedColors.Select(x => x.Key))
+        {
+            items.Add("color: "+ colorName);
+        }
 
         // w
         {

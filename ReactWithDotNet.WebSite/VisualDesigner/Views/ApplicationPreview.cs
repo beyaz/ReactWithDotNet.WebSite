@@ -76,6 +76,16 @@ sealed class ApplicationPreview : Component
             {
                 foreach (var styleAttribute in styleGroup.Items ?? [])
                 {
+                    // try process from plugin
+                    {
+                        var style = Plugin.TryProcessStyleAttribute(styleAttribute);
+                        if (style is not null)
+                        {
+                            element.Add(style);
+                            continue;
+                        }
+                    }
+                    
                     switch (styleAttribute)
                     {
                         case "w-full":
