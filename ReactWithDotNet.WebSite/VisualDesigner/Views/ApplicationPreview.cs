@@ -44,7 +44,7 @@ sealed class ApplicationPreview : Component
         
         if (appState.HoveredVisualElementTreeItemPath.HasValue())
         {
-            rootElement = FindTreeNodeByTreePath(rootElement, appState.HoveredVisualElementTreeItemPath);
+            // rootElement = FindTreeNodeByTreePath(rootElement, appState.HoveredVisualElementTreeItemPath);
         }
 
         return renderElement(rootElement);
