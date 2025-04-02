@@ -584,6 +584,14 @@ sealed class ApplicationView : Component<ApplicationState>
                             return Task.CompletedTask;
                         }
                     }
+                    
+                    // same target control
+                    {
+                        if (source == target)
+                        {
+                            return Task.CompletedTask;
+                        }
+                    }
 
                     VisualElementModel sourceNodeParent;
                     int sourceNodeIndex;
@@ -644,17 +652,41 @@ sealed class ApplicationView : Component<ApplicationState>
                     // is same parent
                     if (sourceNodeParent == targetNodeParent)
                     {
-                        sourceNodeParent.Children.Replace(sourceNodeIndex, targetNodeIndex);
+                        if (position == DragPosition.After && sourceNodeIndex - targetNodeIndex == 1)
+                        {
+                            return Task.CompletedTask;
+                        }
+                        
+                        if (position == DragPosition.Before && targetNodeIndex - sourceNodeIndex == 1)
+                        {
+                            return Task.CompletedTask;
+                        }
 
-                        return Task.CompletedTask;
+                        //var targetIndex = targetNodeIndex + (position == DragPosition.After ? 1 : 0);
+
+                        //if (targetIndex == sourceNodeParent.Children.Count)
+                        //{
+                        //    targetIndex--;
+                        //}
+                        
+                        //sourceNodeParent.Children.Replace(targetIndex, sourceNodeIndex);
+
+                        //return Task.CompletedTask;
                     }
 
                     {
                         var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
 
-                        targetNodeParent.Children.Insert(targetNodeIndex + position == DragPosition.After ? 1 : 0, sourceNode);
+                        targetNodeParent.Children.Insert(targetNodeIndex + (position == DragPosition.After ? 1 : 0), sourceNode);
 
-                        sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
+                        if (sourceNodeParent == targetNodeParent && sourceNodeIndex < targetNodeIndex)
+                        {
+                            sourceNodeParent.Children.RemoveAt(sourceNodeIndex -1);
+                        }
+                        else
+                        {
+                            sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
+                        }
                     }
 
                     return Task.CompletedTask;
