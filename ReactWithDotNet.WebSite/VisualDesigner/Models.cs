@@ -13,7 +13,7 @@ public sealed record PropertyGroupModel
     
     public string Condition { get; set; }
 
-    public required List<string> Items { get; init; }
+    public List<string> Items { get; init; } = [];
     
     // @formatter:on
 }
@@ -26,11 +26,11 @@ public sealed record VisualElementModel
     
     public string Text { get; set; }
     
-    public List<PropertyGroupModel> StyleGroups { get; set; }
+    public List<PropertyGroupModel> StyleGroups { get; init; } = [];
     
-    public List<string> Properties { get; set; }
+    public List<string> Properties { get; init; } = [];
     
-    public List<VisualElementModel> Children { get; set; }
+    public List<VisualElementModel> Children { get; init; } = [];
     
     // @formatter:on
 }

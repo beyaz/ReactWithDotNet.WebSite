@@ -150,7 +150,7 @@ sealed class ApplicationView : Component<ApplicationState>
         
         var node = FindTreeNodeByTreePath(state.ComponentRootElement, selection.VisualElementTreeItemPath);
 
-        (node.Children ??= []).Add(new()
+        node.Children.Add(new()
         {
             Tag = "div"
         });
@@ -630,7 +630,7 @@ sealed class ApplicationView : Component<ApplicationState>
                         {
                             var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
 
-                            (targetNode.Children ??= []).Add(sourceNode);
+                            targetNode.Children.Add(sourceNode);
 
                             sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
 
@@ -1179,23 +1179,21 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Task StyleGroupAddClicked(MouseEvent e)
     {
-        var styleGroups = CurrentVisualElement.StyleGroups ??= [];
+        var styleGroups = CurrentVisualElement.StyleGroups;
 
         PropertyGroupModel newStyleGroup;
         if (styleGroups.Count == 0)
         {
             newStyleGroup = new()
             {
-                Condition = "*",
-                Items     = []
+                Condition = "*"
             };
         }
         else
         {
             newStyleGroup = new()
             {
-                Condition = "? ? ? ?",
-                Items     = []
+                Condition = "? ? ? ?"
             };
         }
 
