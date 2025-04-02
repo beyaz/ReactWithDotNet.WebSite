@@ -434,6 +434,26 @@ static class Extensions
         return string.IsNullOrWhiteSpace(value);
     }
 
+    public static string TryBeautifyPropertyValue(string nameValueCombined)
+    {
+        if (string.IsNullOrWhiteSpace(nameValueCombined))
+        {
+            return nameValueCombined;
+        }
+
+        var colonIndex = nameValueCombined.IndexOf(':');
+        if (colonIndex < 0)
+        {
+            return nameValueCombined;
+        }
+
+        var name = nameValueCombined[..colonIndex];
+
+        var value = nameValueCombined[(colonIndex + 1)..];
+
+        return $"{name.Trim()}: {value.Trim()}";
+    }
+    
     public static (bool success, string name, string value) TryParsePropertyValue(string nameValueCombined)
     {
         if (string.IsNullOrWhiteSpace(nameValueCombined))
