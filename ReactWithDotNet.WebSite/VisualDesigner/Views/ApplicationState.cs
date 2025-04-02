@@ -30,7 +30,7 @@ public sealed record ApplicationSelectionState
     
     public string VisualElementTreeItemPathHover { get; set; }
     
-    public int? StyleGroupIndex { get; set; }
+    public int? StyleGroupIndex { get; init; }
     
     public int? PropertyIndexInStyleGroup { get; set; }
     

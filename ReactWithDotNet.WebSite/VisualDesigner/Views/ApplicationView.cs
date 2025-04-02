@@ -1053,9 +1053,15 @@ sealed class ApplicationView : Component<ApplicationState>
                 {
                     StyleInputLocation location = e.target.id;
 
-                    state.Selection.StyleGroupIndex           = location.StyleGroupIndex;
-                    state.Selection.PropertyIndexInStyleGroup = location.PropertyIndexInGroup;
+                    state.Selection = new()
+                    {
+                        VisualElementTreeItemPath = state.Selection.VisualElementTreeItemPath,
 
+                        StyleGroupIndex = location.StyleGroupIndex,
+
+                        PropertyIndexInStyleGroup = location.PropertyIndexInGroup
+                    };
+                    
                     var id = new StyleInputLocation
                     {
                         StyleGroupIndex = location.StyleGroupIndex
