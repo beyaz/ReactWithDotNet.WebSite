@@ -642,6 +642,8 @@ sealed class ApplicationView : Component<ApplicationState>
                         {
                             targetNode.Children.Add(sourceNode);
 
+                            state.Selection = new();
+
                             return Task.CompletedTask;
                         }
 
@@ -679,6 +681,8 @@ sealed class ApplicationView : Component<ApplicationState>
                             {
                                 targetNodeParent.Children.Insert(targetNodeIndex, sourceNode);
                                     
+                                state.Selection = new();
+                                
                                 return Task.CompletedTask;
                             }
                             
@@ -695,6 +699,8 @@ sealed class ApplicationView : Component<ApplicationState>
                         
                         // insert into target
                         targetNodeParent.Children.Insert(targetNodeIndex, sourceNode);
+                        
+                        state.Selection = new();
                     }
 
                     return Task.CompletedTask;
