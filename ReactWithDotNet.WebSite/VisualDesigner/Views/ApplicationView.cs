@@ -545,6 +545,9 @@ sealed class ApplicationView : Component<ApplicationState>
                 SelectionChanged = treeItemPath =>
                 {
                     state.SelectedVisualElementTreeItemPath = treeItemPath;
+
+                    state.SelectedPropertyIndexInStyleGroup = null;
+                    
                     return Task.CompletedTask;
                 },
 
