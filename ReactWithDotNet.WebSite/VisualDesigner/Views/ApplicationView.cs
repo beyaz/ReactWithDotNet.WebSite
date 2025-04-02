@@ -997,7 +997,13 @@ sealed class ApplicationView : Component<ApplicationState>
                     Name = styleGroupIndex.ToString(),
                     OnFocus = senderNameAsStyleGroupIndex =>
                     {
-                        state.Selection.StyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex);
+                        state.Selection = new()
+                        {
+                            VisualElementTreeItemPath = state.Selection.VisualElementTreeItemPath,
+
+                            StyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex)
+                        };
+                        
 
                         return Task.CompletedTask;
                     },
@@ -1188,8 +1194,14 @@ sealed class ApplicationView : Component<ApplicationState>
         }
 
         styleGroups.Add(newStyleGroup);
-
-        state.Selection.StyleGroupIndex = styleGroups.Count - 1;
+        
+        state.Selection = new()
+        {
+            VisualElementTreeItemPath = state.Selection.VisualElementTreeItemPath,
+            
+            StyleGroupIndex = styleGroups.Count - 1
+        };
+        
 
         return Task.CompletedTask;
     }
@@ -1198,9 +1210,11 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         CurrentVisualElement.StyleGroups.RemoveAt(state.Selection.StyleGroupIndex!.Value);
 
-        state.Selection.StyleGroupIndex           = null;
-        state.Selection.PropertyIndexInStyleGroup = null;
-
+        state.Selection = new()
+        {
+            VisualElementTreeItemPath = state.Selection.VisualElementTreeItemPath
+        };
+        
         return Task.CompletedTask;
     }
 

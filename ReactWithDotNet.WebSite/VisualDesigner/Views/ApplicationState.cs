@@ -26,7 +26,7 @@ public sealed record ApplicationSelectionState
 {
     // @formatter:off
       
-    public string VisualElementTreeItemPath { get; set; }
+    public string VisualElementTreeItemPath { get; init; }
     
     public string VisualElementTreeItemPathHover { get; set; }
     
