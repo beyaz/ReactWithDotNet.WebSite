@@ -41,10 +41,16 @@ sealed class ApplicationPreview : Component
         {
             return null;
         }
-        
+
+        VisualElementModel highlightedElement = null;
+            
         if (appState.HoveredVisualElementTreeItemPath.HasValue())
         {
-            // rootElement = FindTreeNodeByTreePath(rootElement, appState.HoveredVisualElementTreeItemPath);
+            highlightedElement = FindTreeNodeByTreePath(rootElement, appState.HoveredVisualElementTreeItemPath);
+        }
+        else if (appState.SelectedVisualElementTreeItemPath.HasValue())
+        {
+            highlightedElement = FindTreeNodeByTreePath(rootElement, appState.SelectedVisualElementTreeItemPath);
         }
 
         return renderElement(rootElement);
@@ -56,6 +62,11 @@ sealed class ApplicationPreview : Component
             if (model.Text.HasValue())
             {
                 element.text = model.Text;
+            }
+
+            if (highlightedElement == model)
+            {
+                element.Add(Outline($"1px {dashed} {Blue300}"));
             }
 
             foreach (var styleGroup in model.StyleGroups ?? [])
