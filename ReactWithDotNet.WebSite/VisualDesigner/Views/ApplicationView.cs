@@ -661,32 +661,29 @@ sealed class ApplicationView : Component<ApplicationState>
                         {
                             return Task.CompletedTask;
                         }
-
-                        //var targetIndex = targetNodeIndex + (position == DragPosition.After ? 1 : 0);
-
-                        //if (targetIndex == sourceNodeParent.Children.Count)
-                        //{
-                        //    targetIndex--;
-                        //}
-                        
-                        //sourceNodeParent.Children.Replace(targetIndex, sourceNodeIndex);
-
-                        //return Task.CompletedTask;
                     }
 
                     {
                         var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
-
-                        targetNodeParent.Children.Insert(targetNodeIndex + (position == DragPosition.After ? 1 : 0), sourceNode);
-
-                        if (sourceNodeParent == targetNodeParent && sourceNodeIndex < targetNodeIndex)
+                        
+                        // remove from source
+                        sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
+                        
+                        if (sourceNodeParent == targetNodeParent)
                         {
-                            sourceNodeParent.Children.RemoveAt(sourceNodeIndex -1);
+                            if (sourceNodeIndex < targetNodeIndex && position == DragPosition.After)
+                            {
+                                targetNodeIndex++;
+                            }    
+                            
+                            if (targetNodeIndex > targetNodeParent.Children.Count)
+                            {
+                                targetNodeIndex--;
+                            }
                         }
-                        else
-                        {
-                            sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
-                        }
+                        
+                        // insert into target
+                        targetNodeParent.Children.Insert(targetNodeIndex, sourceNode);
                     }
 
                     return Task.CompletedTask;
