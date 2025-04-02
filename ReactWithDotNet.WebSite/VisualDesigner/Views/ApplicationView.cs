@@ -671,15 +671,21 @@ sealed class ApplicationView : Component<ApplicationState>
                         
                         if (sourceNodeParent == targetNodeParent)
                         {
-                            if (sourceNodeIndex < targetNodeIndex && position == DragPosition.After)
+                            if (position == DragPosition.After)
                             {
-                                targetNodeIndex++;
-                            }    
-                            
-                            if (targetNodeIndex > targetNodeParent.Children.Count)
-                            {
-                                targetNodeIndex--;
+                                if (targetNodeIndex == targetNodeParent.Children.Count)
+                                {
+                                    //targetNodeIndex--;
+                                }
                             }
+                            
+                            if (position == DragPosition.Before)
+                            {
+                                if (targetNodeIndex == targetNodeParent.Children.Count)
+                                {
+                                    targetNodeIndex++;
+                                }
+                            }    
                         }
                         
                         // insert into target
