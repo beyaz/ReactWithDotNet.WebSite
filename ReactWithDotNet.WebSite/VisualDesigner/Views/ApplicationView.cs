@@ -180,7 +180,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
             Preview = state.Preview,
 
-            LeftPanelSelectedTab = LeftPanelTab.ElementTree,
+            LeftPanelSelectedTab = LeftPanelTab.Layers,
 
             ComponentId = componentId,
 
@@ -213,7 +213,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
             Preview = state.Preview,
 
-            LeftPanelSelectedTab = LeftPanelTab.ElementTree,
+            LeftPanelSelectedTab = LeftPanelTab.Layers,
             
             Selection = new()
         };
@@ -466,7 +466,7 @@ sealed class ApplicationView : Component<ApplicationState>
         };
 
         var removeIconInLayersTab = CreateIcon(Icon.remove, 16);
-        if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree && state.Selection.VisualElementTreeItemPath.HasValue())
+        if (state.LeftPanelSelectedTab == LeftPanelTab.Layers && state.Selection.VisualElementTreeItemPath.HasValue())
         {
             removeIconInLayersTab.Add(Hover(Color(Blue300), BorderColor(Blue300)), OnClick(LayersTabRemoveSelectedItemClicked));
         }
@@ -476,7 +476,7 @@ sealed class ApplicationView : Component<ApplicationState>
         }
 
         var addIconInLayersTab = CreateIcon(Icon.add, 16);
-        if (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree && (state.ComponentRootElement is null || state.Selection.VisualElementTreeItemPath.HasValue()))
+        if (state.LeftPanelSelectedTab == LeftPanelTab.Layers && (state.ComponentRootElement is null || state.Selection.VisualElementTreeItemPath.HasValue()))
         {
             addIconInLayersTab.Add(Hover(Color(Blue300), BorderColor(Blue300)), OnClick(AddNewLayerClicked));
         }
@@ -498,11 +498,11 @@ sealed class ApplicationView : Component<ApplicationState>
 
                     new FlexRowCentered(WidthFull)
                     {
-                        new IconLayers() + Size(18) + (state.LeftPanelSelectedTab == LeftPanelTab.ElementTree ? Color(Gray500) : null),
+                        new IconLayers() + Size(18) + (state.LeftPanelSelectedTab == LeftPanelTab.Layers ? Color(Gray500) : null),
 
                         OnClick(_ =>
                         {
-                            state.LeftPanelSelectedTab = LeftPanelTab.ElementTree;
+                            state.LeftPanelSelectedTab = LeftPanelTab.Layers;
 
                             return Task.CompletedTask;
                         })
@@ -537,7 +537,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 }
             },
 
-            When(state.LeftPanelSelectedTab == LeftPanelTab.ElementTree, () => new VisualElementTreeView
+            When(state.LeftPanelSelectedTab == LeftPanelTab.Layers, () => new VisualElementTreeView
             {
                 Model = state.ComponentRootElement,
 

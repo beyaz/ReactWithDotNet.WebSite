@@ -4,7 +4,7 @@ namespace ReactWithDotNet.VisualDesigner.Views;
 
 public enum LeftPanelTab
 {
-    ElementTree,
+    Layers,
     Props,
     State
 }
