@@ -48,6 +48,11 @@ sealed class MainLayout : PureComponent, IPageLayout
 
                     """
                 },
+                
+                new style
+                {
+                    Project.GlobalCss
+                },
 
                 arrangeFonts(),
 

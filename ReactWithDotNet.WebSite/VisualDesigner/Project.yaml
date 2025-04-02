@@ -8,12 +8,23 @@ styles:
   bg-soft: "background: #E1E4EA"
   bg-weak: "background: #F5F7FA"
   bg-white: "background: #FFFFFF"
-  heading-05: "font-family: 'Host Grotesk'; font-size: 24px; font-style: normal; font-weight: 600; line-height: 32px;"
+  heading-05: |
+    font-family: "Host Grotesk";
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 32px;
+  body-XL: |
+    font-family: "Host Grotesk";
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 32px;
 
 globalCss: |
   @font-face {
     font-family: 'Host Grotesk';
-    src: url('/fonts/HostGrotesk-Regular.woff2') format('woff2');
+    src: url('/wwwroot/fonts/HostGrotesk-Regular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
   }
