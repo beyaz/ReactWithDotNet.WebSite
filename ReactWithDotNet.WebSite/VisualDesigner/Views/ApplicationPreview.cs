@@ -45,13 +45,13 @@ sealed class ApplicationPreview : Component
         VisualElementModel highlightedElement = null;
         {
             var selection = appState.Selection;
-            if (selection.HoveredVisualElementTreeItemPath.HasValue())
+            if (selection.VisualElementTreeItemPathHover.HasValue())
             {
-                highlightedElement = FindTreeNodeByTreePath(rootElement, selection.HoveredVisualElementTreeItemPath);
+                highlightedElement = FindTreeNodeByTreePath(rootElement, selection.VisualElementTreeItemPathHover);
             }
-            else if (selection.SelectedVisualElementTreeItemPath.HasValue())
+            else if (selection.VisualElementTreeItemPath.HasValue())
             {
-                highlightedElement = FindTreeNodeByTreePath(rootElement, selection.SelectedVisualElementTreeItemPath);
+                highlightedElement = FindTreeNodeByTreePath(rootElement, selection.VisualElementTreeItemPath);
             }
         }
         

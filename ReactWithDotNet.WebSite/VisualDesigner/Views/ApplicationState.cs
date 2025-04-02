@@ -20,17 +20,17 @@ public sealed class ApplicationPreviewInfo
 
 public sealed record ApplicationSelectionState
 {
-    public string SelectedVisualElementTreeItemPath { get; set; }
+    public string VisualElementTreeItemPath { get; set; }
     
-    public string HoveredVisualElementTreeItemPath { get; set; }
+    public string VisualElementTreeItemPathHover { get; set; }
     
     // STYLE
-    public int? SelectedStyleGroupIndex { get; set; }
+    public int? StyleGroupIndex { get; set; }
     
-    public int? SelectedPropertyIndexInStyleGroup { get; set; }
+    public int? PropertyIndexInStyleGroup { get; set; }
     
     // PROPS
-    public int? SelectedPropertyIndexInProps { get; set; }
+    public int? PropertyIndexInProps { get; set; }
 }
 
 public sealed class ApplicationState
