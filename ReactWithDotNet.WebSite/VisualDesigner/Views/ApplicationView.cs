@@ -872,12 +872,17 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Element PartRightPanel()
     {
-        if (!state.SelectedVisualElementTreeItemPath.HasValue())
+        VisualElementModel visualElementModel = null;
+        
+        if (state.SelectedVisualElementTreeItemPath.HasValue())
+        {
+            visualElementModel = FindTreeNodeByTreePath(state.ComponentRootElement, state.SelectedVisualElementTreeItemPath);
+        }
+
+        if (visualElementModel is null)
         {
             return new div();
         }
-
-        var visualElementModel = CurrentVisualElement;
 
         var inputTag = new FlexRow(WidthFull)
         {
