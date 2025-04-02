@@ -19,18 +19,20 @@ public sealed class ApplicationPreviewInfo
 }
 
 public sealed record ApplicationSelectionState
-{
+{ 
+    // @formatter:off
+      
     public string VisualElementTreeItemPath { get; set; }
     
     public string VisualElementTreeItemPathHover { get; set; }
     
-    // STYLE
     public int? StyleGroupIndex { get; set; }
     
     public int? PropertyIndexInStyleGroup { get; set; }
     
-    // PROPS
     public int? PropertyIndexInProps { get; set; }
+    
+    // @formatter:on
 }
 
 public sealed class ApplicationState
