@@ -631,15 +631,16 @@ sealed class ApplicationView : Component<ApplicationState>
 
                     if (position == DragPosition.Inside)
                     {
+                        var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
+                        
                         var targetNode = targetNodeParent.Children[targetNodeIndex];
+                        
+                        // remove from source
+                        sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
 
                         if (targetNode.HasNoChild())
                         {
-                            var sourceNode = sourceNodeParent.Children[sourceNodeIndex];
-
                             targetNode.Children.Add(sourceNode);
-
-                            sourceNodeParent.Children.RemoveAt(sourceNodeIndex);
 
                             return Task.CompletedTask;
                         }
@@ -647,6 +648,8 @@ sealed class ApplicationView : Component<ApplicationState>
                         this.FailNotification("Select valid location");
 
                         return Task.CompletedTask;
+                        
+                        
                     }
 
                     // is same parent
@@ -671,20 +674,22 @@ sealed class ApplicationView : Component<ApplicationState>
                         
                         if (sourceNodeParent == targetNodeParent)
                         {
-                            if (position == DragPosition.After)
+                            // is adding end
+                            if (position == DragPosition.After && targetNodeIndex == targetNodeParent.Children.Count)
                             {
-                                if (targetNodeIndex == targetNodeParent.Children.Count)
-                                {
-                                    //targetNodeIndex--;
-                                }
+                                targetNodeParent.Children.Insert(targetNodeIndex, sourceNode);
+                                    
+                                return Task.CompletedTask;
                             }
                             
-                            if (position == DragPosition.Before)
+                            if (position == DragPosition.After && targetNodeIndex == 0)
                             {
-                                if (targetNodeIndex == targetNodeParent.Children.Count)
-                                {
-                                    targetNodeIndex++;
-                                }
+                                targetNodeIndex++;
+                            }
+                            
+                            if (position == DragPosition.Before && targetNodeIndex == targetNodeParent.Children.Count)
+                            {
+                                targetNodeIndex--;
                             }    
                         }
                         
