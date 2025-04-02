@@ -1084,7 +1084,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 Name = new StyleInputLocation
                 {
                     StyleGroupIndex      = styleGroupIndex,
-                    PropertyIndexInGroup = state.SelectedPropertyIndexInStyleGroup ?? CurrentStyleGroup.Items.Count
+                    PropertyIndexInGroup = state.SelectedPropertyIndexInStyleGroup ?? CurrentVisualElement.StyleGroups[styleGroupIndex].Items.Count
                 },
                 OnChange = (_, newValue) =>
                 {
