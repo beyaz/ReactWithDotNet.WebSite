@@ -259,3 +259,25 @@ sealed class IconImage : PureComponent
         };
     }
 }
+
+sealed class IconSpaceVertical : PureComponent
+{
+    protected override Element render()
+    {
+        return new FlexRowCentered(Size(14))
+        {
+            new div(HeightFull, Width(1), Background(Gray300))
+        };
+    }
+}
+
+sealed class IconSpaceHorizontal : PureComponent
+{
+    protected override Element render()
+    {
+        return new FlexRowCentered(Size(14))
+        {
+            new div(WidthFull, Height(1), Background(Gray300))
+        };
+    }
+}

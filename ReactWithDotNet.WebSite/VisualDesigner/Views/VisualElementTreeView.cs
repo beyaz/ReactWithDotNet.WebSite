@@ -224,6 +224,12 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
             {
                 icon = new IconFlexRow() + Size(16) + Color(Gray300);
             }
+
+            if (true)
+            {
+                icon = new IconSpaceHorizontal();
+                icon = new IconSpaceVertical();
+            }
         }
 
         if (icon is null)
