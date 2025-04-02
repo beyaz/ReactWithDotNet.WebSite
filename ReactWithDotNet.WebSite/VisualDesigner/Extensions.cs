@@ -160,6 +160,11 @@ static class Extensions
     
     public static VisualElementModel FindTreeNodeByTreePath(VisualElementModel node, string path)
     {
+        if (path.HasNoValue())
+        {
+            return null;
+        }
+        
         foreach (var index in path.Split(',').Select(int.Parse).Skip(1))
         {
             node = node.Children[index];
