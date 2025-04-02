@@ -78,7 +78,7 @@ sealed class ApplicationPreview : Component
                 {
                     // try process from plugin
                     {
-                        var style = Plugin.TryProcessStyleAttribute(styleAttribute);
+                        var style = TryProcessStyleAttributeByProjectConfig(styleAttribute);
                         if (style is not null)
                         {
                             element.Add(style);

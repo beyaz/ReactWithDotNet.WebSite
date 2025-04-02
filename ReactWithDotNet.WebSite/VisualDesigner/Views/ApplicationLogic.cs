@@ -5,8 +5,34 @@ namespace ReactWithDotNet.VisualDesigner.Views;
 
 static class ApplicationLogic
 {
-    public static ProjectCondifModel Project => DeserializeFromJson<ProjectCondifModel>(File.ReadAllText(@"C:\github\ReactWithDotNet.WebSite\ReactWithDotNet.WebSite\VisualDesigner\Project.json"));
+    public static ProjectConfigModel Project => DeserializeFromJson<ProjectConfigModel>(File.ReadAllText(@"C:\github\ReactWithDotNet.WebSite\ReactWithDotNet.WebSite\VisualDesigner\Project.json"));
 
+    public static StyleModifier TryProcessStyleAttributeByProjectConfig(string styleAttribute)
+    {
+        {
+            var (success, name, value) = TryParsePropertyValue(styleAttribute);
+            if (success)
+            {
+                if (name == "color")
+                {
+                    if (Project.Colors.TryGetValue(value, out var realColor))
+                    {
+                        return Color(realColor);
+                    }
+                }
+            }
+        }
+
+        {
+            if (!Project.Styles.TryGetValue(styleAttribute, out var value))
+            {
+                return null;
+            }
+
+            return Style.ParseCss(value);
+        }
+    }
+    
     public static IReadOnlyList<string> GetStyleAttributeNameSuggestions(ApplicationState state)
     {
         var items = new List<string>();
