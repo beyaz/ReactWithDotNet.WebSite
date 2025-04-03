@@ -9,6 +9,23 @@ static class ApplicationLogic
     public static ProjectConfigModel Project => DeserializeFromYaml<ProjectConfigModel>(File.ReadAllText(@"C:\github\ReactWithDotNet.WebSite\ReactWithDotNet.WebSite\VisualDesigner\Project.yaml"));
 
     
+    public static async Task<(bool fail, string failMessage, ComponentEntity value)> GetComponentMainVersion(this IDbConnection db, ApplicationState state)
+    {
+        if (state.ProjectId <= 0)
+        {
+            return (fail: true, failMessage: "ProjectId is not valid", value: null);
+        }
+        
+        if (state.ComponentName.HasNoValue())
+        {
+            return (fail: true, failMessage: "ComponentName is not valid", value: null);
+        }
+        
+        var value = await db.GetComponentMainVersion(state.ProjectId, state.ComponentName);
+        
+        return (fail: false, failMessage: null, value);
+    }
+    
     public static Task<ComponentEntity> GetComponentMainVersion(this IDbConnection db, int projectId, string componentName)
     {
         const string sql = $"""
@@ -38,6 +55,28 @@ static class ApplicationLogic
                              """;
 
         return db.QueryFirstOrDefaultAsync<ComponentEntity>(sql, new { projectId, componentName, userName });
+    }
+    
+    public static async Task<(bool fail, string failMessage, ComponentEntity value)> GetComponentUserVersion(this IDbConnection db, ApplicationState state)
+    {
+        if (state.ProjectId <= 0)
+        {
+            return (fail: true, failMessage: "ProjectId is not valid", value: null);
+        }
+        
+        if (state.ComponentName.HasNoValue())
+        {
+            return (fail: true, failMessage: "ComponentName is not valid", value: null);
+        }
+        
+        if (state.UserName.HasNoValue())
+        {
+            return (fail: true, failMessage: "UserName is not valid", value: null);
+        }
+
+        var value = await db.GetComponentUserVersion(state.ProjectId, state.ComponentName, state.UserName);
+        
+        return (fail: false, failMessage: null, value);
     }
     
     public static async Task<ComponentEntity> GetComponentUserVersionNotNull(this IDbConnection db, int projectId, string componentName, string userName)
@@ -107,15 +146,13 @@ static class ApplicationLogic
     {
         return DbOperation(async db =>
         {
-            var component = await db.GetAsync<ComponentEntity>(state.ComponentId);
-
-            var userVersion = await db.GetComponentUserVersion(component.ProjectId, component.Name, state.UserName);
+            var userVersion = await db.GetComponentUserVersion(state.ProjectId, state.ComponentName, state.UserName);
             if (userVersion is null)
             {
                 return (fail: true, failMessage: $"User ({state.UserName}) has no change to commit.");
             }
 
-            var mainVersion = await db.GetComponentMainVersion(component.ProjectId, component.Name);
+            var mainVersion = await db.GetComponentMainVersion(state.ProjectId, state.ComponentName);
 
             // Check if the user version is the same as the main version
             if (mainVersion.PropsAsJson == userVersion.PropsAsJson &&
