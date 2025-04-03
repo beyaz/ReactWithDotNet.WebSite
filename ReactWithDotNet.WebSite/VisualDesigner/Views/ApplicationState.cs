@@ -48,8 +48,6 @@ public sealed class ApplicationState
     
     public int ProjectId { get; set; }
     
-    public int ComponentId { get; set; }
-    
     public string ComponentName { get; set; }
     
     public VisualElementModel ComponentRootElement { get; set; }
