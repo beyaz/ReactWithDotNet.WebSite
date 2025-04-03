@@ -354,7 +354,7 @@ static class ApplicationLogic
 
     public static Task UpdateLastUsageInfo(ApplicationState state)
     {
-        if (state.ComponentId <= 0)
+        if (state.ProjectId <= 0)
         {
             return Task.CompletedTask;
         }
