@@ -307,32 +307,36 @@ static class ApplicationLogic
         }
     }
 
-    public static Task TrySaveComponentForUser(ApplicationState state)
+    public static Task<Result> TrySaveComponentForUser(ApplicationState state)
     {
-        if (state.ProjectId <= 0 || state.ComponentId <= 0)
+        if (state.ProjectId <= 0 || state.ComponentName.HasNoValue())
         {
-            return Task.CompletedTask;
+            return Task.FromResult(Success);
         }
 
         return DbOperation(async db =>
         {
-            var component = await db.GetAsync<ComponentEntity>(state.ComponentId);
-
-            var userRecord = (await db.GetComponentUserVersion(component.ProjectId, component.Name, state.UserName)).Value;
-
-            if (userRecord is null)
+            var userVersionResult = await db.GetComponentUserVersion(state.ProjectId, state.ComponentName, state.UserName);
+            if (userVersionResult.HasError)
             {
-                var mainVersionResult = await db.GetComponentMainVersion(component.ProjectId, component.Name);
+                return userVersionResult.Error;
+            }
+
+            var userVersion = userVersionResult.Value;
+
+            if (userVersion is null)
+            {
+                var mainVersionResult = await db.GetComponentMainVersion(state.ProjectId, state.ComponentName);
                 if (mainVersionResult.HasError)
                 {
-                    return;
+                    return mainVersionResult.Error;
                 }
 
                 var mainVersion = mainVersionResult.Value;
 
                 if (SerializeToJson(state.ComponentRootElement) == mainVersion.RootElementAsJson)
                 {
-                    return;
+                    return Success;
                 }
 
                 await db.InsertAsync(mainVersion with
@@ -342,13 +346,15 @@ static class ApplicationLogic
                     UserName = state.UserName
                 });
 
-                return;
+                return Success;
             }
 
-            await db.UpdateAsync(userRecord with
+            await db.UpdateAsync(userVersion with
             {
                 RootElementAsJson = SerializeToJson(state.ComponentRootElement)
             });
+
+            return Success;
         });
     }
 
@@ -398,7 +404,7 @@ static class ApplicationLogic
             }
 
             var userVersion = userVersionResult.Value;
-            
+
             userVersion = modify(userVersion);
 
             await db.UpdateAsync(userVersion);

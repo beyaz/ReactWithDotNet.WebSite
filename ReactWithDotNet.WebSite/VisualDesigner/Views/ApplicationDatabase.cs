@@ -33,6 +33,8 @@ static class ApplicationDatabase
 
         await operation(connection);
     }
+    
+    
 
     public static async Task<T> DbOperation<T>(Func<IDbConnection, Task<T>> operation)
     {
