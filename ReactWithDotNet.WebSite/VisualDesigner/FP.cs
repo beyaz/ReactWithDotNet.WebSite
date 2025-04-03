@@ -1,5 +1,20 @@
 ﻿namespace ReactWithDotNet.VisualDesigner;
 
+
+public sealed class Result
+{
+    public Exception Error { get; init; }
+
+    public bool HasError { get; init; }
+
+    public bool Success { get; init; }
+    
+    public static implicit operator Result(Exception failInfo)
+    {
+        return new() { HasError = true, Error = failInfo };
+    }
+}
+
 public sealed class Result<TValue>
 {
     public Exception Error { get; init; }
@@ -24,6 +39,8 @@ public sealed class Result<TValue>
 
 static class FP
 {
+    public static readonly Result Success = new() { Success = true };
+    
     public static async Task<TValue> Unwrap<TValue>(this Task<Result<TValue>> responseTask)
     {
         var response = await responseTask;

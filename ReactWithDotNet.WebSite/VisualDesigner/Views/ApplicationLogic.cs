@@ -387,17 +387,25 @@ static class ApplicationLogic
         });
     }
 
-    public static Task UpdateUserVersion(ApplicationState state, Func<ComponentEntity, ComponentEntity> modify)
+    public static Task<Result> UpdateUserVersion(ApplicationState state, Func<ComponentEntity, ComponentEntity> modify)
     {
         return DbOperation(async db =>
         {
             var component = await db.GetAsync<ComponentEntity>(state.ComponentId);
 
-            var userVersion = (await db.GetComponentUserVersionNotNull(component.ProjectId, component.Name, state.UserName)).Value;
+            var userVersionResult = await db.GetComponentUserVersionNotNull(component.ProjectId, state.ComponentName, state.UserName);
+            if (userVersionResult.HasError)
+            {
+                return userVersionResult.Error;
+            }
 
+            var userVersion = userVersionResult.Value;
+            
             userVersion = modify(userVersion);
 
             await db.UpdateAsync(userVersion);
+
+            return Success;
         });
     }
 }
