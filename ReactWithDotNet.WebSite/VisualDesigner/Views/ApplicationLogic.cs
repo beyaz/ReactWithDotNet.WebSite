@@ -48,7 +48,7 @@ static class ApplicationLogic
             return default;
         });
     }
-    
+
     public static Task<ImmutableList<string>> GetAllComponentNamesInProject(int projectId)
     {
         var query = $"SELECT {nameof(ComponentEntity.Name)} FROM Component WHERE {nameof(ComponentEntity.ProjectId)} = @{nameof(projectId)}";
@@ -164,21 +164,34 @@ static class ApplicationLogic
             {
                 return userVersion;
             }
-            
-            return  await db.GetComponentMainVersion(projectId, componentName);
+
+            return await db.GetComponentMainVersion(projectId, componentName);
         });
     }
-    
+
     public static Task<Result<ComponentEntity>> GetComponenUserOrMainVersion(ApplicationState state)
     {
-        return DbOperation(async db => await db.GetComponentUserVersion(state.ProjectId, state.ComponentName, state.UserName) ?? await db.GetComponentMainVersion(state.ProjectId, state.ComponentName));
+        return DbOperation(async db =>
+        {
+            var userVersion = await db.GetComponentUserVersion(state.ProjectId, state.ComponentName, state.UserName);
+            if (userVersion.HasError)
+            {
+                return userVersion;
+            }
+
+            if (userVersion.Value is not null)
+            {
+                return userVersion.Value;
+            }
+
+            return await db.GetComponentMainVersion(state.ProjectId, state.ComponentName);
+        });
     }
 
     public static IReadOnlyList<string> GetProjectNames(ApplicationState state)
     {
         return GetAllProjects().Select(x => x.Name).ToList();
     }
-
 
     public static IReadOnlyList<string> GetStyleAttributeNameSuggestions(ApplicationState state)
     {
@@ -250,14 +263,13 @@ static class ApplicationLogic
 
     public static async Task<IReadOnlyList<string>> GetSuggestionsForComponentSelection(ApplicationState state)
     {
-        
         return (await GetAllComponentNamesInProject(state.ProjectId)).Where(name => name != state.ComponentName).ToList();
     }
 
     public static async Task<IReadOnlyList<string>> GetTagSuggestions(ApplicationState state)
     {
         var suggestions = new List<string>(TagNameList);
-        
+
         suggestions.AddRange((await GetAllComponentNamesInProject(state.ProjectId)).Where(name => name != state.ComponentName));
 
         return suggestions;
