@@ -20,6 +20,50 @@ styles:
     font-style: normal;
     font-weight: 400;
     line-height: 32px;
+ 
+  label-XXL: |
+    font-family: "Host Grotesk";
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 32px;
+
+  label-XL: |
+    font-family: "Host Grotesk";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 28px;
+
+  label-L: |
+    font-family: "Host Grotesk";
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 26px;
+
+  label-M: |
+    font-family: "Host Grotesk";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+  
+  label-S: |
+    font-family: "Host Grotesk";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+
+  label-XS: |
+    font-family: "Host Grotesk";
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px;
+
+
 
 globalCss: |
   @font-face {
