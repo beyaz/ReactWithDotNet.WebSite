@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Immutable;
+using System.Data;
 using System.IO;
 using Dapper.Contrib.Extensions;
 
@@ -47,14 +48,12 @@ static class ApplicationLogic
             return default;
         });
     }
-
-    public static IReadOnlyList<ComponentEntity> GetAllComponentsInProject(ApplicationState state)
+    
+    public static Task<ImmutableList<string>> GetAllComponentNamesInProject(int projectId)
     {
-        var query = $"SELECT * FROM Component WHERE ProjectId = @{nameof(state.ProjectId)}";
+        var query = $"SELECT {nameof(ComponentEntity.Name)} FROM Component WHERE {nameof(ComponentEntity.ProjectId)} = @{nameof(projectId)}";
 
-        var dbRecords = DbOperation(async connection => (await connection.QueryAsync<ComponentEntity>(query, new { state.ProjectId })).ToList()).GetAwaiter().GetResult();
-
-        return dbRecords;
+        return DbOperation(async db => (await db.QueryAsync<string>(query, new { projectId })).ToImmutableList());
     }
 
     public static async Task<Result<ComponentEntity>> GetComponentMainVersion(this IDbConnection db, ApplicationState state)
@@ -249,18 +248,17 @@ static class ApplicationLogic
         return ["MD", "XXL", "state.user.isActive", "MD: state.user.isActive", "XXL: state.user.isActive"];
     }
 
-    public static IReadOnlyList<string> GetSuggestionsForComponentSelection(ApplicationState state)
+    public static async Task<IReadOnlyList<string>> GetSuggestionsForComponentSelection(ApplicationState state)
     {
-        return GetAllComponentsInProject(state).Where(c => c.Name != state.ComponentName).Select(x => x.Name).ToList();
+        
+        return (await GetAllComponentNamesInProject(state.ProjectId)).Where(name => name != state.ComponentName).ToList();
     }
 
-    public static IReadOnlyList<string> GetTagSuggestions(ApplicationState state)
+    public static async Task<IReadOnlyList<string>> GetTagSuggestions(ApplicationState state)
     {
         var suggestions = new List<string>(TagNameList);
-
-        var allComponentsInProject = GetAllComponentsInProject(state);
-
-        suggestions.AddRange(allComponentsInProject.Where(c => c.Name != state.ComponentName).Select(x => x.Name));
+        
+        suggestions.AddRange((await GetAllComponentNamesInProject(state.ProjectId)).Where(name => name != state.ComponentName));
 
         return suggestions;
     }

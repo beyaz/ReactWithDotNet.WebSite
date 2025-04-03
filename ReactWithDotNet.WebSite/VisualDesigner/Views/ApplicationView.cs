@@ -398,7 +398,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     PartPreview
                 },
 
-                PartRightPanel() + BorderBottomRightRadius(8)
+                await PartRightPanel() + BorderBottomRightRadius(8)
             }
         };
     }
@@ -547,7 +547,7 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             Name = string.Empty,
 
-            Suggestions       = GetSuggestionsForComponentSelection(state),
+            Suggestions       = await GetSuggestionsForComponentSelection(state),
             Value             = state.ComponentName,
             OnChange          = (_, componentName) => OnComponentNameChanged(componentName),
             IsTextAlignCenter = true,
@@ -982,7 +982,7 @@ sealed class ApplicationView : Component<ApplicationState>
                                 return;
                             }
 
-                            if (GetAllComponentsInProject(state).Any(x => x.Name == newValue))
+                            if ((await GetAllComponentNamesInProject(state.ProjectId)).Any(name => name == newValue))
                             {
                                 this.FailNotification("Has already same named component.");
 
@@ -1029,7 +1029,7 @@ sealed class ApplicationView : Component<ApplicationState>
         };
     }
 
-    Element PartRightPanel()
+    async Task<Element> PartRightPanel()
     {
         VisualElementModel visualElementModel = null;
 
@@ -1049,7 +1049,7 @@ sealed class ApplicationView : Component<ApplicationState>
             {
                 Name        = string.Empty,
                 Value       = visualElementModel.Tag,
-                Suggestions = GetTagSuggestions(state),
+                Suggestions = await GetTagSuggestions(state),
                 OnChange = (_, newValue) =>
                 {
                     CurrentVisualElement.Tag = newValue;
