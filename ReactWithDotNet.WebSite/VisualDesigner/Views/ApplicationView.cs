@@ -538,7 +538,7 @@ sealed class ApplicationView : Component<ApplicationState>
             Name = string.Empty,
 
             Suggestions       = GetSuggestionsForComponentSelection(state),
-            Value             = await GetSelectedComponentName(state),
+            Value             = state.ComponentName,
             OnChange          = (_, componentName) => OnComponentNameChanged(componentName),
             IsTextAlignCenter = true,
             IsBold            = true

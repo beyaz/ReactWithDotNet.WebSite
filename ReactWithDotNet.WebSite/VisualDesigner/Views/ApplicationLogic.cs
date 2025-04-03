@@ -190,12 +190,7 @@ static class ApplicationLogic
         return dbRecords.FirstOrDefault(x => x.UserName == state.UserName) ?? dbRecords.FirstOrDefault();
     }
 
-    public static Task<string> GetSelectedComponentName(ApplicationState state)
-    {
-        const string query = $"SELECT Name FROM Component WHERE Id = @{nameof(state.ComponentId)}";
-
-        return DbOperation(db => db.ExecuteScalarAsync<string>(query, new { state.ComponentId }));
-    }
+   
 
     public static IReadOnlyList<string> GetStyleAttributeNameSuggestions(ApplicationState state)
     {
@@ -267,7 +262,7 @@ static class ApplicationLogic
 
     public static IReadOnlyList<string> GetSuggestionsForComponentSelection(ApplicationState state)
     {
-        return GetAllComponentsInProject(state).Where(c => c.Id != state.ComponentId).Select(x => x.Name).ToList();
+        return GetAllComponentsInProject(state).Where(c => c.Name != state.ComponentName).Select(x => x.Name).ToList();
     }
 
     public static IReadOnlyList<string> GetTagSuggestions(ApplicationState state)
@@ -276,7 +271,7 @@ static class ApplicationLogic
 
         var allComponentsInProject = GetAllComponentsInProject(state);
 
-        suggestions.AddRange(allComponentsInProject.Where(c => c.Id != state.ComponentId).Select(x => x.Name));
+        suggestions.AddRange(allComponentsInProject.Where(c => c.Name != state.ComponentName).Select(x => x.Name));
 
         return suggestions;
     }
