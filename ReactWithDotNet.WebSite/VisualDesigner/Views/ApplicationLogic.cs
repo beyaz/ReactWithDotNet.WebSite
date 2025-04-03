@@ -48,15 +48,7 @@ static class ApplicationLogic
         });
     }
 
-    public static Task DbOperationForCurrentComponent(ApplicationState state, Func<ComponentEntity, Task> operation)
-    {
-        return DbOperation(async connection =>
-        {
-            var dbRecord = await connection.GetAsync<ComponentEntity>(state.ComponentId);
-
-            await operation(dbRecord);
-        });
-    }
+   
 
     public static Task DbOperationForCurrentComponent(ApplicationState state, Action<ComponentEntity> operation)
     {
