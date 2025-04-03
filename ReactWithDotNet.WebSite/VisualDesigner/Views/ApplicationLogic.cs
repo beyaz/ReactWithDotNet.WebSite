@@ -21,6 +21,12 @@ static class ApplicationLogic
 
         return db.QueryFirstAsync<ComponentEntity>(sql, new { projectId, componentName });
     }
+    
+    public static Task<ComponentEntity> GetComponenUserOrMainVersion(int projectId, string componentName, string userName)
+    {
+        return DbOperation(async db => await db.GetComponentUserVersion(projectId, componentName, userName) ?? await db.GetComponentMainVersion(projectId, componentName));
+    }
+    
     public static Task<ComponentEntity> GetComponentUserVersion(this IDbConnection db, int projectId, string componentName, string userName)
     {
         const string sql = $"""

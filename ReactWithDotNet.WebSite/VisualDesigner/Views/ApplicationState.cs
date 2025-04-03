@@ -50,6 +50,8 @@ public sealed class ApplicationState
     
     public int ComponentId { get; set; }
     
+    public string ComponentName { get; set; }
+    
     public VisualElementModel ComponentRootElement { get; set; }
     
     public bool IsProjectSettingsPopupVisible { get; set; }

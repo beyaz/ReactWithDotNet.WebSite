@@ -166,14 +166,19 @@ sealed class ApplicationView : Component<ApplicationState>
 
         return Task.CompletedTask;
     }
-
-    async Task ChangeSelectedComponent(int componentId)
+    
+    async Task ChangeSelectedComponent(string componentName)
     {
-        state.ComponentId = componentId;
+        state.ComponentName = componentName;
 
-        var componentModel = await GetSelectedComponent(state);
+        var component = await GetComponenUserOrMainVersion(state.ProjectId, componentName, state.UserName);
+        if (component is null)
+        {
+            this.FailNotification($"Component not found. @{componentName}");
+            return;
+        }
 
-        var componentRootElement = DeserializeFromJson<VisualElementModel>(componentModel.RootElementAsJson ?? string.Empty);
+        var componentRootElement = DeserializeFromJson<VisualElementModel>(component.RootElementAsJson ?? string.Empty);
 
         state = new()
         {
@@ -185,7 +190,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
             LeftPanelSelectedTab = LeftPanelTab.Layers,
 
-            ComponentId = componentId,
+            ComponentName = componentName,
 
             ComponentRootElement = componentRootElement,
 
@@ -229,7 +234,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 return;
             }
 
-            await ChangeSelectedComponent(component.Id);
+            await ChangeSelectedComponent(component.Name);
         }
     }
 
@@ -398,7 +403,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
     Task OnComponentNameChanged(string newValue)
     {
-        return ChangeSelectedComponent(GetAllComponentsInProject(state).First(x => x.Name == newValue).Id);
+        return ChangeSelectedComponent(newValue);
     }
 
     [StopPropagation]
