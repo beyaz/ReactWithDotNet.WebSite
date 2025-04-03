@@ -169,13 +169,21 @@ sealed class ApplicationView : Component<ApplicationState>
     
     async Task ChangeSelectedComponent(string componentName)
     {
-        state.ComponentName = componentName;
-
-        var component = await GetComponenUserOrMainVersion(state.ProjectId, componentName, state.UserName);
-        if (component is null)
+        ComponentEntity component;
         {
-            this.FailNotification($"Component not found. @{componentName}");
-            return;
+            var componentResult = await GetComponenUserOrMainVersion(state.ProjectId, componentName, state.UserName);
+            if (componentResult.HasError)
+            {
+                this.FailNotification(componentResult.Error.Message);
+                return;
+            }
+
+            component = componentResult.Value;
+            if (component is null)
+            {
+                this.FailNotification($"Component not found. @{componentName}");
+                return;
+            }
         }
 
         var componentRootElement = DeserializeFromJson<VisualElementModel>(component.RootElementAsJson ?? string.Empty);
@@ -441,7 +449,6 @@ sealed class ApplicationView : Component<ApplicationState>
                             "Rollback",
                             OnClick(_ =>
                             {
-                                state.ToString();
                                 
                                 this.SuccessNotification("Rollback ok");
                                 
@@ -471,7 +478,6 @@ sealed class ApplicationView : Component<ApplicationState>
                             "Export",
                             OnClick(_ =>
                             {
-                                state.ToString();
                                 
                                 this.SuccessNotification("Rollback ok");
                                 

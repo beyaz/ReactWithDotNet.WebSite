@@ -9,25 +9,23 @@ static class ApplicationLogic
     public static ProjectConfigModel Project => DeserializeFromYaml<ProjectConfigModel>(File.ReadAllText(@"C:\github\ReactWithDotNet.WebSite\ReactWithDotNet.WebSite\VisualDesigner\Project.yaml"));
 
     
-    public static async Task<(bool fail, string failMessage, ComponentEntity value)> GetComponentMainVersion(this IDbConnection db, ApplicationState state)
+    public static async Task<Result<ComponentEntity>> GetComponentMainVersion(this IDbConnection db, ApplicationState state)
     {
-        if (state.ProjectId <= 0)
-        {
-            return (fail: true, failMessage: "ProjectId is not valid", value: null);
-        }
-        
-        if (state.ComponentName.HasNoValue())
-        {
-            return (fail: true, failMessage: "ComponentName is not valid", value: null);
-        }
-        
-        var value = await db.GetComponentMainVersion(state.ProjectId, state.ComponentName);
-        
-        return (fail: false, failMessage: null, value);
+        return await db.GetComponentMainVersion(state.ProjectId, state.ComponentName);
     }
     
-    public static Task<ComponentEntity> GetComponentMainVersion(this IDbConnection db, int projectId, string componentName)
+    public static async Task<Result<ComponentEntity>> GetComponentMainVersion(this IDbConnection db, int projectId, string componentName)
     {
+        if (projectId <= 0)
+        {
+            return new ArgumentException($"ProjectId: {projectId} is not valid");
+        }
+        
+        if (componentName.HasNoValue())
+        {
+            return new ArgumentException($"ComponentName ({componentName}) is not valid");
+        }
+        
         const string sql = $"""
                             SELECT * 
                               FROM Component
@@ -36,60 +34,74 @@ static class ApplicationLogic
                                AND {nameof(ComponentEntity.UserName)}  IS NULL OR {nameof(ComponentEntity.UserName)} = ''
                             """;
 
-        return db.QueryFirstAsync<ComponentEntity>(sql, new { projectId, componentName });
+        return await db.QueryFirstAsync<ComponentEntity>(sql, new { projectId, componentName });
+        
     }
     
-    public static Task<ComponentEntity> GetComponenUserOrMainVersion(int projectId, string componentName, string userName)
+    public static async Task<Result<ComponentEntity>>  GetComponentUserVersion(this IDbConnection db, int projectId, string componentName, string userName)
+    {
+        if (projectId <= 0)
+        {
+            return new ArgumentException($"ProjectId: {projectId} is not valid");
+        }
+        
+        if (componentName.HasNoValue())
+        {
+            return new ArgumentException($"ComponentName ({componentName}) is not valid");
+        }
+        
+        if (userName.HasNoValue())
+        {
+            return new ArgumentException($"UserName ({userName}) is not valid");
+        }
+
+        
+        const string sql = $"""
+                            SELECT * 
+                              FROM Component
+                             WHERE {nameof(ComponentEntity.ProjectId)} = @{nameof(projectId)}
+                               AND {nameof(ComponentEntity.Name)}      = @{nameof(componentName)}
+                               AND {nameof(ComponentEntity.UserName)}  = @{nameof(userName)}
+                            """;
+
+        return await db.QueryFirstOrDefaultAsync<ComponentEntity>(sql, new { projectId, componentName, userName });
+    }
+    
+    
+    public static Task<Result<ComponentEntity>> GetComponenUserOrMainVersion(int projectId, string componentName, string userName)
     {
         return DbOperation(async db => await db.GetComponentUserVersion(projectId, componentName, userName) ?? await db.GetComponentMainVersion(projectId, componentName));
     }
     
-    public static Task<ComponentEntity> GetComponentUserVersion(this IDbConnection db, int projectId, string componentName, string userName)
+   
+    
+    public static async Task<Result<ComponentEntity>> GetComponentUserVersion(this IDbConnection db, ApplicationState state)
     {
-        const string sql = $"""
-                             SELECT * 
-                               FROM Component
-                              WHERE {nameof(ComponentEntity.ProjectId)} = @{nameof(projectId)}
-                                AND {nameof(ComponentEntity.Name)}      = @{nameof(componentName)}
-                                AND {nameof(ComponentEntity.UserName)}  = @{nameof(userName)}
-                             """;
-
-        return db.QueryFirstOrDefaultAsync<ComponentEntity>(sql, new { projectId, componentName, userName });
+        return await db.GetComponentUserVersion(state.ProjectId, state.ComponentName, state.UserName);
     }
     
-    public static async Task<(bool fail, string failMessage, ComponentEntity value)> GetComponentUserVersion(this IDbConnection db, ApplicationState state)
+    public static async Task<Result<ComponentEntity>> GetComponentUserVersionNotNull(this IDbConnection db, int projectId, string componentName, string userName)
     {
-        if (state.ProjectId <= 0)
+        var userVersionResult = await db.GetComponentUserVersion(projectId, componentName, userName);
+        if (userVersionResult.HasError)
         {
-            return (fail: true, failMessage: "ProjectId is not valid", value: null);
-        }
-        
-        if (state.ComponentName.HasNoValue())
-        {
-            return (fail: true, failMessage: "ComponentName is not valid", value: null);
-        }
-        
-        if (state.UserName.HasNoValue())
-        {
-            return (fail: true, failMessage: "UserName is not valid", value: null);
+            return userVersionResult;
         }
 
-        var value = await db.GetComponentUserVersion(state.ProjectId, state.ComponentName, state.UserName);
-        
-        return (fail: false, failMessage: null, value);
-    }
-    
-    public static async Task<ComponentEntity> GetComponentUserVersionNotNull(this IDbConnection db, int projectId, string componentName, string userName)
-    {
-        var userVersion = await db.GetComponentUserVersion(projectId, componentName, userName);
-
+        var userVersion = userVersionResult.Value;
         if (userVersion is not null)
         {
             return userVersion;
         }
         
-        var mainVersion = await db.GetComponentMainVersion(projectId, componentName);
+        var mainVersionResult = await db.GetComponentMainVersion(projectId, componentName);
+        if (mainVersionResult.HasError)
+        {
+            return mainVersionResult;
+        }
 
+        var mainVersion = mainVersionResult.Value;
+        
         userVersion = mainVersion with
         {
             Id = 0,
@@ -112,11 +124,17 @@ static class ApplicationLogic
         {
             var component = await db.GetAsync<ComponentEntity>(state.ComponentId);
 
-            var userRecord = await db.GetComponentUserVersion(component.ProjectId, component.Name, state.UserName);
+            var userRecord = (await db.GetComponentUserVersion(component.ProjectId, component.Name, state.UserName)).Value;
 
             if (userRecord is null)
             {
-                var mainVersion = await db.GetComponentMainVersion(component.ProjectId, component.Name);
+                var mainVersionResult = await db.GetComponentMainVersion(component.ProjectId, component.Name);
+                if (mainVersionResult.HasError)
+                {
+                    return;
+                }
+
+                var mainVersion = mainVersionResult.Value;
 
                 if (SerializeToJson(state.ComponentRootElement) == mainVersion.RootElementAsJson)
                 {
@@ -146,13 +164,13 @@ static class ApplicationLogic
     {
         return DbOperation(async db =>
         {
-            var userVersion = await db.GetComponentUserVersion(state.ProjectId, state.ComponentName, state.UserName);
+            var userVersion = (await db.GetComponentUserVersion(state.ProjectId, state.ComponentName, state.UserName)).Value;
             if (userVersion is null)
             {
                 return (fail: true, failMessage: $"User ({state.UserName}) has no change to commit.");
             }
 
-            var mainVersion = await db.GetComponentMainVersion(state.ProjectId, state.ComponentName);
+            var mainVersion = (await db.GetComponentMainVersion(state.ProjectId, state.ComponentName)).Value;
 
             // Check if the user version is the same as the main version
             if (mainVersion.PropsAsJson == userVersion.PropsAsJson &&
@@ -208,7 +226,7 @@ static class ApplicationLogic
         {
             var component = await db.GetAsync<ComponentEntity>(state.ComponentId);
 
-            var userVersion = await db.GetComponentUserVersionNotNull(component.ProjectId, component.Name, state.UserName);
+            var userVersion = (await db.GetComponentUserVersionNotNull(component.ProjectId, component.Name, state.UserName)).Value;
             
             userVersion = modify(userVersion);
 
