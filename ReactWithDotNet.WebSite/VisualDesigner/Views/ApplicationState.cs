@@ -54,6 +54,8 @@ public sealed class ApplicationState
     
     public bool IsProjectSettingsPopupVisible { get; set; }
     
+    public bool IsActionButtonsVisible { get; set; }
+    
     public LeftPanelTab LeftPanelSelectedTab { get; set; }
     
     public string JsonText { get; set; }

@@ -26,7 +26,9 @@ sealed class ApplicationView : Component<ApplicationState>
             var userLastState = GetUserLastState(userName);
             if (userLastState is not null)
             {
-                state = userLastState;
+                state                        = userLastState;
+                
+                state.IsActionButtonsVisible = false;
 
                 return;
             }
@@ -39,6 +41,8 @@ sealed class ApplicationView : Component<ApplicationState>
             {
                 state = DeserializeFromJson<ApplicationState>(lastUsage.StateAsJson);
 
+                state.IsActionButtonsVisible = false;
+                
                 return;
             }
         }
@@ -320,10 +324,10 @@ sealed class ApplicationView : Component<ApplicationState>
         switch (state.LeftPanelSelectedTab)
         {
             case LeftPanelTab.Props:
-                return DbSave(state, x => x with { PropsAsJson = state.JsonText });
+                return UpdateUserVersion(state, x => x with { PropsAsJson = state.JsonText });
 
             case LeftPanelTab.State:
-                return DbSave(state, x => x with { StateAsJson = state.JsonText });
+                return UpdateUserVersion(state, x => x with { StateAsJson = state.JsonText });
 
             default:
                 throw new ArgumentOutOfRangeException();
@@ -397,6 +401,13 @@ sealed class ApplicationView : Component<ApplicationState>
         return ChangeSelectedComponent(GetAllComponentsInProject(state).First(x => x.Name == newValue).Id);
     }
 
+    [StopPropagation]
+    Task ToggleIsActionButtonsVisible(MouseEvent _)
+    {
+        state.IsActionButtonsVisible = !state.IsActionButtonsVisible;
+
+        return Task.CompletedTask;
+    }
     Element PartApplicationTopPanel()
     {
         return new FlexRow(UserSelect(none))
@@ -405,7 +416,65 @@ sealed class ApplicationView : Component<ApplicationState>
             {
                 new h3 { "React Visual Designer" },
 
-                PartProject
+                PartProject,
+                
+                // A C T I O N S
+                SpaceX(8),
+                new FlexRowCentered
+                {
+                    OnMouseEnter(ToggleIsActionButtonsVisible), OnMouseLeave(ToggleIsActionButtonsVisible),
+                    
+                    new FlexRowCentered(Gap(16), Border(1,solid,Theme.BorderColor), BorderRadius(4), PaddingX(8))
+                    {
+                        PositionRelative,
+                        new  label(PositionAbsolute, Top(-4), Left(8), FontSize10, LineHeight7, Background(Theme.BackgroundColor), PaddingX(4)){ "Component" },
+                        
+                        state.IsActionButtonsVisible is false ? VisibilityHidden: null,
+                        
+                        new FlexRowCentered( Hover(Color(Blue300)))
+                        {
+                            "Rollback",
+                            OnClick(_ =>
+                            {
+                                state.ToString();
+                                
+                                this.SuccessNotification("Rollback ok");
+                                
+                                return Task.CompletedTask;
+                            })
+                        },
+                    
+                        new FlexRowCentered( Hover(Color(Blue300)))
+                        {
+                            "Commit",
+                            OnClick(async _ =>
+                            {
+                                var (fail, failMessage) = await CommitComponent(state);
+                                if (fail)
+                                {
+                                    this.SuccessNotification(failMessage);
+
+                                    return;
+                                }
+
+                                this.SuccessNotification("OK");
+                            })
+                        },
+                    
+                        new FlexRowCentered( Hover(Color(Blue300)))
+                        {
+                            "Export",
+                            OnClick(_ =>
+                            {
+                                state.ToString();
+                                
+                                this.SuccessNotification("Rollback ok");
+                                
+                                return Task.CompletedTask;
+                            })
+                        }
+                    }
+                }
             },
             new FlexRowCentered(Gap(32))
             {

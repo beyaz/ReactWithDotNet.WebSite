@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Data;
+using System.IO;
 using Dapper.Contrib.Extensions;
 
 namespace ReactWithDotNet.VisualDesigner.Views;
@@ -6,6 +7,285 @@ namespace ReactWithDotNet.VisualDesigner.Views;
 static class ApplicationLogic
 {
     public static ProjectConfigModel Project => DeserializeFromYaml<ProjectConfigModel>(File.ReadAllText(@"C:\github\ReactWithDotNet.WebSite\ReactWithDotNet.WebSite\VisualDesigner\Project.yaml"));
+
+    
+    public static Task<ComponentEntity> GetComponentMainVersion(this IDbConnection db, int projectId, string componentName)
+    {
+        const string sql = $"""
+                            SELECT * 
+                              FROM Component
+                             WHERE {nameof(ComponentEntity.ProjectId)} = @{nameof(projectId)}
+                               AND {nameof(ComponentEntity.Name)}      = @{nameof(componentName)}
+                               AND {nameof(ComponentEntity.UserName)}  IS NULL OR {nameof(ComponentEntity.UserName)} = ''
+                            """;
+
+        return db.QueryFirstAsync<ComponentEntity>(sql, new { projectId, componentName });
+    }
+    public static Task<ComponentEntity> GetComponentUserVersion(this IDbConnection db, int projectId, string componentName, string userName)
+    {
+        const string sql = $"""
+                             SELECT * 
+                               FROM Component
+                              WHERE {nameof(ComponentEntity.ProjectId)} = @{nameof(projectId)}
+                                AND {nameof(ComponentEntity.Name)}      = @{nameof(componentName)}
+                                AND {nameof(ComponentEntity.UserName)}  = @{nameof(userName)}
+                             """;
+
+        return db.QueryFirstOrDefaultAsync<ComponentEntity>(sql, new { projectId, componentName, userName });
+    }
+    
+    public static async Task<ComponentEntity> GetComponentUserVersionNotNull(this IDbConnection db, int projectId, string componentName, string userName)
+    {
+        var userVersion = await db.GetComponentUserVersion(projectId, componentName, userName);
+
+        if (userVersion is not null)
+        {
+            return userVersion;
+        }
+        
+        var mainVersion = await db.GetComponentMainVersion(projectId, componentName);
+
+        userVersion = mainVersion with
+        {
+            Id = 0,
+            UserName = userName
+        };
+
+        await db.InsertAsync(userVersion);
+
+        return userVersion;
+    }
+    
+    public static Task TrySaveComponentForUser(ApplicationState state)
+    {
+        if (state.ProjectId <= 0 || state.ComponentId <= 0)
+        {
+            return Task.CompletedTask;
+        }
+        
+        return DbOperation(async db =>
+        {
+            var component = await db.GetAsync<ComponentEntity>(state.ComponentId);
+
+            var userRecord = await db.GetComponentUserVersion(component.ProjectId, component.Name, state.UserName);
+
+            if (userRecord is null)
+            {
+                var mainVersion = await db.GetComponentMainVersion(component.ProjectId, component.Name);
+
+                if (SerializeToJson(state.ComponentRootElement) == mainVersion.RootElementAsJson)
+                {
+                    return;
+                }
+                
+                await db.InsertAsync(mainVersion with
+                {
+                    Id =0,
+                    RootElementAsJson = SerializeToJson(state.ComponentRootElement),
+                    UserName = state.UserName
+                });
+                
+                return;
+            }
+            
+            await db.UpdateAsync(userRecord with
+            {
+                RootElementAsJson = SerializeToJson(state.ComponentRootElement)
+            });
+        });
+    }
+    
+    
+    
+    public static Task<(bool fail, string failMessage)> CommitComponent(ApplicationState state)
+    {
+        return DbOperation(async db =>
+        {
+            var component = await db.GetAsync<ComponentEntity>(state.ComponentId);
+
+            var userVersion = await db.GetComponentUserVersion(component.ProjectId, component.Name, state.UserName);
+            if (userVersion is null)
+            {
+                return (fail: true, failMessage: $"User ({state.UserName}) has no change to commit.");
+            }
+
+            var mainVersion = await db.GetComponentMainVersion(component.ProjectId, component.Name);
+
+            // Check if the user version is the same as the main version
+            if (mainVersion.PropsAsJson == userVersion.PropsAsJson &&
+                mainVersion.StateAsJson == userVersion.StateAsJson && 
+                mainVersion.RootElementAsJson == SerializeToJson(state.ComponentRootElement) )
+            {
+                return (fail: true, failMessage: $"User ({state.UserName}) has no change to commit.");
+            }
+
+            userVersion = userVersion with
+            {
+                RootElementAsJson = SerializeToJson(state.ComponentRootElement)
+            };
+
+            mainVersion = mainVersion with
+            {
+                PropsAsJson = userVersion.PropsAsJson,
+                StateAsJson = userVersion.StateAsJson,
+                RootElementAsJson = userVersion.RootElementAsJson
+            };
+
+            await db.UpdateAsync(mainVersion);
+
+            await db.DeleteAsync(userVersion);
+
+            return default;
+        });
+    }
+
+    public static Task DbOperationForCurrentComponent(ApplicationState state, Func<ComponentEntity, Task> operation)
+    {
+        return DbOperation(async connection =>
+        {
+            var dbRecord = await connection.GetAsync<ComponentEntity>(state.ComponentId);
+
+            await operation(dbRecord);
+        });
+    }
+
+    public static Task DbOperationForCurrentComponent(ApplicationState state, Action<ComponentEntity> operation)
+    {
+        return DbOperation(async connection =>
+        {
+            var dbRecord = await connection.GetAsync<ComponentEntity>(state.ComponentId);
+
+            operation(dbRecord);
+        });
+    }
+
+    public static Task UpdateUserVersion(ApplicationState state, Func<ComponentEntity, ComponentEntity> modify)
+    {
+        return DbOperation(async db =>
+        {
+            var component = await db.GetAsync<ComponentEntity>(state.ComponentId);
+
+            var userVersion = await db.GetComponentUserVersionNotNull(component.ProjectId, component.Name, state.UserName);
+            
+            userVersion = modify(userVersion);
+
+            await db.UpdateAsync(userVersion);
+        });
+    }
+
+    public static IReadOnlyList<ComponentEntity> GetAllComponentsInProject(ApplicationState state)
+    {
+        var query = $"SELECT * FROM Component WHERE ProjectId = @{nameof(state.ProjectId)}";
+
+        var dbRecords = DbOperation(async connection => (await connection.QueryAsync<ComponentEntity>(query, new { state.ProjectId })).ToList()).GetAwaiter().GetResult();
+
+        return dbRecords;
+    }
+
+    public static IReadOnlyList<string> GetProjectNames(ApplicationState state)
+    {
+        return GetAllProjects().Select(x => x.Name).ToList();
+    }
+
+    public static async Task<ComponentEntity> GetSelectedComponent(ApplicationState state)
+    {
+        const string query = $"SELECT * FROM Component WHERE Id = @{nameof(state.ComponentId)}";
+
+        var dbRecords = await DbOperation(async connection => (await connection.QueryAsync<ComponentEntity>(query, new { state.ComponentId })).ToList());
+
+        return dbRecords.FirstOrDefault(x => x.UserName == state.UserName) ?? dbRecords.FirstOrDefault();
+    }
+
+    public static Task<string> GetSelectedComponentName(ApplicationState state)
+    {
+        const string query = $"SELECT Name FROM Component WHERE Id = @{nameof(state.ComponentId)}";
+
+        return DbOperation(db => db.ExecuteScalarAsync<string>(query, new { state.ComponentId }));
+    }
+
+    public static IReadOnlyList<string> GetStyleAttributeNameSuggestions(ApplicationState state)
+    {
+        var items = new List<string>();
+
+        items.AddRange(Project.Styles.Keys);
+
+        foreach (var colorName in Project.Colors.Select(x => x.Key))
+        {
+            items.Add("color: " + colorName);
+        }
+
+        // w
+        {
+            items.Add("w-full");
+            items.Add("w-fit");
+            items.Add("w-screen");
+            items.Add("w-screen");
+            for (var i = 1; i <= 100; i++)
+            {
+                if (i % 5 == 0)
+                {
+                    items.Add($"w-{i}vw");
+                }
+            }
+        }
+
+        // paddings
+        {
+            string[] names = ["padding", "padding-left", "padding-right", "padding-top", "padding-bottom"];
+
+            foreach (var name in names)
+            {
+                for (var i = 1; i <= 1000; i++)
+                {
+                    if (i % 4 == 0)
+                    {
+                        items.Add($"{name}: {i}");
+                    }
+                }
+            }
+        }
+
+        foreach (var propertyInfo in StyleProperties)
+        {
+            var attributeName = propertyInfo.Name;
+
+            if (attributeName == "gap")
+            {
+                for (var i = 1; i < 100; i++)
+                {
+                    items.Add($"{attributeName}: {i * 4}");
+                }
+            }
+
+            foreach (var suggestion in propertyInfo.Suggestions)
+            {
+                items.Add($"{attributeName}: {suggestion}");
+            }
+        }
+
+        return items;
+    }
+
+    public static IReadOnlyList<string> GetStyleGroupConditionSuggestions(ApplicationState state)
+    {
+        return ["MD", "XXL", "state.user.isActive", "MD: state.user.isActive", "XXL: state.user.isActive"];
+    }
+
+    public static IReadOnlyList<string> GetSuggestionsForComponentSelection(ApplicationState state)
+    {
+        return GetAllComponentsInProject(state).Where(c => c.Id != state.ComponentId).Select(x => x.Name).ToList();
+    }
+
+    public static IReadOnlyList<string> GetTagSuggestions(ApplicationState state)
+    {
+        var suggestions = new List<string>(TagNameList);
+
+        var allComponentsInProject = GetAllComponentsInProject(state);
+
+        suggestions.AddRange(allComponentsInProject.Where(c => c.Id != state.ComponentId).Select(x => x.Name));
+
+        return suggestions;
+    }
 
     public static StyleModifier TryProcessStyleAttributeByProjectConfig(string styleAttribute)
     {
@@ -32,141 +312,14 @@ static class ApplicationLogic
             return Style.ParseCss(value);
         }
     }
-    
-    public static IReadOnlyList<string> GetStyleAttributeNameSuggestions(ApplicationState state)
-    {
-        var items = new List<string>();
-        
-        items.AddRange(Project.Styles.Keys);
-        
-        foreach (var colorName in Project.Colors.Select(x => x.Key))
-        {
-            items.Add("color: "+ colorName);
-        }
 
-        // w
-        {
-            items.Add("w-full");
-            items.Add("w-fit");
-            items.Add("w-screen");
-            items.Add("w-screen");
-            for (var i = 1; i <= 100; i++)
-            {
-                if (i%5 == 0)
-                {
-                    items.Add($"w-{i}vw");
-                }
-            }
-        }
-        
-        
-        // paddings
-        {
-            string[] names = ["padding", "padding-left", "padding-right", "padding-top", "padding-bottom"];
-            
-            foreach (var name in names)
-            {
-                for (var i = 1; i <= 1000; i++)
-                {
-                    if (i % 4 == 0)
-                    {
-                        items.Add($"{name}: {i}");
-                    }
-                }    
-            }
-            
-        }
-        
-        foreach (var propertyInfo in StyleProperties)
-        {
-            var attributeName = propertyInfo.Name;
-
-            if (attributeName == "gap")
-            { 
-                for (var i = 1; i < 100; i++)
-                {
-                    items.Add($"{attributeName}: {i*4}");
-                }
-            }
-            
-            foreach (var suggestion in propertyInfo.Suggestions)
-            {
-                items.Add($"{attributeName}: {suggestion}");
-            }
-        }
-
-        return items;
-    }
-    
-    public static Task DbOperationForCurrentComponent(ApplicationState state, Func<ComponentEntity, Task> operation)
-    {
-        return DbOperation(async connection =>
-        {
-            var dbRecord = await connection.GetAsync<ComponentEntity>(state.ComponentId);
-
-            await operation(dbRecord);
-        });
-    }
-
-    public static Task DbOperationForCurrentComponent(ApplicationState state, Action<ComponentEntity> operation)
-    {
-        return DbOperation(async connection =>
-        {
-            var dbRecord = await connection.GetAsync<ComponentEntity>(state.ComponentId);
-
-            operation(dbRecord);
-        });
-    }
-
-    public static Task DbSave(ApplicationState state, Func<ComponentEntity, ComponentEntity> modify)
-    {
-        return DbOperation(async connection =>
-        {
-            var dbRecord = await connection.GetAsync<ComponentEntity>(state.ComponentId);
-
-            dbRecord = modify(dbRecord);
-
-            await connection.UpdateAsync(dbRecord);
-        });
-    }
-
-    public static IReadOnlyList<ComponentEntity> GetAllComponentsInProject(ApplicationState state)
-    {
-        var query = $"SELECT * FROM Component WHERE ProjectId = @{nameof(state.ProjectId)}";
-
-        var dbRecords = DbOperation(async connection => (await connection.QueryAsync<ComponentEntity>(query, new{state.ProjectId})).ToList()).GetAwaiter().GetResult();
-
-        return dbRecords;
-    }
-
-    public static IReadOnlyList<string> GetProjectNames(ApplicationState state)
-    {
-        return GetAllProjects().Select(x => x.Name).ToList();
-    }
-
-    public static async Task<ComponentEntity> GetSelectedComponent(ApplicationState state)
-    {
-        const string query = $"SELECT * FROM Component WHERE Id = @{nameof(state.ComponentId)}";
-
-        var dbRecords = await DbOperation(async connection => (await connection.QueryAsync<ComponentEntity>(query, new { state.ComponentId })).ToList());
-        
-        return dbRecords.FirstOrDefault(x=>x.UserName == state.UserName) ?? dbRecords.FirstOrDefault();
-    }
-    
-    public static Task<string> GetSelectedComponentName(ApplicationState state)
-    {
-        const string query = $"SELECT Name FROM Component WHERE Id = @{nameof(state.ComponentId)}";
-
-        return DbOperation(db => db.ExecuteScalarAsync<string>(query, new { state.ComponentId }));
-    }
-    
     public static Task UpdateLastUsageInfo(ApplicationState state)
     {
         if (state.ComponentId <= 0)
         {
             return Task.CompletedTask;
         }
-        
+
         const string query = $"SELECT * FROM LastUsageInfo WHERE UserName = @{nameof(state.UserName)}";
 
         return DbOperation(async db =>
@@ -186,7 +339,7 @@ static class ApplicationLogic
             {
                 await db.InsertAsync(new LastUsageInfoEntity
                 {
-                    UserName    = state.UserName, 
+                    UserName    = state.UserName,
                     ProjectId   = state.ProjectId,
                     AccessTime  = DateTime.Now,
                     StateAsJson = SerializeToJson(state)
@@ -194,25 +347,6 @@ static class ApplicationLogic
             }
         });
     }
-
-    public static IReadOnlyList<string> GetStyleGroupConditionSuggestions(ApplicationState state)
-    {
-        return ["MD", "XXL", "state.user.isActive", "MD: state.user.isActive", "XXL: state.user.isActive"];
-    }
-
-    public static IReadOnlyList<string> GetSuggestionsForComponentSelection(ApplicationState state)
-    {
-        return GetAllComponentsInProject(state).Where(c => c.Id != state.ComponentId).Select(x => x.Name).ToList();
-    }
-
-    public static IReadOnlyList<string> GetTagSuggestions(ApplicationState state)
-    {
-        var suggestions = new List<string>(TagNameList);
-
-        var allComponentsInProject = GetAllComponentsInProject(state);
-
-        suggestions.AddRange(allComponentsInProject.Where(c => c.Id != state.ComponentId).Select(x => x.Name));
-
-        return suggestions;
-    }
+    
+    
 }
