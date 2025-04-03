@@ -597,8 +597,6 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         state.LeftPanelSelectedTab = LeftPanelTab.Props;
 
-                        state.JsonText = (await GetSelectedComponent(state)).PropsAsJson;
-
                         await DbOperationForCurrentComponent(state, x => { state.JsonText = x.PropsAsJson; });
                     })
                 },
@@ -608,8 +606,6 @@ sealed class ApplicationView : Component<ApplicationState>
                     PaddingX(8), OnClick(async _ =>
                     {
                         state.LeftPanelSelectedTab = LeftPanelTab.State;
-
-                        state.JsonText = (await GetSelectedComponent(state)).StateAsJson;
 
                         await DbOperationForCurrentComponent(state, x => { state.JsonText = x.StateAsJson; });
                     })

@@ -175,22 +175,17 @@ static class ApplicationLogic
     {
         return DbOperation(async db => await db.GetComponentUserVersion(projectId, componentName, userName) ?? await db.GetComponentMainVersion(projectId, componentName));
     }
+    
+    public static Task<Result<ComponentEntity>> GetComponenUserOrMainVersion(ApplicationState state)
+    {
+        return DbOperation(async db => await db.GetComponentUserVersion(state.ProjectId, state.ComponentName, state.UserName) ?? await db.GetComponentMainVersion(state.ProjectId, state.ComponentName));
+    }
 
     public static IReadOnlyList<string> GetProjectNames(ApplicationState state)
     {
         return GetAllProjects().Select(x => x.Name).ToList();
     }
 
-    public static async Task<ComponentEntity> GetSelectedComponent(ApplicationState state)
-    {
-        const string query = $"SELECT * FROM Component WHERE Id = @{nameof(state.ComponentId)}";
-
-        var dbRecords = await DbOperation(async connection => (await connection.QueryAsync<ComponentEntity>(query, new { state.ComponentId })).ToList());
-
-        return dbRecords.FirstOrDefault(x => x.UserName == state.UserName) ?? dbRecords.FirstOrDefault();
-    }
-
-   
 
     public static IReadOnlyList<string> GetStyleAttributeNameSuggestions(ApplicationState state)
     {
