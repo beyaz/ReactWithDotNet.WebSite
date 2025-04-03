@@ -79,6 +79,16 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
+    void ShowErrorIfExist<T>(Result<T> result)
+    {
+        if (result.Success)
+        {
+            return;
+        }
+        
+        this.FailNotification(result.Error.Message);
+    }
+    
     protected override Element render()
     {
         return new FlexRow(Padding(10), SizeFull, Background(Theme.BackgroundColor))
@@ -597,7 +607,10 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         state.LeftPanelSelectedTab = LeftPanelTab.Props;
 
-                        await DbOperationForCurrentComponent(state, x => { state.JsonText = x.PropsAsJson; });
+                        ShowErrorIfExist(await GetComponenUserOrMainVersion(state).Then(x =>
+                        {
+                            state.JsonText = x.PropsAsJson;
+                        }));
                     })
                 },
                 new FlexRowCentered(WidthFull, Opacity(0.7), When(state.LeftPanelSelectedTab == LeftPanelTab.State, Color(Gray500)))
@@ -607,7 +620,10 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         state.LeftPanelSelectedTab = LeftPanelTab.State;
 
-                        await DbOperationForCurrentComponent(state, x => { state.JsonText = x.StateAsJson; });
+                        ShowErrorIfExist(await GetComponenUserOrMainVersion(state).Then(x =>
+                        {
+                            state.JsonText = x.StateAsJson;
+                        }));
                     })
                 }
             },

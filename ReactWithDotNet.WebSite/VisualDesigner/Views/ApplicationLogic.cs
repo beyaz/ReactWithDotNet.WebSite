@@ -48,18 +48,6 @@ static class ApplicationLogic
         });
     }
 
-   
-
-    public static Task DbOperationForCurrentComponent(ApplicationState state, Action<ComponentEntity> operation)
-    {
-        return DbOperation(async connection =>
-        {
-            var dbRecord = await connection.GetAsync<ComponentEntity>(state.ComponentId);
-
-            operation(dbRecord);
-        });
-    }
-
     public static IReadOnlyList<ComponentEntity> GetAllComponentsInProject(ApplicationState state)
     {
         var query = $"SELECT * FROM Component WHERE ProjectId = @{nameof(state.ProjectId)}";
