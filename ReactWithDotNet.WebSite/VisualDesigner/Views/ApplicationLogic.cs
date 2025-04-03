@@ -391,9 +391,7 @@ static class ApplicationLogic
     {
         return DbOperation(async db =>
         {
-            var component = await db.GetAsync<ComponentEntity>(state.ComponentId);
-
-            var userVersionResult = await db.GetComponentUserVersionNotNull(component.ProjectId, state.ComponentName, state.UserName);
+            var userVersionResult = await db.GetComponentUserVersionNotNull(state.ProjectId, state.ComponentName, state.UserName);
             if (userVersionResult.HasError)
             {
                 return userVersionResult.Error;
