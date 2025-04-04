@@ -1125,7 +1125,20 @@ sealed class ApplicationView : Component<ApplicationState>
                                 addStyleAttributeInput(styleGroupIndex, styleGroup)
                             },
 
-                            styleGroup.Items?.Select((value, index) => styleAttributeView(index, value, styleGroupIndex))
+                            new FlexRow(WidthFull, FlexWrap, Gap(4))
+                            {
+                                OnClick(_ =>
+                                {
+                                    state.Selection = state.Selection with
+                                    {
+                                        PropertyIndexInStyleGroup = null
+                                    };
+                                    
+                                    return Task.CompletedTask;
+                                }),
+                                
+                                styleGroup.Items?.Select((value, index) => styleAttributeView(index, value, styleGroupIndex))
+                            }
                         }
                     };
                 })
@@ -1194,7 +1207,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     StyleGroupIndex      = styleGroupIndex,
                     PropertyIndexInGroup = index
                 }),
-                OnClick(e =>
+                OnClick([StopPropagation](e) =>
                 {
                     StyleInputLocation location = e.target.id;
 
