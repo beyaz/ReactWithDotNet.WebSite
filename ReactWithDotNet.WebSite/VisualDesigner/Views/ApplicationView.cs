@@ -55,9 +55,9 @@ sealed class ApplicationView : Component<ApplicationState>
 
             Preview = new()
             {
-                Width  = 600,
+                Width = 600,
                 Height = 100,
-                Scale  = 100
+                Scale = 100
             },
 
             Selection = new()
@@ -397,13 +397,13 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         state.Preview.Width = e.currentTarget.data["value"] switch
         {
-            "M"   => 320,
-            "SM"  => 640,
-            "MD"  => 768,
-            "LG"  => 1024,
-            "XL"  => 1280,
+            "M" => 320,
+            "SM" => 640,
+            "MD" => 768,
+            "LG" => 1024,
+            "XL" => 1280,
             "XXL" => 1536,
-            _     => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException()
         };
 
         return Task.CompletedTask;
@@ -528,11 +528,11 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             Name = string.Empty,
 
-            Suggestions       = await GetSuggestionsForComponentSelection(state),
-            Value             = state.ComponentName,
-            OnChange          = (_, componentName) => OnComponentNameChanged(componentName),
+            Suggestions = await GetSuggestionsForComponentSelection(state),
+            Value = state.ComponentName,
+            OnChange = (_, componentName) => OnComponentNameChanged(componentName),
             IsTextAlignCenter = true,
-            IsBold            = true
+            IsBold = true
         };
 
         var removeIconInLayersTab = CreateIcon(Icon.remove, 16);
@@ -912,8 +912,8 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             return new iframe
             {
-                id    = "ComponentPreview",
-                src   = Page.VisualDesignerPreview.Url,
+                id = "ComponentPreview",
+                src = Page.VisualDesignerPreview.Url,
                 style = { BorderNone, WidthFull, HeightFull },
                 title = "Component Preview"
             };
@@ -1091,7 +1091,7 @@ sealed class ApplicationView : Component<ApplicationState>
             },
 
             propsHeader,
-            viewProps(visualElementModel)
+            viewProps(visualElementModel.Properties)
         };
 
         Element viewStyleGroup(PropertyGroupModel styleGroup, int styleGroupIndex)
@@ -1242,7 +1242,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     },
                     Name = new StyleInputLocation
                     {
-                        StyleGroupIndex      = styleGroupIndex,
+                        StyleGroupIndex = styleGroupIndex,
                         PropertyIndexInGroup = state.Selection.PropertyIndexInStyleGroup ?? CurrentVisualElement.StyleGroups[styleGroupIndex].Items.Count
                     },
                     OnChange = (senderName, newValue) =>
@@ -1275,8 +1275,8 @@ sealed class ApplicationView : Component<ApplicationState>
                 };
             }
         }
-        
-        Element viewProps(VisualElementModel visualElementModel)
+
+        Element viewProps(IReadOnlyList<string> props)
         {
             return new FlexColumn(WidthFull, Gap(4))
             {
@@ -1284,7 +1284,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 {
                     new FlexRow(WidthFull, BorderRadius(4), PaddingLeft(4), Background(WhiteSmoke))
                     {
-                        inputEditor(visualElementModel)
+                        inputEditor()
                     },
                     new FlexRow(WidthFull, FlexWrap, Gap(4))
                     {
@@ -1294,7 +1294,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
                             return Task.CompletedTask;
                         }),
-                        visualElementModel.Properties?.Select((value, index) => attributeItem(index, value))
+                        props.Select((value, index) => attributeItem(index, value))
                     }
                 }
             };
@@ -1341,7 +1341,7 @@ sealed class ApplicationView : Component<ApplicationState>
                             PropertyIndexInProps = location
                         };
 
-                        var id = "PROPS-"+location;
+                        var id = "PROPS-INPUT-EDITOR-" + location;
 
                         // calculate js code for focus to input editor
                         {
@@ -1370,20 +1370,25 @@ sealed class ApplicationView : Component<ApplicationState>
                 };
             }
 
-            Element inputEditor(VisualElementModel visualElementModel)
+            Element inputEditor()
             {
                 string value = null;
 
                 if (state.Selection.PropertyIndexInProps >= 0)
                 {
-                    value = visualElementModel.Properties[state.Selection.PropertyIndexInProps.Value];
+                    value = props[state.Selection.PropertyIndexInProps.Value];
                 }
 
                 return new MagicInput
                 {
                     Placeholder = "Add property",
+
                     Suggestions = GetStyleAttributeNameSuggestions(state),
+
                     Name = (state.Selection.PropertyIndexInProps ?? -1).ToString(),
+
+                    Id = "PROPS-INPUT-EDITOR-" + (state.Selection.PropertyIndexInProps ?? -1),
+
                     OnChange = (senderName, newValue) =>
                     {
                         var index = int.Parse(senderName);
@@ -1543,8 +1548,8 @@ sealed class ApplicationView : Component<ApplicationState>
 
             return new()
             {
-                Prefix               = parts[0],
-                StyleGroupIndex      = int.Parse(parts[1]),
+                Prefix = parts[0],
+                StyleGroupIndex = int.Parse(parts[1]),
                 PropertyIndexInGroup = int.Parse(parts[2])
             };
         }
