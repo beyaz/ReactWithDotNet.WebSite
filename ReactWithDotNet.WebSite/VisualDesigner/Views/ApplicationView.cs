@@ -1090,7 +1090,8 @@ sealed class ApplicationView : Component<ApplicationState>
                 visualElementModel.StyleGroups?.Select(viewStyleGroup)
             },
 
-            propsHeader
+            propsHeader,
+            viewProps(visualElementModel)
         };
 
         Element viewStyleGroup(PropertyGroupModel styleGroup, int styleGroupIndex)
@@ -1267,6 +1268,139 @@ sealed class ApplicationView : Component<ApplicationState>
                         }
 
                         state.Selection.PropertyIndexInStyleGroup = null;
+
+                        return Task.CompletedTask;
+                    },
+                    Value = value
+                };
+            }
+        }
+        
+        Element viewProps(VisualElementModel visualElementModel)
+        {
+            return new FlexColumn(WidthFull, Gap(4))
+            {
+                new FlexRow(FlexWrap, Gap(4))
+                {
+                    new FlexRow(WidthFull, BorderRadius(4), PaddingLeft(4), Background(WhiteSmoke))
+                    {
+                        inputEditor(visualElementModel)
+                    },
+                    new FlexRow(WidthFull, FlexWrap, Gap(4))
+                    {
+                        OnClick(_ =>
+                        {
+                            state.Selection = state.Selection with { PropertyIndexInProps = null };
+
+                            return Task.CompletedTask;
+                        }),
+                        visualElementModel.Properties?.Select((value, index) => attributeItem(index, value))
+                    }
+                }
+            };
+
+
+            FlexRowCentered attributeItem(int index, string value)
+            {
+                var isSelected = index == state.Selection.PropertyIndexInProps;
+
+                var closeIcon = new FlexRowCentered(Size(20), PositionAbsolute, Top(-8), Right(-8), Padding(4), Background(White),
+                                                    Border(0.5, solid, Theme.BorderColor), BorderRadius(24))
+                {
+                    Color(Gray500), Hover(Color(Blue300), BorderColor(Blue300)),
+
+                    new IconClose() + Size(16),
+
+                    OnClick([StopPropagation](_) =>
+                    {
+                        CurrentVisualElement.Properties.RemoveAt(state.Selection.PropertyIndexInProps!.Value);
+
+                        state.Selection.PropertyIndexInProps = null;
+
+                        return Task.CompletedTask;
+                    })
+                };
+
+                return new(CursorDefault, Padding(4, 8), BorderRadius(16))
+                {
+                    Background(isSelected ? Gray200 : Gray50),
+
+                    isSelected ? PositionRelative : null,
+                    isSelected ? closeIcon : null,
+
+                    value,
+                    Id("PROPS-"+index),
+                    OnClick([StopPropagation](e) =>
+                    {
+                        var location = int.Parse(e.target.id.RemoveFromStart("PROPS-"));
+
+                        state.Selection = new()
+                        {
+                            VisualElementTreeItemPath = state.Selection.VisualElementTreeItemPath,
+
+                            PropertyIndexInProps = location
+                        };
+
+                        var id = "PROPS-"+location;
+
+                        // calculate js code for focus to input editor
+                        {
+                            var jsCode = new StringBuilder();
+
+                            jsCode.AppendLine($"document.getElementById('{id}').focus();");
+
+                            // calculate text selection in edit input
+                            {
+                                var nameValue = CurrentVisualElement.Properties[location];
+                                var (success, _, parsedValue) = TryParsePropertyValue(nameValue);
+                                if (success)
+                                {
+                                    var startIndex = nameValue.LastIndexOf(parsedValue, StringComparison.OrdinalIgnoreCase);
+                                    var endIndex = nameValue.Length;
+
+                                    jsCode.AppendLine($"document.getElementById('{id}').setSelectionRange({startIndex}, {endIndex});");
+                                }
+                            }
+
+                            Client.RunJavascript(jsCode.ToString());
+                        }
+
+                        return Task.CompletedTask;
+                    })
+                };
+            }
+
+            Element inputEditor(VisualElementModel visualElementModel)
+            {
+                string value = null;
+
+                if (state.Selection.PropertyIndexInProps >= 0)
+                {
+                    value = visualElementModel.Properties[state.Selection.PropertyIndexInProps.Value];
+                }
+
+                return new MagicInput
+                {
+                    Placeholder = "Add property",
+                    Suggestions = GetStyleAttributeNameSuggestions(state),
+                    Name = (state.Selection.PropertyIndexInProps ?? -1).ToString(),
+                    OnChange = (senderName, newValue) =>
+                    {
+                        var index = int.Parse(senderName);
+
+
+                        newValue = TryBeautifyPropertyValue(newValue);
+
+                        if (index >= 0)
+                        {
+                            CurrentVisualElement.Properties[index] = newValue;
+                        }
+                        else
+                        {
+                            CurrentVisualElement.Properties.Add(newValue);
+                        }
+
+                        state.Selection.PropertyIndexInProps = null;
 
                         return Task.CompletedTask;
                     },
