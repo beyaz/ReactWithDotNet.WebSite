@@ -476,7 +476,9 @@ sealed class ApplicationView : Component<ApplicationState>
                             "Export",
                             OnClick(_ =>
                             {
-                                this.SuccessNotification("Rollback ok");
+                                Exporter.Export(state);
+                                
+                                this.SuccessNotification("OK");
 
                                 return Task.CompletedTask;
                             })
