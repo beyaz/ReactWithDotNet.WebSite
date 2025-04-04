@@ -125,6 +125,23 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
         return Task.CompletedTask;
     }
 
+    [StopPropagation]
+    Task ToggleFold(MouseEvent e)
+    {
+        var nodePath = e.currentTarget.id;
+
+        if (state.CollapsedNodes.Contains(nodePath))
+        {
+            state.CollapsedNodes.Remove(nodePath);
+        }
+        else
+        {
+            state.CollapsedNodes.Add(nodePath);
+        }
+
+        return Task.CompletedTask;
+    }
+
     IReadOnlyList<Element> ToVisual(VisualElementModel node, int indent, string path)
     {
         var isSelected = SelectedPath == path;
@@ -146,7 +163,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                 PositionAbsolute, Top(0)
             };
         }
-        
+
         Element afterPositionElement = null;
         if (isDragHoveredElement)
         {
@@ -158,13 +175,13 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                 BorderBottomLeftRadius(16), BorderTopLeftRadius(16),
 
                 When(state.DragPosition == DragPosition.After, Background(Blue300)),
-                
+
                 PositionAbsolute, Bottom(0)
             };
         }
 
         Element icon = null;
-        
+
         var commonStyles = node.StyleGroups?.FirstOrDefault(x => x.Condition == "*");
         if (commonStyles is not null)
         {
@@ -199,7 +216,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 
                 return false;
             });
-            
+
             var hasFlexDirectionRow = commonStyles.Items.Any(x =>
             {
                 var (success, name, value) = TryParsePropertyValue(x);
@@ -215,7 +232,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 
                 return false;
             });
-            
+
             var hasHeightWithConstantValue = commonStyles.Items.Any(x =>
             {
                 var (success, name, value) = TryParsePropertyValue(x);
@@ -223,7 +240,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                 {
                     return false;
                 }
-                
+
                 if (double.TryParse(value, out _))
                 {
                     return name == "h" || name == "height";
@@ -231,7 +248,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 
                 return false;
             });
-            
+
             var hasWidhtWithConstantValue = commonStyles.Items.Any(x =>
             {
                 var (success, name, value) = TryParsePropertyValue(x);
@@ -239,7 +256,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
                 {
                     return false;
                 }
-                
+
                 if (double.TryParse(value, out _))
                 {
                     return name == "w" || name == "width";
@@ -247,7 +264,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 
                 return false;
             });
-            
+
             if (hasFlexDirectionColumn)
             {
                 icon = new IconFlexColumn() + Size(16) + Color(Gray300);
@@ -256,60 +273,68 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
             {
                 icon = new IconFlexRow() + Size(16) + Color(Gray300);
             }
-            else if(node.Text.HasNoValue() && commonStyles.Items.Count == 1 && hasHeightWithConstantValue)
+            else if (node.Text.HasNoValue() && commonStyles.Items.Count == 1 && hasHeightWithConstantValue)
             {
                 icon = new IconSpaceVertical();
             }
-            else if(node.Text.HasNoValue() && commonStyles.Items.Count == 1 && hasWidhtWithConstantValue)
+            else if (node.Text.HasNoValue() && commonStyles.Items.Count == 1 && hasWidhtWithConstantValue)
             {
                 icon = new IconSpaceHorizontal();
             }
-
         }
 
         if (icon is null)
         {
             if (node.Text.HasValue())
             {
-                if (node.Tag[0]== 'h')
+                if (node.Tag[0] == 'h')
                 {
-                    icon = new IconHeader() + Size(16) + Color(Gray300);    
+                    icon = new IconHeader() + Size(16) + Color(Gray300);
                 }
                 else if (node.Tag == "a")
                 {
-                    icon = new IconLink() + Size(16) + Color(Gray300);    
+                    icon = new IconLink() + Size(16) + Color(Gray300);
                 }
                 else if (node.Tag == "img")
                 {
-                    icon = new IconImage() + Size(16) + Color(Gray300);    
+                    icon = new IconImage() + Size(16) + Color(Gray300);
                 }
                 else
                 {
                     icon = new IconText() + Size(16) + Color(Gray300);
                 }
-                
             }
         }
-        
+
+        var foldIcon = new FlexRowCentered(Size(16), PositionAbsolute, Top(4), Left(indent * 16 - 12))
+        {
+            new IconArrowRightOrDown { IsArrowDown = !state.CollapsedNodes.Contains(path) },
+
+            Id(path),
+            OnClick(ToggleFold)
+        };
+        if (path == "0" || node.HasNoChild())
+        {
+            foldIcon = null;
+        }
+
         var returnList = new List<Element>
         {
             new FlexColumn(PaddingLeft(indent * 16), Id(path), OnClick(OnTreeItemClicked), OnMouseEnter(OnMouseEnterHandler))
             {
                 PositionRelative,
-                
+
+                foldIcon,
+
                 beforePositionElement,
 
                 new FlexRow(Gap(4), AlignItemsCenter)
                 {
                     MarginLeft(4), FontSize13,
-                    
-                    
-                    
-                    new span{ node.Tag },
-                    
-                    icon,
-                    
-                    
+
+                    new span { node.Tag },
+
+                    icon
                 },
 
                 state.DragStartedTreeItemPath.HasNoValue() && isSelected ? Background(Blue100) + BorderRadius(3) : null,
@@ -330,6 +355,11 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
             return returnList;
         }
 
+        if (state.CollapsedNodes.Contains(path))
+        {
+            return returnList;
+        }
+
         for (var i = 0; i < node.Children.Count; i++)
         {
             var child = node.Children[i];
@@ -342,6 +372,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 
     internal class State
     {
+        public List<string> CollapsedNodes { get; init; } = [];
         public string CurrentDragOveredPath { get; set; }
 
         public DragPosition DragPosition { get; set; }
