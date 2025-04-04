@@ -244,6 +244,7 @@ static class ApplicationLogic
         foreach (var colorName in Project.Colors.Select(x => x.Key))
         {
             items.Add("color: " + colorName);
+            items.Add($"border: 1px solid {colorName}");
         }
 
         // w

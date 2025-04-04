@@ -1,6 +1,9 @@
 colors:
   content-weak: "#F5F7FA"
+  border-strong: #181B25
   border-sub: "#CACFD8"
+  border-soft: #E1E4EA
+  border-white: #FFFFFF
 
 styles:
   bg-strong: "background: #0E121B"

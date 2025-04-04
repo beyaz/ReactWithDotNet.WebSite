@@ -169,6 +169,22 @@ sealed class ApplicationPreview : Component
                     {
                         case "border":
                         {
+                            var parts = value.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                            if (parts.Length == 3)
+                            {
+                                for (int i = 0; i < parts.Length; i++)
+                                {
+                                    if (Project.Colors.TryGetValue(parts[i], out var color))
+                                    {
+                                        parts[i] = color;
+                                    }
+                                    
+                                }
+
+                                value = string.Join(" ", parts);
+                            }
+                            
+                            
                             element.Add(Border(value));
                             continue;
                         }
