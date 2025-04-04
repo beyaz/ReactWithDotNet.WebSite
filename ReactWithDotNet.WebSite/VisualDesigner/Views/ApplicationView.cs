@@ -1097,10 +1097,13 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             return new FlexColumn(WidthFull, Gap(4))
             {
-                newStyleGroupHeader(styleGroup, styleGroupIndex),
+                conditionEditor(),
                 new FlexRow(FlexWrap, Gap(4))
                 {
-                    new FlexRow(WidthFull, BorderRadius(4), PaddingLeft(4), Background(WhiteSmoke)) { addStyleAttributeInput(styleGroupIndex, styleGroup) },
+                    new FlexRow(WidthFull, BorderRadius(4), PaddingLeft(4), Background(WhiteSmoke))
+                    {
+                        inputEditor()
+                    },
                     new FlexRow(WidthFull, FlexWrap, Gap(4))
                     {
                         OnClick(_ =>
@@ -1109,167 +1112,167 @@ sealed class ApplicationView : Component<ApplicationState>
 
                             return Task.CompletedTask;
                         }),
-                        styleGroup.Items?.Select((value, index) => styleAttributeView(index, value, styleGroupIndex))
+                        styleGroup.Items?.Select((value, index) => attributeItem(index, value))
                     }
                 }
             };
-        }
 
-        Element newStyleGroupHeader(PropertyGroupModel styleGroup, int styleGroupIndex)
-        {
-            return new FlexRow(WidthFull, AlignItemsCenter, Gap(4), PaddingX(2))
+            Element conditionEditor()
             {
-                new MagicInput
+                return new FlexRow(WidthFull, AlignItemsCenter, Gap(4), PaddingX(2))
                 {
-                    Name = styleGroupIndex.ToString(),
-                    OnFocus = senderNameAsStyleGroupIndex =>
+                    new MagicInput
                     {
+                        Name = styleGroupIndex.ToString(),
+                        OnFocus = senderNameAsStyleGroupIndex =>
+                        {
+                            state.Selection = new()
+                            {
+                                VisualElementTreeItemPath = state.Selection.VisualElementTreeItemPath,
+
+                                StyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex)
+                            };
+
+                            return Task.CompletedTask;
+                        },
+                        Value             = styleGroup.Condition,
+                        IsTextAlignCenter = true,
+                        Suggestions       = GetStyleGroupConditionSuggestions(state)
+                    } + FlexGrow(1)
+                };
+            }
+
+            FlexRowCentered attributeItem(int index, string value)
+            {
+                var isSelected = index == state.Selection.PropertyIndexInStyleGroup &&
+                                 styleGroupIndex == state.Selection.StyleGroupIndex;
+
+                var closeIcon = new FlexRowCentered(Size(20), PositionAbsolute, Top(-8), Right(-8), Padding(4), Background(White),
+                                                    Border(0.5, solid, Theme.BorderColor), BorderRadius(24))
+                {
+                    Color(Gray500), Hover(Color(Blue300), BorderColor(Blue300)),
+
+                    new IconClose() + Size(16),
+
+                    OnClick([StopPropagation](_) =>
+                    {
+                        CurrentStyleGroup.Items.RemoveAt(state.Selection.PropertyIndexInStyleGroup!.Value);
+
+                        state.Selection.PropertyIndexInStyleGroup = null;
+
+                        return Task.CompletedTask;
+                    })
+                };
+
+                return new(CursorDefault, Padding(4, 8), BorderRadius(16))
+                {
+                    Background(isSelected ? Gray200 : Gray50),
+
+                    isSelected ? PositionRelative : null,
+                    isSelected ? closeIcon : null,
+
+                    value,
+                    Id(new StyleInputLocation
+                    {
+                        StyleGroupIndex      = styleGroupIndex,
+                        PropertyIndexInGroup = index
+                    }),
+                    OnClick([StopPropagation](e) =>
+                    {
+                        StyleInputLocation location = e.target.id;
+
                         state.Selection = new()
                         {
                             VisualElementTreeItemPath = state.Selection.VisualElementTreeItemPath,
 
-                            StyleGroupIndex = int.Parse(senderNameAsStyleGroupIndex)
+                            StyleGroupIndex = location.StyleGroupIndex,
+
+                            PropertyIndexInStyleGroup = location.PropertyIndexInGroup
                         };
+
+                        var id = new StyleInputLocation
+                        {
+                            StyleGroupIndex = location.StyleGroupIndex
+                        }.ToString();
+
+                        // calculate js code for focus to input editor
+                        {
+                            var jsCode = new StringBuilder();
+
+                            jsCode.AppendLine($"document.getElementById('{id}').focus();");
+
+                            // calculate text selection in edit input
+                            {
+                                var nameValue = CurrentVisualElement.StyleGroups[location.StyleGroupIndex].Items[state.Selection.PropertyIndexInStyleGroup.Value];
+                                var (success, _, parsedValue) = TryParsePropertyValue(nameValue);
+                                if (success)
+                                {
+                                    var startIndex = nameValue.LastIndexOf(parsedValue, StringComparison.OrdinalIgnoreCase);
+                                    var endIndex = nameValue.Length;
+
+                                    jsCode.AppendLine($"document.getElementById('{id}').setSelectionRange({startIndex}, {endIndex});");
+                                }
+                            }
+
+                            Client.RunJavascript(jsCode.ToString());
+                        }
+
+                        return Task.CompletedTask;
+                    })
+                };
+            }
+
+            Element inputEditor()
+            {
+                string value = null;
+
+                if (state.Selection.StyleGroupIndex == styleGroupIndex && state.Selection.PropertyIndexInStyleGroup >= 0)
+                {
+                    value = styleGroup.Items[state.Selection.PropertyIndexInStyleGroup.Value];
+                }
+
+                return new MagicInput
+                {
+                    Placeholder = "Add style attribute",
+                    Suggestions = GetStyleAttributeNameSuggestions(state),
+                    Id = new StyleInputLocation
+                    {
+                        StyleGroupIndex = styleGroupIndex
+                    },
+                    Name = new StyleInputLocation
+                    {
+                        StyleGroupIndex      = styleGroupIndex,
+                        PropertyIndexInGroup = state.Selection.PropertyIndexInStyleGroup ?? CurrentVisualElement.StyleGroups[styleGroupIndex].Items.Count
+                    },
+                    OnChange = (senderName, newValue) =>
+                    {
+                        StyleInputLocation location = senderName;
+                        if (state.Selection.StyleGroupIndex is null)
+                        {
+                            state.Selection = state.Selection with
+                            {
+                                StyleGroupIndex = location.StyleGroupIndex
+                            };
+                        }
+
+                        newValue = TryBeautifyPropertyValue(newValue);
+
+                        if (state.Selection.StyleGroupIndex.HasValue && state.Selection.PropertyIndexInStyleGroup.HasValue)
+                        {
+                            CurrentStyleGroup.Items[state.Selection.PropertyIndexInStyleGroup.Value] = newValue;
+                        }
+                        else
+                        {
+                            CurrentStyleGroup.Items.Add(newValue);
+                        }
+
+                        state.Selection.PropertyIndexInStyleGroup = null;
 
                         return Task.CompletedTask;
                     },
-                    Value             = styleGroup.Condition,
-                    IsTextAlignCenter = true,
-                    Suggestions       = GetStyleGroupConditionSuggestions(state)
-                } + FlexGrow(1)
-            };
-        }
-
-        FlexRowCentered styleAttributeView(int index, string value, int styleGroupIndex)
-        {
-            var isSelected = index == state.Selection.PropertyIndexInStyleGroup &&
-                             styleGroupIndex == state.Selection.StyleGroupIndex;
-
-            var closeIcon = new FlexRowCentered(Size(20), PositionAbsolute, Top(-8), Right(-8), Padding(4), Background(White),
-                                                Border(0.5, solid, Theme.BorderColor), BorderRadius(24))
-            {
-                Color(Gray500), Hover(Color(Blue300), BorderColor(Blue300)),
-
-                new IconClose() + Size(16),
-
-                OnClick([StopPropagation](_) =>
-                {
-                    CurrentStyleGroup.Items.RemoveAt(state.Selection.PropertyIndexInStyleGroup!.Value);
-
-                    state.Selection.PropertyIndexInStyleGroup = null;
-
-                    return Task.CompletedTask;
-                })
-            };
-
-            return new(CursorDefault, Padding(4, 8), BorderRadius(16))
-            {
-                Background(isSelected ? Gray200 : Gray50),
-
-                isSelected ? PositionRelative : null,
-                isSelected ? closeIcon : null,
-
-                value,
-                Id(new StyleInputLocation
-                {
-                    StyleGroupIndex      = styleGroupIndex,
-                    PropertyIndexInGroup = index
-                }),
-                OnClick([StopPropagation](e) =>
-                {
-                    StyleInputLocation location = e.target.id;
-
-                    state.Selection = new()
-                    {
-                        VisualElementTreeItemPath = state.Selection.VisualElementTreeItemPath,
-
-                        StyleGroupIndex = location.StyleGroupIndex,
-
-                        PropertyIndexInStyleGroup = location.PropertyIndexInGroup
-                    };
-
-                    var id = new StyleInputLocation
-                    {
-                        StyleGroupIndex = location.StyleGroupIndex
-                    }.ToString();
-
-                    // calculate js code for focus to input editor
-                    {
-                        var jsCode = new StringBuilder();
-
-                        jsCode.AppendLine($"document.getElementById('{id}').focus();");
-
-                        // calculate text selection in edit input
-                        {
-                            var nameValue = CurrentVisualElement.StyleGroups[location.StyleGroupIndex].Items[state.Selection.PropertyIndexInStyleGroup.Value];
-                            var (success, _, parsedValue) = TryParsePropertyValue(nameValue);
-                            if (success)
-                            {
-                                var startIndex = nameValue.LastIndexOf(parsedValue, StringComparison.OrdinalIgnoreCase);
-                                var endIndex = nameValue.Length;
-
-                                jsCode.AppendLine($"document.getElementById('{id}').setSelectionRange({startIndex}, {endIndex});");
-                            }
-                        }
-
-                        Client.RunJavascript(jsCode.ToString());
-                    }
-
-                    return Task.CompletedTask;
-                })
-            };
-        }
-
-        Element addStyleAttributeInput(int styleGroupIndex, PropertyGroupModel styleGroup)
-        {
-            string value = null;
-
-            if (state.Selection.StyleGroupIndex == styleGroupIndex && state.Selection.PropertyIndexInStyleGroup >= 0)
-            {
-                value = styleGroup.Items[state.Selection.PropertyIndexInStyleGroup.Value];
+                    Value = value
+                };
             }
-
-            return new MagicInput
-            {
-                Placeholder = "Add style attribute",
-                Suggestions = GetStyleAttributeNameSuggestions(state),
-                Id = new StyleInputLocation
-                {
-                    StyleGroupIndex = styleGroupIndex
-                },
-                Name = new StyleInputLocation
-                {
-                    StyleGroupIndex      = styleGroupIndex,
-                    PropertyIndexInGroup = state.Selection.PropertyIndexInStyleGroup ?? CurrentVisualElement.StyleGroups[styleGroupIndex].Items.Count
-                },
-                OnChange = (senderName, newValue) =>
-                {
-                    StyleInputLocation location = senderName;
-                    if (state.Selection.StyleGroupIndex is null)
-                    {
-                        state.Selection = state.Selection with
-                        {
-                            StyleGroupIndex = location.StyleGroupIndex
-                        };
-                    }
-
-                    newValue = TryBeautifyPropertyValue(newValue);
-
-                    if (state.Selection.StyleGroupIndex.HasValue && state.Selection.PropertyIndexInStyleGroup.HasValue)
-                    {
-                        CurrentStyleGroup.Items[state.Selection.PropertyIndexInStyleGroup.Value] = newValue;
-                    }
-                    else
-                    {
-                        CurrentStyleGroup.Items.Add(newValue);
-                    }
-
-                    state.Selection.PropertyIndexInStyleGroup = null;
-
-                    return Task.CompletedTask;
-                },
-                Value = value
-            };
         }
     }
 
