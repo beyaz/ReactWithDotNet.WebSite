@@ -239,6 +239,7 @@ static class ApplicationLogic
         items.AddRange(Project.Styles.Keys);
         
         items.Add("flex-row-centered");
+        items.Add("flex-col-centered");
 
         foreach (var colorName in Project.Colors.Select(x => x.Key))
         {

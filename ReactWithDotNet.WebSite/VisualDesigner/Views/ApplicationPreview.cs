@@ -150,6 +150,11 @@ sealed class ApplicationPreview : Component
                             element.Add(DisplayFlexRowCentered);
                             continue;
                         }
+                        case "flex-col-centered":
+                        {
+                            element.Add(DisplayFlexColumnCentered);
+                            continue;
+                        }
                     }
                     
                     var (success, name, value) = TryParsePropertyValue(styleAttribute);
