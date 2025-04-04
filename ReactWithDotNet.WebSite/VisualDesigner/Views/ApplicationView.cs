@@ -476,7 +476,7 @@ sealed class ApplicationView : Component<ApplicationState>
                             "Export",
                             OnClick(_ =>
                             {
-                                Exporter.Export(state);
+                                Exporter_For_NextJs_with_Tailwind.Export(state);
                                 
                                 this.SuccessNotification("OK");
 

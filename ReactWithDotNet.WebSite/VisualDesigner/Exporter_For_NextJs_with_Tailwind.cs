@@ -3,7 +3,7 @@ using System.Text;
 
 namespace ReactWithDotNet.VisualDesigner.Models;
 
-class Exporter
+static class Exporter_For_NextJs_with_Tailwind
 {
     public static void Export(ApplicationState state)
     {
