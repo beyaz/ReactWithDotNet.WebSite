@@ -67,6 +67,8 @@ sealed class ApplicationPreview : Component
                 element = new i();
             }
 
+            element.style.Add(UserSelect(none));
+            
             if (model.Text.HasValue())
             {
                 element.text = model.Text;
