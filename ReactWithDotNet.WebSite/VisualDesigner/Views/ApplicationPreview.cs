@@ -307,7 +307,23 @@ sealed class ApplicationPreview : Component
                         
                         case "color":
                         {
+                            if (Project.Colors.TryGetValue(value, out var realColor))
+                            {
+                                value = realColor;
+                            }
                             element.Add(Color(value));
+                            continue;
+                        }
+                        
+                        case "px":
+                        {
+                            if (isValueDouble)
+                            {
+                                element.Add(PaddingLeftRight(valueAsDouble));
+                                continue;
+                            }
+
+                            element.Add(PaddingLeftRight(value));
                             continue;
                         }
                         

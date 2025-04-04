@@ -1,5 +1,6 @@
 colors:
   content-weak: "#F5F7FA"
+  content-disable: #CACFD8
   border-strong: #181B25
   border-sub: "#CACFD8"
   border-soft: #E1E4EA
@@ -20,10 +21,34 @@ styles:
     line-height: 32px;
   body-XL: |
     font-family: "Host Grotesk";
-    font-size: 24px;
+    font-size: 20px;
     font-style: normal;
     font-weight: 400;
     line-height: 32px;
+  body-L: |
+    font-family: "Host Grotesk";
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 26px;
+  body-M: |
+    font-family: "Host Grotesk";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+  body-S: |
+    font-family: "Host Grotesk";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+  body-XS: |
+    font-family: "Host Grotesk";
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px;
  
   label-XXL: |
     font-family: "Host Grotesk";
