@@ -1314,7 +1314,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
                     Suggestions = GetPropSuggestions(state),
 
-                    Name = (state.Selection.PropertyIndexInProps ?? -1).ToString(),
+                    Name = (state.Selection.PropertyIndexInProps ?? (props.Count + 1) * -1).ToString(),
 
                     Id = "PROPS-INPUT-EDITOR-" + (state.Selection.PropertyIndexInProps ?? -1),
 

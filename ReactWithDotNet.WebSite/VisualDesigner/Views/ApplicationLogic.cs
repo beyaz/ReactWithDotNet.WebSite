@@ -215,6 +215,20 @@ static class ApplicationLogic
         items.Add("class: ph ph-x-logo");
         items.Add("class: ph ph-instagram-logo");
         items.Add("class: ph ph-linkedin-logo");
+
+        string tag = null;
+
+        if (state.Selection.VisualElementTreeItemPath.HasValue())
+        {
+            var selectedVisualItem = FindTreeNodeByTreePath(state.ComponentRootElement, state.Selection.VisualElementTreeItemPath);
+
+            tag = selectedVisualItem.Tag;
+        }
+        
+        if (tag == "a")
+        {
+            items.Add("href: ");
+        }
         
         return items;
     }
