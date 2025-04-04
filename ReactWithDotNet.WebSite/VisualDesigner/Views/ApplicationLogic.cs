@@ -81,7 +81,7 @@ static class ApplicationLogic
                                AND {nameof(ComponentEntity.UserName)}  IS NULL OR {nameof(ComponentEntity.UserName)} = ''
                             """;
 
-        return await db.QueryFirstAsync<ComponentEntity>(sql, new { projectId, componentName });
+        return await db.QueryFirstOrDefaultAsync<ComponentEntity>(sql, new { projectId, componentName });
     }
 
     public static async Task<Result<ComponentEntity>> GetComponentUserVersion(this IDbConnection db, int projectId, string componentName, string userName)
