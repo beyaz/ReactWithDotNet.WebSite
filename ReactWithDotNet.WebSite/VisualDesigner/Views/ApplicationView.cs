@@ -1143,6 +1143,58 @@ sealed class ApplicationView : Component<ApplicationState>
                 };
             }
 
+            Element inputEditor()
+            {
+                string value = null;
+
+                if (state.Selection.StyleGroupIndex == styleGroupIndex && state.Selection.PropertyIndexInStyleGroup >= 0)
+                {
+                    value = styleGroup.Items[state.Selection.PropertyIndexInStyleGroup.Value];
+                }
+
+                return new MagicInput
+                {
+                    Placeholder = "Add style attribute",
+                    Suggestions = GetStyleAttributeNameSuggestions(state),
+                    Id = new StyleInputLocation
+                    {
+                        StyleGroupIndex = styleGroupIndex
+                    },
+                    Name = new StyleInputLocation
+                    {
+                        StyleGroupIndex      = styleGroupIndex,
+                        PropertyIndexInGroup = state.Selection.PropertyIndexInStyleGroup ?? CurrentVisualElement.StyleGroups[styleGroupIndex].Items.Count
+                    },
+                    OnChange = (senderName, newValue) =>
+                    {
+                        StyleInputLocation location = senderName;
+                        if (state.Selection.StyleGroupIndex is null)
+                        {
+                            state.Selection = state.Selection with
+                            {
+                                StyleGroupIndex = location.StyleGroupIndex
+                            };
+                        }
+
+                        newValue = TryBeautifyPropertyValue(newValue);
+
+                        if (state.Selection.StyleGroupIndex.HasValue && state.Selection.PropertyIndexInStyleGroup.HasValue)
+                        {
+                            CurrentStyleGroup.Items[state.Selection.PropertyIndexInStyleGroup.Value] = newValue;
+                        }
+                        else
+                        {
+                            CurrentStyleGroup.Items.Add(newValue);
+                        }
+
+                        state.Selection.PropertyIndexInStyleGroup = null;
+
+                        return Task.CompletedTask;
+                    },
+                    Value = value
+                };
+            }
+
             FlexRowCentered attributeItem(int index, string value)
             {
                 var isSelected = index == state.Selection.PropertyIndexInStyleGroup &&
@@ -1220,58 +1272,6 @@ sealed class ApplicationView : Component<ApplicationState>
 
                         return Task.CompletedTask;
                     })
-                };
-            }
-
-            Element inputEditor()
-            {
-                string value = null;
-
-                if (state.Selection.StyleGroupIndex == styleGroupIndex && state.Selection.PropertyIndexInStyleGroup >= 0)
-                {
-                    value = styleGroup.Items[state.Selection.PropertyIndexInStyleGroup.Value];
-                }
-
-                return new MagicInput
-                {
-                    Placeholder = "Add style attribute",
-                    Suggestions = GetStyleAttributeNameSuggestions(state),
-                    Id = new StyleInputLocation
-                    {
-                        StyleGroupIndex = styleGroupIndex
-                    },
-                    Name = new StyleInputLocation
-                    {
-                        StyleGroupIndex      = styleGroupIndex,
-                        PropertyIndexInGroup = state.Selection.PropertyIndexInStyleGroup ?? CurrentVisualElement.StyleGroups[styleGroupIndex].Items.Count
-                    },
-                    OnChange = (senderName, newValue) =>
-                    {
-                        StyleInputLocation location = senderName;
-                        if (state.Selection.StyleGroupIndex is null)
-                        {
-                            state.Selection = state.Selection with
-                            {
-                                StyleGroupIndex = location.StyleGroupIndex
-                            };
-                        }
-
-                        newValue = TryBeautifyPropertyValue(newValue);
-
-                        if (state.Selection.StyleGroupIndex.HasValue && state.Selection.PropertyIndexInStyleGroup.HasValue)
-                        {
-                            CurrentStyleGroup.Items[state.Selection.PropertyIndexInStyleGroup.Value] = newValue;
-                        }
-                        else
-                        {
-                            CurrentStyleGroup.Items.Add(newValue);
-                        }
-
-                        state.Selection.PropertyIndexInStyleGroup = null;
-
-                        return Task.CompletedTask;
-                    },
-                    Value = value
                 };
             }
         }
