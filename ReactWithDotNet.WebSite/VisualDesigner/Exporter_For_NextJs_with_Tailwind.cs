@@ -8,51 +8,68 @@ static class Exporter_For_NextJs_with_Tailwind
     public static void Export(ApplicationState state)
     {
         var code = GenerateHtml(state.ComponentRootElement);
-        
-        File.WriteAllText("C:\\github\\hopgogo\\web\\enduser-ui\\src\\components\\a.html", code);
+
+        File.WriteAllText($"C:\\github\\hopgogo\\web\\enduser-ui\\src\\components\\{state.ComponentName}.tsx", code);
     }
-    
+
     public static string GenerateHtml(VisualElementModel element, int indentLevel = 0)
     {
         var indent = new string(' ', indentLevel * 2);
+
         var sb = new StringBuilder();
-        
+
+        List<string> classNames = [];
+
         // Open tag
         sb.Append($"{indent}<{element.Tag}");
-        
+
         // Add properties
-        if (element.Properties.Any())
+        foreach (var property in element.Properties)
         {
-            sb.Append(" " + string.Join(" ", element.Properties));
+            var (success, name, value) = TryParsePropertyValue(property);
+            if (success)
+            {
+                sb.Append($" {name}=\"{value}\"");
+            }
         }
-        
-        // Add style
-        var styles = element.StyleGroups
-            .SelectMany(g => g.Items)
-            .ToList();
-        
-        if (styles.Any())
+
+        foreach (var styleGroup in element.StyleGroups)
         {
-            sb.Append($" style=\"{string.Join(" ", styles)}\"");
+            foreach (var styleItem in styleGroup.Items)
+            {
+                var (success, name, value) = TryParsePropertyValue(styleItem);
+                if (success)
+                {
+                    if (name == "pt")
+                    {
+                        classNames.Add($"pt-[{value}px]");
+                    }
+                }
+            }
         }
-        
+
+        if (classNames.Any())
+        {
+            sb.Append($" className=\"{string.Join(" ", classNames)}\"");
+        }
+
         sb.AppendLine(">");
-        
+
         // Add text content
         if (!string.IsNullOrWhiteSpace(element.Text))
         {
             sb.AppendLine($"{indent}  {element.Text}");
         }
-        
+
         // Add children
         foreach (var child in element.Children)
         {
             sb.Append(GenerateHtml(child, indentLevel + 1));
         }
-        
+
         // Close tag
         sb.AppendLine($"{indent}</{element.Tag}>");
-        
+
         return sb.ToString();
     }
 }
