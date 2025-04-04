@@ -1261,8 +1261,17 @@ sealed class ApplicationView : Component<ApplicationState>
                     StyleGroupIndex      = styleGroupIndex,
                     PropertyIndexInGroup = state.Selection.PropertyIndexInStyleGroup ?? CurrentVisualElement.StyleGroups[styleGroupIndex].Items.Count
                 },
-                OnChange = (_, newValue) =>
+                OnChange = (senderName, newValue) =>
                 {
+                    StyleInputLocation location = senderName;
+                    if (state.Selection.StyleGroupIndex is null)
+                    {
+                        state.Selection = state.Selection with
+                        {
+                            StyleGroupIndex = location.StyleGroupIndex
+                        };
+                    }
+                    
                     newValue = TryBeautifyPropertyValue(newValue);
 
                     if (state.Selection.StyleGroupIndex.HasValue && state.Selection.PropertyIndexInStyleGroup.HasValue)
