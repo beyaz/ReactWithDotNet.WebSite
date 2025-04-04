@@ -9,24 +9,38 @@ static class ApplicationLogic
 {
     public static ProjectConfigModel Project => DeserializeFromYaml<ProjectConfigModel>(File.ReadAllText(@"C:\github\ReactWithDotNet.WebSite\ReactWithDotNet.WebSite\VisualDesigner\Project.yaml"));
 
-    public static Task<(bool fail, string failMessage)> CommitComponent(ApplicationState state)
+    public static Task<Result> CommitComponent(ApplicationState state)
     {
         return DbOperation(async db =>
         {
             var userVersion = (await db.GetComponentUserVersion(state.ProjectId, state.ComponentName, state.UserName)).Value;
             if (userVersion is null)
             {
-                return (fail: true, failMessage: $"User ({state.UserName}) has no change to commit.");
+                return Fail($"User ({state.UserName}) has no change to commit.");
             }
 
-            var mainVersion = (await db.GetComponentMainVersion(state.ProjectId, state.ComponentName)).Value;
+            var resultMainVersion = await db.GetComponentMainVersion(state.ProjectId, state.ComponentName);
+            if (resultMainVersion.HasError)
+            {
+                return resultMainVersion.Error;
+            }
+            var mainVersion = resultMainVersion.Value;
+            if (mainVersion is null)
+            {
+                await db.UpdateAsync(userVersion with
+                {
+                    UserName = null
+                });
+                
+                return Success;
+            }
 
             // Check if the user version is the same as the main version
             if (mainVersion.PropsAsJson == userVersion.PropsAsJson &&
                 mainVersion.StateAsJson == userVersion.StateAsJson &&
                 mainVersion.RootElementAsJson == SerializeToJson(state.ComponentRootElement))
             {
-                return (fail: true, failMessage: $"User ({state.UserName}) has no change to commit.");
+                return Fail( $"User ({state.UserName}) has no change to commit.");
             }
 
             userVersion = userVersion with
@@ -45,7 +59,7 @@ static class ApplicationLogic
 
             await db.DeleteAsync(userVersion);
 
-            return default;
+            return Success;
         });
     }
 

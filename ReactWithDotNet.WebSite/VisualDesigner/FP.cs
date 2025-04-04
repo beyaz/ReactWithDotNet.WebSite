@@ -41,6 +41,8 @@ static class FP
 {
     public static readonly Result Success = new() { Success = true };
     
+    public static  Result Fail(string message) => new() { Success = false, Error = new Exception(message)};
+    
     public static async Task<TValue> Unwrap<TValue>(this Task<Result<TValue>> responseTask)
     {
         var response = await responseTask;
