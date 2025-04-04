@@ -83,23 +83,7 @@ static class Extensions
         client.RunJavascript(jsCode);
     }
     
-    public static void RefreshComponentPreviewCompleted(this Client client)
-    {
-        const string jsCode =
-            """
-            var parentWindow = window.parent;
-            if(parentWindow)
-            {
-              var reactWithDotNet = parentWindow.ReactWithDotNet;
-              if(reactWithDotNet)
-              {
-                reactWithDotNet.DispatchEvent('RefreshComponentPreviewCompleted', []);
-              }
-            }
-            """;
-        
-        client.RunJavascript(jsCode);
-    }
+  
     
     public static IReadOnlyList<string> TagNameList =>
     [

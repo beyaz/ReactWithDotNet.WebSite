@@ -1,4 +1,6 @@
-﻿namespace ReactWithDotNet.VisualDesigner.Views;
+﻿using System.Text;
+
+namespace ReactWithDotNet.VisualDesigner.Views;
 
 sealed class ApplicationPreview : Component
 {
@@ -14,6 +16,8 @@ sealed class ApplicationPreview : Component
             exceptionOccurredInRender.ToString()
         };
     }
+    
+    
 
     protected override Task constructor()
     {
@@ -22,6 +26,28 @@ sealed class ApplicationPreview : Component
         return Task.CompletedTask;
     }
 
+    [StopPropagation]
+    Task OnItemClick(MouseEvent e)
+    {
+        var visualElementTreeItemPath = e.target.id;
+
+        var sb = new StringBuilder();
+
+        sb.AppendLine("var parentWindow = window.parent;");
+        sb.AppendLine("if(parentWindow)");
+        sb.AppendLine("{");
+        sb.AppendLine("  var reactWithDotNet = parentWindow.ReactWithDotNet;");
+        sb.AppendLine("  if(reactWithDotNet)");
+        sb.AppendLine("  {");
+        sb.AppendLine($"    reactWithDotNet.DispatchEvent('Change_VisualElementTreeItemPath', ['{visualElementTreeItemPath}']);");
+        sb.AppendLine("  }");
+        sb.AppendLine("}");
+        
+        Client.RunJavascript(sb.ToString());
+        
+        return Task.CompletedTask;
+    }
+    
     protected override Element render()
     {
         var userName = Environment.UserName; // future: get userName from cookie or url
@@ -56,9 +82,9 @@ sealed class ApplicationPreview : Component
         }
         
 
-        return renderElement(rootElement);
+        return renderElement(rootElement,"0");
 
-        Element renderElement(VisualElementModel model)
+        Element renderElement(VisualElementModel model, string path)
         {
             HtmlElement element = new div();
 
@@ -68,6 +94,12 @@ sealed class ApplicationPreview : Component
             }
 
             element.style.Add(UserSelect(none));
+
+            element.Add(Hover(Outline($"1px {dashed} {Blue300}")));
+            
+            element.id = $"{path}";
+            
+            element.onClick = OnItemClick;
             
             if (model.Text.HasValue())
             {
@@ -295,7 +327,12 @@ sealed class ApplicationPreview : Component
                 return element;
             }
 
-            element.children.AddRange(model.Children.Select(renderElement));
+            for (var i = 0; i < model.Children.Count; i++)
+            {
+                var childElement = renderElement(model.Children[i], $"{path},{i}");
+
+                element.children.Add(childElement);    
+            }
 
             return element;
         }

@@ -21,6 +21,17 @@ sealed class ApplicationView : Component<ApplicationState>
     {
         var userName = Environment.UserName; // future: get userName from cookie or url
 
+        Client.ListenEvent("Change_VisualElementTreeItemPath", treeItemPath =>
+        {
+            state.Selection = new ()
+            {
+                VisualElementTreeItemPath = treeItemPath
+            };
+
+            return Task.CompletedTask;
+        });
+        
+        
         // try take from memory cache
         {
             var userLastState = GetUserLastState(userName);
