@@ -1,5 +1,6 @@
 colors:
   content-weak: "#F5F7FA"
+  border-sub: "#CACFD8"
 
 styles:
   bg-strong: "background: #0E121B"

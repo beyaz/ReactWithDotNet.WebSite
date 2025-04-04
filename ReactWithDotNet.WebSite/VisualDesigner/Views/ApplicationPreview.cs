@@ -144,6 +144,12 @@ sealed class ApplicationPreview : Component
                             element.Add(Width("100%"));
                             continue;
                         }
+                        
+                        case "flex-row-centered":
+                        {
+                            element.Add(DisplayFlexRowCentered);
+                            continue;
+                        }
                     }
                     
                     var (success, name, value) = TryParsePropertyValue(styleAttribute);
@@ -156,6 +162,29 @@ sealed class ApplicationPreview : Component
 
                     switch (name)
                     {
+                        case "border":
+                        {
+                            element.Add(Border(value));
+                            continue;
+                        }
+                        
+                        case "justify-items":
+                        {
+                            element.Add(JustifyItems(value));
+                            continue;
+                        }
+                        case "justify-content":
+                        {
+                            element.Add(JustifyContent(value));
+                            continue;
+                        }
+                            
+                        case "align-items":
+                        {
+                            element.Add(AlignItems(value));
+                            continue;
+                        }
+                        
                         case "display":
                         {
                             element.Add(Display(value));
