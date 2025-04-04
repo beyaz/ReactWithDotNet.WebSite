@@ -54,9 +54,16 @@ sealed class MainLayout : PureComponent, IPageLayout
                     Project.GlobalCss
                 },
                 
-                new link(Rel("stylesheet"), link.Type("text/css"), Href("https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css")),
-                new link(Rel("stylesheet"), link.Type("text/css"), Href("https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css")),
-
+                // phosphor
+                new link
+                {
+                    rel = "stylesheet", type = "text/css", href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+                },
+                new link
+                {
+                    rel = "stylesheet", type = "text/css", href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+                },
+                
                 arrangeFonts(),
 
                 new link { href = "https://fonts.googleapis.com/icon?family=Material+Icons", rel = "stylesheet" }
