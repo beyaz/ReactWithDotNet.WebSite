@@ -26,8 +26,8 @@ sealed class ApplicationView : Component<ApplicationState>
             var userLastState = GetUserLastState(userName);
             if (userLastState is not null)
             {
-                state                        = userLastState;
-                
+                state = userLastState;
+
                 state.IsActionButtonsVisible = false;
 
                 return;
@@ -42,7 +42,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 state = DeserializeFromJson<ApplicationState>(lastUsage.StateAsJson);
 
                 state.IsActionButtonsVisible = false;
-                
+
                 return;
             }
         }
@@ -79,16 +79,6 @@ sealed class ApplicationView : Component<ApplicationState>
         return Task.CompletedTask;
     }
 
-    void ShowErrorIfExist<T>(Result<T> result)
-    {
-        if (result.Success)
-        {
-            return;
-        }
-        
-        this.FailNotification(result.Error.Message);
-    }
-    
     protected override Element render()
     {
         return new FlexRow(Padding(10), SizeFull, Background(Theme.BackgroundColor))
@@ -176,7 +166,7 @@ sealed class ApplicationView : Component<ApplicationState>
 
         return Task.CompletedTask;
     }
-    
+
     async Task ChangeSelectedComponent(string componentName)
     {
         ComponentEntity component;
@@ -424,13 +414,6 @@ sealed class ApplicationView : Component<ApplicationState>
         return ChangeSelectedComponent(newValue);
     }
 
-    [StopPropagation]
-    Task ToggleIsActionButtonsVisible(MouseEvent _)
-    {
-        state.IsActionButtonsVisible = !state.IsActionButtonsVisible;
-
-        return Task.CompletedTask;
-    }
     Element PartApplicationTopPanel()
     {
         return new FlexRow(UserSelect(none))
@@ -440,33 +423,32 @@ sealed class ApplicationView : Component<ApplicationState>
                 new h3 { "React Visual Designer" },
 
                 PartProject,
-                
+
                 // A C T I O N S
                 SpaceX(8),
                 new FlexRowCentered
                 {
                     OnMouseEnter(ToggleIsActionButtonsVisible), OnMouseLeave(ToggleIsActionButtonsVisible),
-                    
-                    new FlexRowCentered(Gap(16), Border(1,solid,Theme.BorderColor), BorderRadius(4), PaddingX(8))
+
+                    new FlexRowCentered(Gap(16), Border(1, solid, Theme.BorderColor), BorderRadius(4), PaddingX(8))
                     {
                         PositionRelative,
-                        new  label(PositionAbsolute, Top(-4), Left(8), FontSize10, LineHeight7, Background(Theme.BackgroundColor), PaddingX(4)){ "Component" },
-                        
-                        state.IsActionButtonsVisible is false ? VisibilityHidden: null,
-                        
-                        new FlexRowCentered( Hover(Color(Blue300)))
+                        new label(PositionAbsolute, Top(-4), Left(8), FontSize10, LineHeight7, Background(Theme.BackgroundColor), PaddingX(4)) { "Component" },
+
+                        state.IsActionButtonsVisible is false ? VisibilityHidden : null,
+
+                        new FlexRowCentered(Hover(Color(Blue300)))
                         {
                             "Rollback",
                             OnClick(_ =>
                             {
-                                
                                 this.SuccessNotification("Rollback ok");
-                                
+
                                 return Task.CompletedTask;
                             })
                         },
-                    
-                        new FlexRowCentered( Hover(Color(Blue300)))
+
+                        new FlexRowCentered(Hover(Color(Blue300)))
                         {
                             "Commit",
                             OnClick(async _ =>
@@ -482,15 +464,14 @@ sealed class ApplicationView : Component<ApplicationState>
                                 this.SuccessNotification("OK");
                             })
                         },
-                    
-                        new FlexRowCentered( Hover(Color(Blue300)))
+
+                        new FlexRowCentered(Hover(Color(Blue300)))
                         {
                             "Export",
                             OnClick(_ =>
                             {
-                                
                                 this.SuccessNotification("Rollback ok");
-                                
+
                                 return Task.CompletedTask;
                             })
                         }
@@ -607,10 +588,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         state.LeftPanelSelectedTab = LeftPanelTab.Props;
 
-                        ShowErrorIfExist(await GetComponenUserOrMainVersion(state).Then(x =>
-                        {
-                            state.JsonText = x.PropsAsJson;
-                        }));
+                        ShowErrorIfExist(await GetComponenUserOrMainVersion(state).Then(x => { state.JsonText = x.PropsAsJson; }));
                     })
                 },
                 new FlexRowCentered(WidthFull, Opacity(0.7), When(state.LeftPanelSelectedTab == LeftPanelTab.State, Color(Gray500)))
@@ -620,10 +598,7 @@ sealed class ApplicationView : Component<ApplicationState>
                     {
                         state.LeftPanelSelectedTab = LeftPanelTab.State;
 
-                        ShowErrorIfExist(await GetComponenUserOrMainVersion(state).Then(x =>
-                        {
-                            state.JsonText = x.StateAsJson;
-                        }));
+                        ShowErrorIfExist(await GetComponenUserOrMainVersion(state).Then(x => { state.JsonText = x.StateAsJson; }));
                     })
                 }
             },
@@ -1112,40 +1087,33 @@ sealed class ApplicationView : Component<ApplicationState>
 
             new FlexColumnCentered(WidthFull)
             {
-                visualElementModel.StyleGroups?.Select((styleGroup, styleGroupIndex) =>
-                {
-                    return new FlexColumn(WidthFull, Gap(4))
-                    {
-                        newStyleGroupHeader(styleGroup, styleGroupIndex),
-
-                        new FlexRow(FlexWrap, Gap(4))
-                        {
-                            new FlexRow(WidthFull, BorderRadius(4), PaddingLeft(4), Background(WhiteSmoke))
-                            {
-                                addStyleAttributeInput(styleGroupIndex, styleGroup)
-                            },
-
-                            new FlexRow(WidthFull, FlexWrap, Gap(4))
-                            {
-                                OnClick(_ =>
-                                {
-                                    state.Selection = state.Selection with
-                                    {
-                                        PropertyIndexInStyleGroup = null
-                                    };
-                                    
-                                    return Task.CompletedTask;
-                                }),
-                                
-                                styleGroup.Items?.Select((value, index) => styleAttributeView(index, value, styleGroupIndex))
-                            }
-                        }
-                    };
-                })
+                visualElementModel.StyleGroups?.Select(viewStyleGroup)
             },
 
             propsHeader
         };
+
+        Element viewStyleGroup(PropertyGroupModel styleGroup, int styleGroupIndex)
+        {
+            return new FlexColumn(WidthFull, Gap(4))
+            {
+                newStyleGroupHeader(styleGroup, styleGroupIndex),
+                new FlexRow(FlexWrap, Gap(4))
+                {
+                    new FlexRow(WidthFull, BorderRadius(4), PaddingLeft(4), Background(WhiteSmoke)) { addStyleAttributeInput(styleGroupIndex, styleGroup) },
+                    new FlexRow(WidthFull, FlexWrap, Gap(4))
+                    {
+                        OnClick(_ =>
+                        {
+                            state.Selection = state.Selection with { PropertyIndexInStyleGroup = null };
+
+                            return Task.CompletedTask;
+                        }),
+                        styleGroup.Items?.Select((value, index) => styleAttributeView(index, value, styleGroupIndex))
+                    }
+                }
+            };
+        }
 
         Element newStyleGroupHeader(PropertyGroupModel styleGroup, int styleGroupIndex)
         {
@@ -1284,7 +1252,7 @@ sealed class ApplicationView : Component<ApplicationState>
                             StyleGroupIndex = location.StyleGroupIndex
                         };
                     }
-                    
+
                     newValue = TryBeautifyPropertyValue(newValue);
 
                     if (state.Selection.StyleGroupIndex.HasValue && state.Selection.PropertyIndexInStyleGroup.HasValue)
@@ -1344,6 +1312,16 @@ sealed class ApplicationView : Component<ApplicationState>
         };
     }
 
+    void ShowErrorIfExist<T>(Result<T> result)
+    {
+        if (result.Success)
+        {
+            return;
+        }
+
+        this.FailNotification(result.Error.Message);
+    }
+
     Task StyleGroupAddClicked(MouseEvent e)
     {
         var styleGroups = CurrentVisualElement.StyleGroups;
@@ -1384,6 +1362,14 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             VisualElementTreeItemPath = state.Selection.VisualElementTreeItemPath
         };
+
+        return Task.CompletedTask;
+    }
+
+    [StopPropagation]
+    Task ToggleIsActionButtonsVisible(MouseEvent _)
+    {
+        state.IsActionButtonsVisible = !state.IsActionButtonsVisible;
 
         return Task.CompletedTask;
     }
