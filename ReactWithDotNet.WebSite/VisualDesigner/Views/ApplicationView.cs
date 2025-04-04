@@ -169,12 +169,7 @@ sealed class ApplicationView : Component<ApplicationState>
         {
             Tag = "div"
         });
-
-        state.Selection = new()
-        {
-            VisualElementTreeItemPath = selection.VisualElementTreeItemPath + "," + (node.Children.Count - 1)
-        };
-
+        
         return Task.CompletedTask;
     }
 
