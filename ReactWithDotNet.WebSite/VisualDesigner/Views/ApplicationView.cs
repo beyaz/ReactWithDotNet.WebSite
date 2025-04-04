@@ -453,10 +453,10 @@ sealed class ApplicationView : Component<ApplicationState>
                             "Commit",
                             OnClick(async _ =>
                             {
-                                var (fail, failMessage) = await CommitComponent(state);
-                                if (fail)
+                                var result = await CommitComponent(state);
+                                if (result.HasError)
                                 {
-                                    this.SuccessNotification(failMessage);
+                                    this.SuccessNotification(result.Error.Message);
 
                                     return;
                                 }
