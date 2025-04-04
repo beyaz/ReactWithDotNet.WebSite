@@ -1312,7 +1312,7 @@ sealed class ApplicationView : Component<ApplicationState>
                 {
                     Placeholder = "Add property",
 
-                    Suggestions = GetStyleAttributeNameSuggestions(state),
+                    Suggestions = GetPropSuggestions(state),
 
                     Name = (state.Selection.PropertyIndexInProps ?? -1).ToString(),
 

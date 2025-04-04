@@ -60,11 +60,28 @@ sealed class ApplicationPreview : Component
 
         Element renderElement(VisualElementModel model)
         {
-            var element = new div();
+            HtmlElement element = new div();
+
+            if (model.Tag == "i")
+            {
+                element = new i();
+            }
 
             if (model.Text.HasValue())
             {
                 element.text = model.Text;
+            }
+            
+            foreach (var property in model.Properties)
+            {
+                var (success, name, value) = TryParsePropertyValue(property);
+                if (success)
+                {
+                    if (name == "class")
+                    {
+                        element.AddClass(value);
+                    }
+                }
             }
 
             if (highlightedElement == model)
@@ -115,6 +132,18 @@ sealed class ApplicationPreview : Component
                         case "bg":
                         {
                             element.Add(Background(value));
+                            continue;
+                        }
+                        
+                        case "font-size":
+                        {
+                            if (isValueDouble)
+                            {
+                                element.Add(FontSize(valueAsDouble));
+                                continue;
+                            }
+
+                            element.Add(FontSize(value));
                             continue;
                         }
                         

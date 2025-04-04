@@ -193,6 +193,17 @@ static class ApplicationLogic
         return GetAllProjects().Select(x => x.Name).ToList();
     }
 
+    public static IReadOnlyList<string> GetPropSuggestions(ApplicationState state)
+    {
+        var items = new List<string>();
+
+        items.Add("class: ph ph-facebook-logo");
+        items.Add("class: ph ph-x-logo");
+        items.Add("class: ph ph-instagram-logo");
+        items.Add("class: ph ph-linkedin-logo");
+        
+        return items;
+    }
     public static IReadOnlyList<string> GetStyleAttributeNameSuggestions(ApplicationState state)
     {
         var items = new List<string>();
