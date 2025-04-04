@@ -51,7 +51,7 @@ static class ApplicationLogic
 
     public static Task<ImmutableList<string>> GetAllComponentNamesInProject(int projectId)
     {
-        var query = $"SELECT {nameof(ComponentEntity.Name)} FROM Component WHERE {nameof(ComponentEntity.ProjectId)} = @{nameof(projectId)}";
+        var query = $"SELECT DISTINCT({nameof(ComponentEntity.Name)}) FROM Component WHERE {nameof(ComponentEntity.ProjectId)} = @{nameof(projectId)}";
 
         return DbOperation(async db => (await db.QueryAsync<string>(query, new { projectId })).ToImmutableList());
     }
