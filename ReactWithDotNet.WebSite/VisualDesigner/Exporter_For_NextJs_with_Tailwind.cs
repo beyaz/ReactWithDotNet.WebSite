@@ -7,18 +7,24 @@ static class Exporter_For_NextJs_with_Tailwind
 {
     public static void Export(ApplicationState state)
     {
+        var context = new Context();
+
         const int indentLevel = 1;
 
         var indent = new string(' ', indentLevel * 4);
 
+        var partRender = GenerateHtml(context, state.ComponentRootElement, indentLevel);
+
         var file = new StringBuilder();
 
-        file.AppendLine("import Link from \"next/link\";");
+        foreach (var import in context.Imports)
+        {
+            file.AppendLine($"import {import.ClassName} from \"{import.Package}\";");
+        }
+
         file.AppendLine();
 
         file.AppendLine($"export default function {state.ComponentName}() {{");
-
-        var partRender = GenerateHtml(state.ComponentRootElement, indentLevel);
 
         file.AppendLine($"{indent}return (");
         file.AppendLine(partRender);
@@ -29,7 +35,7 @@ static class Exporter_For_NextJs_with_Tailwind
         File.WriteAllText($"C:\\github\\hopgogo\\web\\enduser-ui\\src\\components\\{state.ComponentName}.tsx", file.ToString());
     }
 
-    public static string GenerateHtml(VisualElementModel element, int indentLevel = 0)
+    static string GenerateHtml(Context context, VisualElementModel element, int indentLevel = 0)
     {
         var indent = new string(' ', indentLevel * 4);
 
@@ -42,6 +48,7 @@ static class Exporter_For_NextJs_with_Tailwind
 
         if (tag == "a")
         {
+            context.Imports.Add("Link", "next/link");
             tag = "Link";
         }
 
@@ -242,12 +249,35 @@ static class Exporter_For_NextJs_with_Tailwind
         // Add children
         foreach (var child in element.Children)
         {
-            sb.Append(GenerateHtml(child, indentLevel + 1));
+            sb.Append(GenerateHtml(context, child, indentLevel + 1));
         }
 
         // Close tag
         sb.AppendLine($"{indent}</{tag}>");
 
         return sb.ToString();
+    }
+
+    sealed class Context
+    {
+        public Imports Imports { get; } = new();
+    }
+
+    class Imports : List<ImportInfo>
+    {
+        public void Add(string className, string package)
+        {
+            var import = this.FirstOrDefault(i => i.ClassName == className && i.Package == package);
+            if (import == null)
+            {
+                Add(new() { ClassName = className, Package = package });
+            }
+        }
+    }
+
+    record ImportInfo
+    {
+        public string ClassName { get; init; }
+        public string Package { get; init; }
     }
 }
