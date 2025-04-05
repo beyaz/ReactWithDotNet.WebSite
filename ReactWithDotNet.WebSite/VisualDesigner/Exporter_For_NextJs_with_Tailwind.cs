@@ -19,12 +19,24 @@ static class Exporter_For_NextJs_with_Tailwind
 
         foreach (var import in context.Imports)
         {
-            file.AppendLine($"import {import.ClassName} from \"{import.Package}\";");
+            if (import.IsNamed)
+            {
+                file.AppendLine($"import {{ {import.ClassName} }} from \"{import.Package}\";");
+            }
+            else
+            {
+                file.AppendLine($"import {import.ClassName} from \"{import.Package}\";");
+            }
         }
 
         file.AppendLine();
 
         file.AppendLine($"export default function {state.ComponentName}() {{");
+
+        foreach (var line in context.Body)
+        {
+            file.AppendLine(indent + line);
+        }
 
         file.AppendLine($"{indent}return (");
         file.AppendLine(partRender);
@@ -243,7 +255,14 @@ static class Exporter_For_NextJs_with_Tailwind
         // Add text content
         if (!string.IsNullOrWhiteSpace(element.Text))
         {
-            sb.AppendLine($"{indent}  {element.Text}");
+            if (context.Imports.All(x => x.ClassName != "useTranslations"))
+            {
+                context.Imports.Add("useTranslations", "next-intl", true);
+
+                context.Body.Add("const t = useTranslations();");
+            }
+
+            sb.AppendLine($"{indent}{{t(\"{element.Text}\")}}");
         }
 
         // Add children
@@ -260,17 +279,18 @@ static class Exporter_For_NextJs_with_Tailwind
 
     sealed class Context
     {
+        public List<string> Body { get; } = new();
         public Imports Imports { get; } = new();
     }
 
     class Imports : List<ImportInfo>
     {
-        public void Add(string className, string package)
+        public void Add(string className, string package, bool isNamed = false)
         {
             var import = this.FirstOrDefault(i => i.ClassName == className && i.Package == package);
             if (import == null)
             {
-                Add(new() { ClassName = className, Package = package });
+                Add(new() { ClassName = className, Package = package, IsNamed = isNamed });
             }
         }
     }
@@ -278,6 +298,7 @@ static class Exporter_For_NextJs_with_Tailwind
     record ImportInfo
     {
         public string ClassName { get; init; }
+        public bool IsNamed { get; init; }
         public string Package { get; init; }
     }
 }
