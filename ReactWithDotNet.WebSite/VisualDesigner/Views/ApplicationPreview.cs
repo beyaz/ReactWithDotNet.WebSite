@@ -189,6 +189,7 @@ sealed class ApplicationPreview : Component
                             continue;
                         }
                         
+                        
                         case "justify-items":
                         {
                             element.Add(JustifyItems(value));
@@ -280,7 +281,19 @@ sealed class ApplicationPreview : Component
                             element.Add(Gap(value));
                             continue;
                         }
+                        case "flex-grow":
+                        {
+                            if (isValueDouble)
+                            {
+                                element.Add(FlexGrow(valueAsDouble));
+                                continue;
+                            }
 
+                            element.Add(FlexGrow(value));
+                            continue;
+                        }
+
+                        case "p":
                         case "padding":
                         {
                             if (isValueDouble)

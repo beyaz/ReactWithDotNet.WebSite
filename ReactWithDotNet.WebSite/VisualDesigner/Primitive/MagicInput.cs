@@ -145,7 +145,7 @@ sealed class MagicInput : Component<MagicInput.State>
 
             if (e.key == "Enter")
             {
-                if (state.Value?.Length > 0)
+                if (state.Value?.Length > 0 || (state.InitialValue.HasValue() && state.Value.HasNoValue()))
                 {
                     DispatchEvent(OnChange, [Name, state.Value]);
 

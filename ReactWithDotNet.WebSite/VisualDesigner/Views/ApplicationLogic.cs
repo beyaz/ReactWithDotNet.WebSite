@@ -261,6 +261,14 @@ static class ApplicationLogic
                 }
             }
         }
+        
+        // flex-frow
+        {
+            for (var i = 1; i <= 10; i++)
+            {
+                items.Add($"flex-grow: {i}");
+            }
+        }
 
         // paddings
         {
@@ -274,6 +282,19 @@ static class ApplicationLogic
                     {
                         items.Add($"{name}: {i}");
                     }
+                }
+            }
+        }
+        
+        // border
+        {
+            string[] names = ["border", "border-left", "border-right", "border-top", "border-bottom"];
+
+            foreach (var name in names)
+            {
+                foreach (var (key, _) in Project.Colors)
+                {
+                    items.Add($"{name}: 1px solid {key}");
                 }
             }
         }

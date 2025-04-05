@@ -167,7 +167,8 @@ sealed class ApplicationView : Component<ApplicationState>
 
         node.Children.Add(new()
         {
-            Tag = "div"
+            Tag = "div",
+            StyleGroups = [new (){ Condition = "*"}]
         });
         
         return Task.CompletedTask;
