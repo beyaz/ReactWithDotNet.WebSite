@@ -599,6 +599,27 @@ sealed class ApplicationPreview : Component
                             element.Add(MaxHeight(value));
                             continue;
                         }
+                        case  "border-top-left-radius":
+                            {
+                                element.Add(BorderTopLeftRadius(valueAsDouble));
+                                continue;
+                            }
+                        case "border-top-right-radius":
+                            {
+                                element.Add(BorderTopRightRadius(valueAsDouble));
+                                continue;
+                            }
+                        case "border-bottom-left-radius":
+                            {
+                                element.Add(BorderBottomLeftRadius(valueAsDouble));
+                                continue;
+                            }
+                        case "border-bottom-right-radius":
+                            {
+                                element.Add(BorderBottomRightRadius(valueAsDouble));
+                                continue;
+                            }
+                            
                         case "overflow-y":
                         {
                             element.Add(OverflowY(value));

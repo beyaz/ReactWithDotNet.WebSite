@@ -63,6 +63,12 @@ static class Exporter_For_NextJs_with_Tailwind
             context.Imports.Add("Link", "next/link");
             tag = "Link";
         }
+        
+        if (tag == "img")
+        {
+            context.Imports.Add("Image", "next/image");
+            tag = "Image";
+        }
 
         sb.Append($"{indent}<{tag}");
 
@@ -76,6 +82,22 @@ static class Exporter_For_NextJs_with_Tailwind
                 {
                     classNames.AddRange(value.Split(" ", StringSplitOptions.RemoveEmptyEntries));
                     continue;
+                }
+                
+                if (name == "w" || name == "width")
+                {
+                    sb.Append($" width={{{value}}}");
+                    continue;
+                }
+                if (name == "h" || name == "height")
+                {
+                    sb.Append($" height={{{value}}}");
+                    continue;
+                }
+
+                if (tag == "Image")
+                {
+                    value = "/"+value; // todo: fixme
                 }
 
                 sb.Append($" {name}=\"{value}\"");
@@ -112,10 +134,33 @@ static class Exporter_For_NextJs_with_Tailwind
                         classNames.Add($"h-[{value}px]");
                         continue;
                     }
+                    
+                    if (name == "max-width")
+                    {
+                        classNames.Add($"max-w-[{value}px]");
+                        continue;
+                    }
+                    
+                    if (name == "max-height")
+                    {
+                        classNames.Add($"max-h-[{value}px]");
+                        continue;
+                    }
 
                     if (name == "pt")
                     {
                         classNames.Add($"pt-[{value}px]");
+                        continue;
+                    }
+                    if (name == "z-index")
+                    {
+                        classNames.Add($"z-[{value}]");
+                        continue;
+                    }
+                    
+                    if (name == "overflow-y" ||name == "overflow-x")
+                    {
+                        classNames.Add($"{name}-{value}");
                         continue;
                     }
 
@@ -131,6 +176,61 @@ static class Exporter_For_NextJs_with_Tailwind
                         continue;
                     }
 
+                    if (name == "p")
+                    {
+                        classNames.Add($"p-[{value}px]");
+                        continue;
+                    }
+                    
+                    if (name == "border-top-left-radius")
+                    {
+                        classNames.Add($"rounded-tl-[{value}px]");
+                        continue;
+                    }
+                    if (name == "border-top-right-radius")
+                    {
+                        classNames.Add($"rounded-tr-[{value}px]");
+                        continue;
+                    }
+                    if (name == "border-bottom-left-radius")
+                    {
+                        classNames.Add($"rounded-bl-[{value}px]");
+                        continue;
+                    }
+                    if (name == "border-bottom-right-radius")
+                    {
+                        classNames.Add($"rounded-br-[{value}px]");
+                        continue;
+                    }
+                    
+                    if (name == "flex-grow")
+                    {
+                        classNames.Add($"flex-grow-[{value}]");
+                        continue;
+                    }
+                    
+                    if (name == "border-bottom-width")
+                    {
+                        classNames.Add($"border-b-[{value}px]");
+                        continue;
+                    }
+                    
+                    if (name == "border-top-width")
+                    {
+                        classNames.Add($"border-t-[{value}px]");
+                        continue;
+                    }
+                    if (name == "border-left-width")
+                    {
+                        classNames.Add($"border-l-[{value}px]");
+                        continue;
+                    }
+                    if (name == "border-right-width")
+                    {
+                        classNames.Add($"border-r-[{value}px]");
+                        continue;
+                    }
+                    
                     if (name == "pr")
                     {
                         classNames.Add($"pr-[{value}px]");
@@ -169,6 +269,18 @@ static class Exporter_For_NextJs_with_Tailwind
                     if (name == "gap")
                     {
                         classNames.Add($"gap-[{value}px]");
+                        continue;
+                    }
+                    
+                    if (name == "size")
+                    {
+                        classNames.Add($"size-[{value}px]");
+                        continue;
+                    }
+                    
+                    if (name == "bottom" || name == "top" || name == "left" || name == "right")
+                    {
+                        classNames.Add($"{name}-[{value}px]");
                         continue;
                     }
 
@@ -231,6 +343,23 @@ static class Exporter_For_NextJs_with_Tailwind
 
                             continue;
                         }
+                    }
+                    
+                    if (name == "background" || name == "bg")
+                    {
+                        if (Project.Colors.TryGetValue(value, out var htmlColor))
+                        {
+                            value = htmlColor;
+                        }
+
+                        classNames.Add($"bg-[{value}]");
+                        continue;
+                    }
+                    
+                    if (name == "position")
+                    {
+                        classNames.Add($"{value}");
+                        continue;
                     }
                 }
 
