@@ -977,7 +977,8 @@ sealed class ApplicationView : Component<ApplicationState>
                             {
                                 Name      = newValue,
                                 ProjectId = state.ProjectId,
-                                UserName  = state.UserName
+                                UserName  = state.UserName,
+                                LastAccessTime = DateTime.Now
                             };
 
                             await DbOperation(db => db.InsertAsync(newDbRecord));

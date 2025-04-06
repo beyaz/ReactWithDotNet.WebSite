@@ -24,6 +24,7 @@ static class ApplicationLogic
             {
                 return resultMainVersion.Error;
             }
+
             var mainVersion = resultMainVersion.Value;
             if (mainVersion is null)
             {
@@ -31,7 +32,7 @@ static class ApplicationLogic
                 {
                     UserName = null
                 });
-                
+
                 return Success;
             }
 
@@ -40,13 +41,24 @@ static class ApplicationLogic
                 mainVersion.StateAsJson == userVersion.StateAsJson &&
                 mainVersion.RootElementAsJson == SerializeToJson(state.ComponentRootElement))
             {
-                return Fail( $"User ({state.UserName}) has no change to commit.");
+                return Fail($"User ({state.UserName}) has no change to commit.");
             }
 
             userVersion = userVersion with
             {
                 RootElementAsJson = SerializeToJson(state.ComponentRootElement)
             };
+
+            await db.InsertAsync(new ComponentHistoryEntity
+            {
+                ProjectId         = mainVersion.ProjectId,
+                Name              = mainVersion.Name,
+                RootElementAsJson = mainVersion.RootElementAsJson,
+                PropsAsJson       = mainVersion.PropsAsJson,
+                StateAsJson       = mainVersion.StateAsJson,
+                LastAccessTime    = mainVersion.LastAccessTime,
+                UserName          = userVersion.UserName
+            });
 
             mainVersion = mainVersion with
             {
@@ -224,20 +236,21 @@ static class ApplicationLogic
 
             tag = selectedVisualItem.Tag;
         }
-        
+
         if (tag == "a")
         {
             items.Add("href: ");
         }
-        
+
         return items;
     }
+
     public static IReadOnlyList<string> GetStyleAttributeNameSuggestions(ApplicationState state)
     {
         var items = new List<string>();
 
         items.AddRange(Project.Styles.Keys);
-        
+
         items.Add("flex-row-centered");
         items.Add("flex-col-centered");
 
@@ -261,7 +274,7 @@ static class ApplicationLogic
                 }
             }
         }
-        
+
         // flex-frow
         {
             for (var i = 1; i <= 10; i++)
@@ -285,7 +298,7 @@ static class ApplicationLogic
                 }
             }
         }
-        
+
         // border
         {
             string[] names = ["border", "border-left", "border-right", "border-top", "border-bottom"];
@@ -442,10 +455,10 @@ static class ApplicationLogic
             {
                 await db.InsertAsync(new LastUsageInfoEntity
                 {
-                    UserName    = state.UserName,
-                    ProjectId   = state.ProjectId,
-                    LastAccessTime  = DateTime.Now,
-                    StateAsJson = SerializeToJson(state)
+                    UserName       = state.UserName,
+                    ProjectId      = state.ProjectId,
+                    LastAccessTime = DateTime.Now,
+                    StateAsJson    = SerializeToJson(state)
                 });
             }
         });
