@@ -434,7 +434,7 @@ static class ApplicationLogic
             {
                 await db.UpdateAsync(dbRecord with
                 {
-                    AccessTime = DateTime.Now,
+                    LastAccessTime = DateTime.Now,
                     StateAsJson = SerializeToJson(state)
                 });
             }
@@ -444,7 +444,7 @@ static class ApplicationLogic
                 {
                     UserName    = state.UserName,
                     ProjectId   = state.ProjectId,
-                    AccessTime  = DateTime.Now,
+                    LastAccessTime  = DateTime.Now,
                     StateAsJson = SerializeToJson(state)
                 });
             }

@@ -48,7 +48,7 @@ public sealed record LastUsageInfoEntity
     
     public int ProjectId { get; init; }
 
-    public DateTime AccessTime { get; init; }
+    public DateTime LastAccessTime { get; init; }
     
     public string StateAsJson { get; init; }
     

@@ -57,7 +57,7 @@ static class ApplicationDatabase
     
     public static async Task<IReadOnlyList<LastUsageInfoEntity>> GetLastUsageInfoByUserName(string userName)
     {
-        const string query = $"SELECT * FROM LastUsageInfo WHERE UserName = @{nameof(userName)} Order BY {nameof(LastUsageInfoEntity.AccessTime)} DESC";
+        const string query = $"SELECT * FROM LastUsageInfo WHERE UserName = @{nameof(userName)} Order BY {nameof(LastUsageInfoEntity.LastAccessTime)} DESC";
 
         return (await DbOperation(async db =>  await db.QueryAsync<LastUsageInfoEntity>(query, new{ userName}))).ToList();
     }
