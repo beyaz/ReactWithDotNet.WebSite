@@ -10,6 +10,10 @@ colors:
   border-sub: "#CACFD8"
   border-soft: "#E1E4EA"
   border-white: "#FFFFFF"
+  primary-dark: "#552502"
+  primary-base: "#FF6E06"
+  primary-light: "#FFB682"
+  primary-lighter: "#FFE2CD"
   secondary-dark: "#14464F"
   secondary-base: "#3DD3EE"
   secondary-light: "#9EE9F6"
@@ -22,12 +26,42 @@ styles:
   bg-soft: "background: #E1E4EA"
   bg-weak: "background: #F5F7FA"
   bg-white: "background: #FFFFFF"
+  heading-01: |
+    font-family: "Host Grotesk";
+    font-size: 56px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 64px;
+  heading-02: |
+    font-family: "Host Grotesk";
+    font-size: 48px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 56px;
+  heading-03: |
+    font-family: "Host Grotesk";
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 48px;
+  heading-04: |
+    font-family: "Host Grotesk";
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 40px;
   heading-05: |
     font-family: "Host Grotesk";
     font-size: 24px;
     font-style: normal;
     font-weight: 600;
     line-height: 32px;
+  heading-06: |
+    font-family: "Host Grotesk";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 28px;
   body-XL: |
     font-family: "Host Grotesk";
     font-size: 20px;

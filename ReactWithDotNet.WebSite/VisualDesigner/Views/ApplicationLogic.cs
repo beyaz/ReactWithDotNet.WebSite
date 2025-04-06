@@ -250,6 +250,16 @@ static class ApplicationLogic
         var items = new List<string>();
 
         items.AddRange(Project.Styles.Keys);
+        
+        for (var i = 1; i <= 10; i++)
+        {
+            items.Add($"z-index: {i}");
+        }
+        
+        for (var i = 1; i <= 100; i++)
+        {
+            items.Add($"border-radius: {i}");
+        }
 
         items.Add("flex-row-centered");
         items.Add("flex-col-centered");
@@ -260,6 +270,15 @@ static class ApplicationLogic
             items.Add($"border: 1px solid {colorName}");
         }
         
+        items.Add("overflow-y: hidden");
+        items.Add("overflow-y: scroll");
+        items.Add("overflow-y: auto");
+        items.Add("overflow-y: visible");
+        
+        items.Add("overflow-x: hidden");
+        items.Add("overflow-x: scroll");
+        items.Add("overflow-x: auto");
+        items.Add("overflow-x: visible");
         
         foreach (var colorName in Project.Colors.Select(x => x.Key))
         {
@@ -270,6 +289,8 @@ static class ApplicationLogic
         {
             items.Add("w-full");
             items.Add("w-fit");
+            items.Add("h-fit");
+            items.Add("size-fit");
             items.Add("w-screen");
             items.Add("w-screen");
             for (var i = 1; i <= 100; i++)
@@ -297,7 +318,23 @@ static class ApplicationLogic
             {
                 for (var i = 1; i <= 1000; i++)
                 {
-                    if (i % 4 == 0)
+                    if (i % 2 == 0 || i % 5 == 0)
+                    {
+                        items.Add($"{name}: {i}");
+                    }
+                }
+            }
+        }
+        
+        // margins
+        {
+            string[] names = ["margin", "margin-left", "margin-right", "margin-top", "margin-bottom"];
+
+            foreach (var name in names)
+            {
+                for (var i = 1; i <= 1000; i++)
+                {
+                    if (i % 2 == 0 || i % 5 == 0)
                     {
                         items.Add($"{name}: {i}");
                     }

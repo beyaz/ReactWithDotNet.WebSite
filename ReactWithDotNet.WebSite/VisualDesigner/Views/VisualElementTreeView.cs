@@ -11,10 +11,15 @@ enum DragPosition
 
 delegate Task OnTreeItemMove(string treeItemPathSourge, string treeItemPathTarget, DragPosition position);
 
+delegate Task OnTreeItemCopyPaste(string treeItemPathSourge, string treeItemPathTarget);
+
 sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
 {
     public VisualElementModel Model { get; init; }
 
+    [CustomEvent]
+    public OnTreeItemCopyPaste CopyPaste { get; init; }
+    
     [CustomEvent]
     public Func<Task> MouseLeave { get; init; }
 
@@ -36,7 +41,7 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
             return new FlexRowCentered(SizeFull) { "Empty" };
         }
 
-        return new div(CursorDefault, Padding(5), OnMouseLeave(OnMouseLeaveHandler))
+        return new div(CursorDefault, Padding(5), OnMouseLeave(OnMouseLeaveHandler), OnKeyDown(On_Key_Down), TabIndex(0))
         {
             ToVisual(Model, 0, "0"),
             WidthFull, HeightFull
@@ -370,13 +375,34 @@ sealed class VisualElementTreeView : Component<VisualElementTreeView.State>
         return returnList;
     }
 
+
+    [KeyboardEventCallOnly("CTRL+c", "CTRL+v")]
+    Task On_Key_Down(KeyboardEvent e)
+    {
+        if (e.key == "c")
+        {
+            state.CopiedTreeItemPath = SelectedPath;
+        }
+        else if (e.key == "v" && state.CopiedTreeItemPath.HasValue())
+        {
+            DispatchEvent(CopyPaste,[state.CopiedTreeItemPath, SelectedPath]);
+            
+            state.CopiedTreeItemPath = null;
+        }
+
+        return Task.CompletedTask;
+    }
+
     internal class State
     {
         public List<string> CollapsedNodes { get; init; } = [];
+        
         public string CurrentDragOveredPath { get; set; }
 
         public DragPosition DragPosition { get; set; }
 
         public string DragStartedTreeItemPath { get; set; }
+
+        public string CopiedTreeItemPath { get; set; }
     }
 }

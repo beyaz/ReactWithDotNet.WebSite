@@ -639,6 +639,17 @@ sealed class ApplicationView : Component<ApplicationState>
                     return Task.CompletedTask;
                 },
 
+                CopyPaste = (source, target) =>
+                {
+                    var sourceNode = FindTreeNodeByTreePath(state.ComponentRootElement, source);
+                    var targetNode = FindTreeNodeByTreePath(state.ComponentRootElement, target);
+
+                    var sourceNodeClone = DeserializeFromJson<VisualElementModel>(SerializeToJson(sourceNode));
+
+                    targetNode.Children.Add(sourceNodeClone);
+                    
+                    return Task.CompletedTask;
+                },
                 TreeItemMove = (source, target, position) =>
                 {
                     // root check
