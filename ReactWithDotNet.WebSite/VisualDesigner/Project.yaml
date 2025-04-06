@@ -1,10 +1,19 @@
 colors:
-  content-weak: "#F5F7FA"
+  content-strong: "#0E121B"
+  content-sub: "#222530"
+  content-soft: "#525866"
   content-disable: "#CACFD8"
+  content-weak: "#F5F7FA"
+  content-white: "#FFFFFF"
+  button-text-white: "#FFFFFF"
   border-strong: "#181B25"
   border-sub: "#CACFD8"
   border-soft: "#E1E4EA"
   border-white: "#FFFFFF"
+  secondary-dark: "#14464F"
+  secondary-base: "#3DD3EE"
+  secondary-light: "#9EE9F6"
+  secondary-lighter: "#D8F6FC"
 
 styles:
   bg-strong: "background: #0E121B"

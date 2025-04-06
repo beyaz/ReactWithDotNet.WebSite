@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 
 namespace ReactWithDotNet.VisualDesigner.Views;
 
@@ -92,6 +93,10 @@ sealed class ApplicationPreview : Component
             {
                 element = new i();
             }
+            else if (model.Tag == "img")
+            {
+                element = new img();
+            }
 
             element.style.Add(UserSelect(none));
 
@@ -115,6 +120,41 @@ sealed class ApplicationPreview : Component
                     {
                         element.AddClass(value);
                     }
+
+                    if (element is img elementAsImage)
+                    {
+                        var isValueDouble = double.TryParse(value, out var valueAsDouble);
+                        
+                        if (name.Equals("h", StringComparison.OrdinalIgnoreCase) || name.Equals("height", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (isValueDouble)
+                            {
+                                elementAsImage.height = valueAsDouble+ "px";    
+                            }
+                            else
+                            {
+                                elementAsImage.height = value;
+                            }
+                        }
+                        
+                        if (name.Equals("w", StringComparison.OrdinalIgnoreCase) || name.Equals("width", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (isValueDouble)
+                            {
+                                elementAsImage.width = valueAsDouble + "px";    
+                            }
+                            else
+                            {
+                                elementAsImage.width = value;
+                            }
+                        }
+                        
+                        if (name.Equals("src", StringComparison.OrdinalIgnoreCase))
+                        {
+                            elementAsImage.src = Path.Combine(Context.wwwroot, value);
+                        }
+                    }
+                    
                 }
             }
 
@@ -216,6 +256,11 @@ sealed class ApplicationPreview : Component
                         case "background":
                         case "bg":
                         {
+                            if (Project.Colors.TryGetValue(value, out var realColor))
+                            {
+                                value = realColor;
+                            }
+                            
                             element.Add(Background(value));
                             continue;
                         }

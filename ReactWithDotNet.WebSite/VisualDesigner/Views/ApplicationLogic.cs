@@ -259,6 +259,12 @@ static class ApplicationLogic
             items.Add("color: " + colorName);
             items.Add($"border: 1px solid {colorName}");
         }
+        
+        
+        foreach (var colorName in Project.Colors.Select(x => x.Key))
+        {
+            items.Add("bg: " + colorName);
+        }
 
         // w
         {
