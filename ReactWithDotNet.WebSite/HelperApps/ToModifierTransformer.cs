@@ -4,78 +4,10 @@ namespace ReactWithDotNet.WebSite.HelperApps;
 
 static class ToModifierTransformer
 {
-    /// <summary>
-    ///     Removes from end.
-    /// </summary>
-    static string RemoveFromEnd(this string data, string value, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
-    {
-        if (data.EndsWith(value, comparison))
-        {
-            return data.Substring(0, data.Length - value.Length);
-        }
+    static readonly IReadOnlyList<(string Name, string Value)> GlobalDeclaredStringFields = typeof(Mixin).GetFields(BindingFlags.Static | BindingFlags.Public).Where(f => f.FieldType == typeof(string)).Select(f => (f.Name, (string)f.GetValue(null))).ToList();
 
-        return data;
-    }
-    
-    static string RemovePixelFromEnd(this string value)
-    {
-        return value?.RemoveFromEnd("px");
-    }
-    
-    /// <summary>
-    ///     Removes value from start of str
-    /// </summary>
-    static string RemoveFromStart(this string data, string value, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
-    {
-        if (data == null)
-        {
-            return null;
-        }
-
-        if (data.StartsWith(value, comparison))
-        {
-            return data.Substring(value.Length, data.Length - value.Length);
-        }
-
-        return data;
-    }
-    
-    static string CamelCase(string str)
-    {
-        if (string.IsNullOrEmpty(str))
-        {
-            return str;
-        }
-
-        if (str.IndexOf('-') > 0)
-        {
-            return string.Join(string.Empty, str.Split("-").Select(CamelCase));
-        }
-
-        if (str == "lowercase")
-        {
-            return "LowerCase";
-        }
-
-        if (str == "uppercase")
-        {
-            return "UpperCase";
-        }
-
-        return char.ToUpper(str[0], new("en-US")) + str.Substring(1);
-    }
-    
-    
-    static bool EndsWithPixel(this string value)
-    {
-        return value?.EndsWith("px", StringComparison.OrdinalIgnoreCase) == true;
-    }
-    
-      
     public static (bool success, string modifierCode) TryConvertToModifier(string tagName, string name, string value)
     {
-       
-
         var success = (string modifierCode) => (true, modifierCode);
 
         if ((tagName == "iframe" || tagName == "script") && name.Equals("src", StringComparison.OrdinalIgnoreCase))
@@ -190,26 +122,7 @@ static class ToModifierTransformer
             return default;
         }
     }
-      
-    public static PropertyInfo TryFindProperty(string htmlTagName, string attributeName)
-    {
-        var propertyName = string.Join(string.Empty, attributeName.Split(":-".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()));
 
-        return TryFindTypeOfHtmlTag(htmlTagName)?.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-        
-        static Type TryFindTypeOfHtmlTag(string htmlTagName)
-        {
-            return typeof(div).Assembly.GetType(nameof(ReactWithDotNet) + "." + htmlTagName, false, true);
-        }
-    }
-
-   
-      
-    static bool IsEndsWithPixel(string x)
-    {
-        return x.EndsWith("px", StringComparison.OrdinalIgnoreCase);
-    }
-    
     public static (bool success, string modifierCode) TryConvertToModifier_From_Mixin_Extension(string name, string value)
     {
         var success = (string modifierCode) => (true, modifierCode);
@@ -440,33 +353,19 @@ static class ToModifierTransformer
             return default;
         }
     }
-    
-    static string getStringParameter(string prm)
-    {
-        return TryGetGlobalDeclaredStringConstValue(prm) ?? '"' + prm + '"';
-    }
-    
-    #region already calculated modifier
 
-    public static string MarkAsAlreadyCalculatedModifier(string modifierCode)
+    public static PropertyInfo TryFindProperty(string htmlTagName, string attributeName)
     {
-        return "|" + modifierCode;
-    }
+        var propertyName = string.Join(string.Empty, attributeName.Split(":-".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()));
 
-    public static string UnMarkAsAlreadyCalculatedModifier(string modifierCode)
-    {
-        return modifierCode.Substring(1);
+        return TryFindTypeOfHtmlTag(htmlTagName)?.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+
+        static Type TryFindTypeOfHtmlTag(string htmlTagName)
+        {
+            return typeof(div).Assembly.GetType(nameof(ReactWithDotNet) + "." + htmlTagName, false, true);
+        }
     }
 
-    public static bool IsMarkedAsAlreadyCalculatedModifier(string modifierCode)
-    {
-        return modifierCode?.Length > 2 && modifierCode[0] == '|';
-    }
-
-    #endregion
-    
-    static readonly IReadOnlyList<(string Name, string Value)> GlobalDeclaredStringFields = typeof(Mixin).GetFields(BindingFlags.Static | BindingFlags.Public).Where(f => f.FieldType == typeof(string)).Select(f => (f.Name, (string)f.GetValue(null))).ToList();
-    
     public static string TryGetGlobalDeclaredStringConstValue(string value)
     {
         if (value == none ||
@@ -488,4 +387,99 @@ static class ToModifierTransformer
 
         return null;
     }
+
+    static string CamelCase(string str)
+    {
+        if (string.IsNullOrEmpty(str))
+        {
+            return str;
+        }
+
+        if (str.IndexOf('-') > 0)
+        {
+            return string.Join(string.Empty, str.Split("-").Select(CamelCase));
+        }
+
+        if (str == "lowercase")
+        {
+            return "LowerCase";
+        }
+
+        if (str == "uppercase")
+        {
+            return "UpperCase";
+        }
+
+        return char.ToUpper(str[0], new("en-US")) + str.Substring(1);
+    }
+
+    static bool EndsWithPixel(this string value)
+    {
+        return value?.EndsWith("px", StringComparison.OrdinalIgnoreCase) == true;
+    }
+
+    static string getStringParameter(string prm)
+    {
+        return TryGetGlobalDeclaredStringConstValue(prm) ?? '"' + prm + '"';
+    }
+
+    static bool IsEndsWithPixel(string x)
+    {
+        return x.EndsWith("px", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    ///     Removes from end.
+    /// </summary>
+    static string RemoveFromEnd(this string data, string value, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+    {
+        if (data.EndsWith(value, comparison))
+        {
+            return data.Substring(0, data.Length - value.Length);
+        }
+
+        return data;
+    }
+
+    /// <summary>
+    ///     Removes value from start of str
+    /// </summary>
+    static string RemoveFromStart(this string data, string value, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+    {
+        if (data == null)
+        {
+            return null;
+        }
+
+        if (data.StartsWith(value, comparison))
+        {
+            return data.Substring(value.Length, data.Length - value.Length);
+        }
+
+        return data;
+    }
+
+    static string RemovePixelFromEnd(this string value)
+    {
+        return value?.RemoveFromEnd("px");
+    }
+
+    #region already calculated modifier
+
+    public static string MarkAsAlreadyCalculatedModifier(string modifierCode)
+    {
+        return "|" + modifierCode;
+    }
+
+    public static string UnMarkAsAlreadyCalculatedModifier(string modifierCode)
+    {
+        return modifierCode.Substring(1);
+    }
+
+    public static bool IsMarkedAsAlreadyCalculatedModifier(string modifierCode)
+    {
+        return modifierCode?.Length > 2 && modifierCode[0] == '|';
+    }
+
+    #endregion
 }

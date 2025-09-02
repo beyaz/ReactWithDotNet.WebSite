@@ -1,9 +1,9 @@
-﻿using HtmlAgilityPack;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Web;
+using HtmlAgilityPack;
 using static ReactWithDotNet.WebSite.HelperApps.ToModifierTransformer;
 
 namespace ReactWithDotNet.WebSite.HelperApps;
@@ -22,7 +22,6 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
         { "preserveaspectratio", "preserveAspectRatio" }
     };
 
-
     static readonly List<string> ignoredTags = ["rect", "path", "circle", "line"];
 
     public static string HtmlToCSharp(string htmlRootNode)
@@ -40,8 +39,6 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
 
         return ToCSharpCode(ToCSharpCode(document.DocumentNode.FirstChild));
     }
-
- 
 
     static string ConvertToCSharpString(string value)
     {
@@ -83,7 +80,6 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
     {
         return value?.EndsWith("px", StringComparison.OrdinalIgnoreCase) == true;
     }
-   
 
     static string GetName(this HtmlAttribute htmlAttribute)
     {
@@ -132,8 +128,6 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
     {
         return !string.IsNullOrWhiteSpace(value);
     }
-
-   
 
     static IReadOnlyList<HtmlAttribute> RemoveAll(this HtmlAttributeCollection htmlAttributeCollection, Func<HtmlAttribute, bool> match)
     {
@@ -926,8 +920,6 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
         }
     }
 
-    
-    
     static (bool success, string modifierCode) TryConvertToModifier(HtmlAttribute htmlAttribute)
     {
         var name = htmlAttribute.GetName();
@@ -936,14 +928,6 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
 
         return ToModifierTransformer.TryConvertToModifier(tagName, name, value);
     }
-
-   
-
-    
-
-   
-
-    
 
     class AgilityPackageOverride
     {
@@ -1069,11 +1053,9 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
         public HtmlNode htmlNode { get; init; }
 
         public string htmlNodeName { get; init; }
-        
+
         public List<ModifierCode> modifiers { get; init; }
 
         public Style style { get; init; }
     }
-
-   
 }
