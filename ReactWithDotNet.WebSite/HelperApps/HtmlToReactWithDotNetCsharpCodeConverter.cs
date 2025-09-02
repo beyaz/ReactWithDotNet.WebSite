@@ -4,9 +4,60 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Web;
 using HtmlAgilityPack;
+using ReactWithDotNet.Transformers;
 using static ReactWithDotNet.Transformers.ToModifierTransformer;
+using static ReactWithDotNet.Transformers.AlreadyCalculatedModifierMarker;
 
 namespace ReactWithDotNet.WebSite.HelperApps;
+
+static class HtmlToReactWithDotNetCsharpCodeConverterExtensions
+{
+    public static bool EndsWithPixel(this string value)
+    {
+        return value?.EndsWith("px", StringComparison.OrdinalIgnoreCase) == true;
+    }
+
+    public static bool HasValue(this string value)
+    {
+        return !string.IsNullOrWhiteSpace(value);
+    }
+
+    /// <summary>
+    ///     Removes from end.
+    /// </summary>
+    public static string RemoveFromEnd(this string data, string value, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+    {
+        if (data.EndsWith(value, comparison))
+        {
+            return data.Substring(0, data.Length - value.Length);
+        }
+
+        return data;
+    }
+
+    /// <summary>
+    ///     Removes value from start of str
+    /// </summary>
+    public static string RemoveFromStart(this string data, string value, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+    {
+        if (data == null)
+        {
+            return null;
+        }
+
+        if (data.StartsWith(value, comparison))
+        {
+            return data.Substring(value.Length, data.Length - value.Length);
+        }
+
+        return data;
+    }
+
+    public static string RemovePixelFromEnd(this string value)
+    {
+        return value?.RemoveFromEnd("px");
+    }
+}
 
 static class HtmlToReactWithDotNetCsharpCodeConverter
 {
@@ -76,11 +127,6 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
         return value;
     }
 
-    static bool EndsWithPixel(this string value)
-    {
-        return value?.EndsWith("px", StringComparison.OrdinalIgnoreCase) == true;
-    }
-
     static string GetName(this HtmlAttribute htmlAttribute)
     {
         var name = htmlAttribute.Name;
@@ -124,11 +170,6 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
         return htmlAttribute.OwnerNode.Name;
     }
 
-    static bool HasValue(this string value)
-    {
-        return !string.IsNullOrWhiteSpace(value);
-    }
-
     static IReadOnlyList<HtmlAttribute> RemoveAll(this HtmlAttributeCollection htmlAttributeCollection, Func<HtmlAttribute, bool> match)
     {
         var items = htmlAttributeCollection.Where(match).ToList();
@@ -149,42 +190,6 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
         {
             htmlNodeCollection.Remove(node);
         }
-    }
-
-    /// <summary>
-    ///     Removes from end.
-    /// </summary>
-    static string RemoveFromEnd(this string data, string value, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
-    {
-        if (data.EndsWith(value, comparison))
-        {
-            return data.Substring(0, data.Length - value.Length);
-        }
-
-        return data;
-    }
-
-    /// <summary>
-    ///     Removes value from start of str
-    /// </summary>
-    static string RemoveFromStart(this string data, string value, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
-    {
-        if (data == null)
-        {
-            return null;
-        }
-
-        if (data.StartsWith(value, comparison))
-        {
-            return data.Substring(value.Length, data.Length - value.Length);
-        }
-
-        return data;
-    }
-
-    static string RemovePixelFromEnd(this string value)
-    {
-        return value?.RemoveFromEnd("px");
     }
 
     static string ToCSharpCode(IEnumerable<string> lines)
