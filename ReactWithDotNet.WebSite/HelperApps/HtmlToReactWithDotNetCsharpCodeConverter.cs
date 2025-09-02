@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Web;
 using HtmlAgilityPack;
-using static ReactWithDotNet.WebSite.HelperApps.ToModifierTransformer;
+using static ReactWithDotNet.Transformers.ToModifierTransformer;
 
 namespace ReactWithDotNet.WebSite.HelperApps;
 

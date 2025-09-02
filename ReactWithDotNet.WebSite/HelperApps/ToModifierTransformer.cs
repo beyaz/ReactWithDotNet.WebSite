@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace ReactWithDotNet.WebSite.HelperApps;
+namespace ReactWithDotNet.Transformers;
 
 static class ToModifierTransformer
 {
