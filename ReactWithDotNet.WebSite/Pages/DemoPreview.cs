@@ -3,6 +3,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace ReactWithDotNet.WebSite.Pages;
 
+[Route(Routes.DemoPreview)]
 sealed class DemoPreview : Component
 {
     public const string QueryParameterNameOfFullTypeName = "fullTypeName";

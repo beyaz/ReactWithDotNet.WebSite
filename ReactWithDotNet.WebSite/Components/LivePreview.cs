@@ -99,6 +99,7 @@ sealed class LivePreview : Component
         var sb = new StringBuilder();
         sb.AppendLine("using ReactWithDotNet;");
         sb.AppendLine("using static ReactWithDotNet.Mixin;");
+        sb.AppendLine("using static ReactWithDotNet.Tailwind;");
         sb.AppendLine();
         sb.AppendLine("namespace Preview;");
         sb.AppendLine();
