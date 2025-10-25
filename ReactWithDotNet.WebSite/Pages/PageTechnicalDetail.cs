@@ -3,6 +3,7 @@
 using h1 = BlogH1;
 using p = BlogP;
 
+[Route(TechnicalDetail)]
 sealed class PageTechnicalDetail : PureComponent
 {
     protected override Element render()

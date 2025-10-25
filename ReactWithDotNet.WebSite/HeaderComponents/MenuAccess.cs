@@ -25,19 +25,19 @@ static class MenuAccess
                 new()
                 {
                     Title       = "Technical Detail",
-                    PageLink    = Page.TechnicalDetail.Url,
+                    PageLink    = TechnicalDetail,
                     Description = "Technical details of ReactWithDotnet"
                 },
                 new()
                 {
                     Title       = "Modifiers",
-                    PageLink    = Page.Modifiers.Url,
+                    PageLink    = Modifiers,
                     Description = "What is modifier"
                 },
                 new()
                 {
                     Title       = "React Context",
-                    PageLink    = Page.ReactContexts.Url,
+                    PageLink    = ReactContexts,
                     Description = "How to implement react contexts"
                 }
             ]
@@ -51,21 +51,21 @@ static class MenuAccess
                 new()
                 {
                     Title       = "Designer",
-                    PageLink    = Page.Designer.Url,
+                    PageLink    = Designer,
                     Description = "Preview components in hotreload mode",
                     SvgFileName = "design.svg"
                 },
                 new()
                 {
                     Title       = "Import Html",
-                    PageLink    = Page.LiveEditor.Url,
+                    PageLink    = LiveEditor,
                     Description = "Import any html / Live Editor",
                     SvgFileName = "import.svg"
                 },
                 new()
                 {
                     Title       = "Made by ReactWithDotNet",
-                    PageLink    = Page.MadeBy.Url,
+                    PageLink    = MadeBy,
                     Description = "Web sites or apps using ReactWithDotNet",
                     SvgFileName = "import.svg"
                 }

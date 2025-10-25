@@ -3,6 +3,7 @@
 using h1 = BlogH1;
 using p = BlogP;
 
+[Route(Modifiers)]
 sealed class PageModifiers : PureComponent
 {
     protected override Element render()

@@ -4,6 +4,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace ReactWithDotNet.WebSite.Components;
 
+[Route(Routes.LivePreview)]
 sealed class LivePreview : Component
 {
     public const string QueryParameterNameOfGuid = "guid";

@@ -3,6 +3,7 @@
 using h1 = BlogH1;
 using p = BlogP;
 
+[Route(DocSetup)]
 sealed class PageDocumentation_Setup : PageDocumentation
 {
     protected override Element CreateContent()

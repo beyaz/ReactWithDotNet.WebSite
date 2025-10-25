@@ -52,7 +52,7 @@ class PageMain : PureComponent
 
                 new FlexRow(JustifyContentFlexStart, WidthFull, FlexWrap, Gap(32))
                 {
-                    new PrimaryLinkButton { Text = "Documentation", Href      = Page.DocStart.Url } + WidthFull + SM(Width(auto)),
+                    new PrimaryLinkButton { Text = "Documentation", Href      = DocStart } + WidthFull + SM(Width(auto)),
                     new PrimaryLinkButton { Text = "Showcase", Href           = Showcase } + WidthFull + SM(Width(auto)),
                     new PrimaryLinkButton { Text = "Project Milestones", Href = Milestones } + WidthFull + SM(Width(auto))
                 }

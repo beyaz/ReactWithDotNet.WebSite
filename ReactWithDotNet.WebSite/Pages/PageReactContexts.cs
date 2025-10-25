@@ -3,6 +3,7 @@
 using h1 = BlogH1;
 using p = BlogP;
 
+[Route(ReactContexts)]
 sealed class PageReactContexts : PureComponent
 {
     protected override Element render()

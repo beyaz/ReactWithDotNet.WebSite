@@ -100,8 +100,8 @@ abstract class PageDocumentation : Component<PageDocumentation.State>
                     Title = "Introduction",
                     Links = new[]
                     {
-                        new { Label = "Getting started", Url  = Page.DocStart.Url },
-                        new { Label = "Setup", Url = Page.DocSetup.Url }
+                        new { Label = "Getting started", Url  = DocStart },
+                        new { Label = "Setup", Url = DocSetup }
                     }
                 }
             };

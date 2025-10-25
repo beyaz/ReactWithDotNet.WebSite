@@ -3,6 +3,7 @@
 using h1 = BlogH1;
 using p = BlogP;
 
+[Route(MadeBy)]
 sealed class PageMadeBy : PureComponent
 {
     protected override Element render()

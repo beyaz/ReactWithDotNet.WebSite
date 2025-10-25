@@ -14,7 +14,8 @@ record HtmlToCSharpViewModel
     public string Guid { get; init; }
 }
 
-class HtmlToCSharpView : Component<HtmlToCSharpViewModel>
+[Route(LiveEditor)]
+sealed class HtmlToCSharpView : Component<HtmlToCSharpViewModel>
 {
     static ScriptManager Scripts => ScriptManager.Instance;
 

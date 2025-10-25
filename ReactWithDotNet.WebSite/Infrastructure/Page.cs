@@ -12,16 +12,29 @@ static class Routes
     public  const string Home = "/";
     
     // H o m e   b u t t o n s
-    public const string Milestones = $"/{nameof(Milestones)}";
-    public  const string Showcase = $"/{nameof(Showcase)}";
+    public const string Milestones = "/" +nameof(Milestones);
+    public  const string Showcase = "/" + nameof(Showcase);
+    
+    
+    // T e c h n i c a l
+    public const string  TechnicalDetail =  "/" +nameof(TechnicalDetail);
+    public const string  Modifiers = "/" +nameof(Modifiers);
+    public const string  ReactContexts = "/" +nameof(ReactContexts);
+    
+    // D o c
+    public const string  DocStart = "/doc/start";
+    public const string  DocSetup = "/doc/setup";
+    
+    // H e l p e r   A p p s
+    public const string  LiveEditor = "/LiveEditor";
+    public const string  LivePreview = "/" +nameof(LivePreview);
+    public const string  Designer = "/" +nameof(Designer);
+    public const string  MadeBy = "/" +nameof(MadeBy);
 }
 
 static class Page
 {
-    // H o m e   b u t t o n s
-    public static readonly PageRouteInfo Milestones = new($"/{nameof(Milestones)}", typeof(PageMilestones));
-    public static readonly PageRouteInfo Showcase = new($"/{nameof(Showcase)}", typeof(PageShowcase));
-    
+   
     // T e c h n i c a l
     public static readonly PageRouteInfo TechnicalDetail = new($"/{nameof(TechnicalDetail)}", typeof(PageTechnicalDetail));
     public static readonly PageRouteInfo Modifiers = new($"/{nameof(Modifiers)}", typeof(PageModifiers));
