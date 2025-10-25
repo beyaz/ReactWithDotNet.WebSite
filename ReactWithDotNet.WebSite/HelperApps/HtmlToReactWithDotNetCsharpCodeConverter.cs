@@ -933,7 +933,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
 
         
 
-        return ToModifierTransformer.TryConvertToModifier(tagName, name, value);
+        return ToModifierTransformer.TryConvertToModifier(tagName, name, value, true);
     }
 
     class AgilityPackageOverride
