@@ -63,7 +63,7 @@ sealed class RenderPreview : Component<RenderPreview.Model>
                 new iframe
                 {
                     id    = state.Guid,
-                    src   = Page.LivePreviewUrl(state.Guid),
+                    src   = LivePreviewUrl(state.Guid),
                     style = { BorderNone, SizeFull, Padding(8) }
                 }
             }
