@@ -1,5 +1,4 @@
 using System.IO;
-using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
@@ -13,12 +12,7 @@ public static class ReactWithDotNetIntegration
     {
         app.UseMiddleware<ReactWithDotNetJavaScriptFiles>();
 
-        var routeMap = typeof(Page)
-            .GetFields(BindingFlags.Static | BindingFlags.Public)
-            .Where(f => f.FieldType == typeof(PageRouteInfo))
-            .Select(f => (PageRouteInfo)f.GetValue(null))
-            .Where(x => x is not null)
-            .ToDictionary(x => x.Url, x => x, StringComparer.OrdinalIgnoreCase);
+        
 
         RequestHandlerPath = "/" + nameof(HandleReactWithDotNetRequest);
 
@@ -37,12 +31,6 @@ public static class ReactWithDotNetIntegration
             if (routes.TryGetValue(path, out var route))
             {
                 await WriteHtmlResponse(httpContext, typeof(MainLayout), route.Page);
-                return;
-            }
-            
-            if (routeMap.TryGetValue(path, out var routeInfo))
-            {
-                await WriteHtmlResponse(httpContext, typeof(MainLayout), routeInfo.page);
                 return;
             }
 
