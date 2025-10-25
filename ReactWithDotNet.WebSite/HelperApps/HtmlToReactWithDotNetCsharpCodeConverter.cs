@@ -931,6 +931,8 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
         var value = htmlAttribute.Value;
         var tagName = htmlAttribute.OwnerNode.Name;
 
+        
+
         return ToModifierTransformer.TryConvertToModifier(tagName, name, value);
     }
 
