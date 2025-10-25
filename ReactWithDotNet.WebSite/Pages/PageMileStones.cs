@@ -3,6 +3,7 @@
 using h1 = BlogH1;
 using p = BlogP;
 
+[Route(Milestones)]
 sealed class PageMilestones : PureComponent
 {
     protected override Element render()

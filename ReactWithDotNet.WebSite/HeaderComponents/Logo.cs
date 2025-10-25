@@ -4,7 +4,7 @@ sealed class Logo : PureComponent
 {
     protected override Element render()
     {
-        return new a(DisplayFlexColumn, TextDecorationNone, Color(inherit), Width(140), Href(Page.Home.Url), AlignItemsStretch, Padding(8))
+        return new a(DisplayFlexColumn, TextDecorationNone, Color(inherit), Width(140), Href(Home), AlignItemsStretch, Padding(8))
         {
             new FlexRow
             {

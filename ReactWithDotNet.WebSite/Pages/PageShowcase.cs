@@ -4,6 +4,7 @@ using ReactWithDotNet.WebSite.Showcases;
 
 namespace ReactWithDotNet.WebSite.Pages;
 
+[Route(Showcase)]
 sealed class PageShowcase : Component<PageShowcase.State>
 {
     static IReadOnlyList<DemoInfo> DemoList =>

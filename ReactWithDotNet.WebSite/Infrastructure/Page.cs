@@ -1,3 +1,4 @@
+global using static ReactWithDotNet.WebSite.Routes;
 using ReactWithDotNet.WebSite.HelperApps;
 using ReactWithDotNet.WebSite.Pages;
 
@@ -5,11 +6,18 @@ namespace ReactWithDotNet.WebSite;
 
 sealed record PageRouteInfo(string Url, Type page);
 
-static class Page
+static class Routes
 {
     // H o m e
-    public static readonly PageRouteInfo Home = new("/", typeof(PageMain));
+    public  const string Home = "/";
     
+    // H o m e   b u t t o n s
+    public const string Milestones = $"/{nameof(Milestones)}";
+    public  const string Showcase = $"/{nameof(Showcase)}";
+}
+
+static class Page
+{
     // H o m e   b u t t o n s
     public static readonly PageRouteInfo Milestones = new($"/{nameof(Milestones)}", typeof(PageMilestones));
     public static readonly PageRouteInfo Showcase = new($"/{nameof(Showcase)}", typeof(PageShowcase));

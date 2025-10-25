@@ -22,6 +22,8 @@ public static class ReactWithDotNetIntegration
 
         RequestHandlerPath = "/" + nameof(HandleReactWithDotNetRequest);
 
+        var routes = RouteHelper.GetRoutesFromAssembly(typeof(ReactWithDotNetIntegration).Assembly);
+
         app.Use(async (httpContext, next) =>
         {
             var path = httpContext.Request.Path.Value ?? string.Empty;
@@ -32,6 +34,12 @@ public static class ReactWithDotNetIntegration
                 return;
             }
 
+            if (routes.TryGetValue(path, out var route))
+            {
+                await WriteHtmlResponse(httpContext, typeof(MainLayout), route.Page);
+                return;
+            }
+            
             if (routeMap.TryGetValue(path, out var routeInfo))
             {
                 await WriteHtmlResponse(httpContext, typeof(MainLayout), routeInfo.page);
