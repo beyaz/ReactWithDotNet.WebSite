@@ -210,7 +210,7 @@ sealed class PageShowcase : Component<PageShowcase.State>
             {
                 return new iframe
                 {
-                    src   = Page.DemoPreviewUrl(DemoInfo.TargetType.FullName),
+                    src   = DemoPreviewUrl(DemoInfo.TargetType.FullName),
                     style = { BorderNone, SizeFull, DisplayFlexRowCentered }
                 };
             }

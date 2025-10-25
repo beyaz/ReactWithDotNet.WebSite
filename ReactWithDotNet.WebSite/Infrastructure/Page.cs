@@ -1,6 +1,4 @@
 global using static ReactWithDotNet.WebSite.Routes;
-using ReactWithDotNet.WebSite.HelperApps;
-using ReactWithDotNet.WebSite.Pages;
 
 namespace ReactWithDotNet.WebSite;
 
@@ -33,20 +31,14 @@ static class Routes
     
     // i n t e r n a l
     public const string  DemoPreview = "/" + nameof(DemoPreview);
-}
-
-static class Page
-{
-   
-   
-
+    
     public static string DemoPreviewUrl(string fullTypeName)
     {
-        return Routes.DemoPreview + $"?{Pages.DemoPreview.QueryParameterNameOfFullTypeName}={fullTypeName}";
+        return DemoPreview + $"?{Pages.DemoPreview.QueryParameterNameOfFullTypeName}={fullTypeName}";
     }
 
     public static string LivePreviewUrl(string guid)
     {
-        return Routes.LivePreview + $"?{Components.LivePreview.QueryParameterNameOfGuid}={guid}";
+        return LivePreview + $"?{Components.LivePreview.QueryParameterNameOfGuid}={guid}";
     }
 }
