@@ -16,7 +16,7 @@ public static class ReactWithDotNetIntegration
 
         RequestHandlerPath = "/" + nameof(HandleReactWithDotNetRequest);
 
-        var routes = RouteHelper.GetRoutesFromAssembly(typeof(ReactWithDotNetIntegration).Assembly);
+        var routes = RouteHelper.GetRoutesFrom(typeof(ReactWithDotNetIntegration).Assembly);
 
         app.Use(async (httpContext, next) =>
         {
