@@ -376,7 +376,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
                 {
                     if (canStyleExportInOneLine(data.style))
                     {
-                        return [string.Join(", ", data.style.ToDictionary().Select(p => TryConvertToModifier_From_Mixin_Extension(p.Key, p.Value)).Where(x => x.success).Select(x => x.modifierCode))];
+                        return [string.Join(", ", data.style.ToDictionary().Select(p => TryConvertToModifier_From_Mixin_Extension(isStyleValue: true, p.Key, p.Value)).Where(x => x.success).Select(x => x.modifierCode))];
                     }
 
                     var returnList = new List<string>
@@ -540,7 +540,7 @@ static class HtmlToReactWithDotNetCsharpCodeConverter
         {
             if (data.style is not null)
             {
-                data.modifiers.AddRange(data.style.ToDictionary().Select(p => TryConvertToModifier_From_Mixin_Extension(p.Key, p.Value)).Select(ModifierCode.From));
+                data.modifiers.AddRange(data.style.ToDictionary().Select(p => TryConvertToModifier_From_Mixin_Extension(isStyleValue:true, p.Key, p.Value)).Select(ModifierCode.From));
 
                 data = data with { style = null };
             }
