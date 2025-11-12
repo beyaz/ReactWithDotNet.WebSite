@@ -60,6 +60,13 @@ sealed class PageShowcase : Component<PageShowcase.State>
         },
         new()
         {
+            TargetType = typeof(GoogleMaterialSymbolsDemo),
+            Height     = 500,
+            Label      = "Google Material Symbols"
+        },
+        
+        new()
+        {
             TargetType = typeof(BasicDashboardDemo),
             Height     = 500,
             Label      = "Basic Dashboard"
