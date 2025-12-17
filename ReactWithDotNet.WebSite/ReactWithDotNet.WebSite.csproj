@@ -25,6 +25,9 @@
 		<Compile Update="Components\HomePageDemoComponent.cs">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Compile>
+		<Compile Update="Showcases\WhatsAppUIDemo.cs">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Compile>
 		<Compile Update="Showcases\MonacoEditorDemo.cs">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Compile>

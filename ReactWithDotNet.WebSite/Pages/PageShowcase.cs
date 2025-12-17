@@ -72,6 +72,13 @@ sealed class PageShowcase : Component<PageShowcase.State>
             Label      = "Basic Dashboard"
         },
         
+        new()
+        {
+            TargetType = typeof(WhatsAppUIDemo),
+            Height     = 500,
+            Label      = "WhatsApp UI"
+        }
+        
     ];
 
     protected override Task constructor()
