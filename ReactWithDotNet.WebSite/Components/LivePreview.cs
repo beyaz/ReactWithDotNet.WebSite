@@ -100,6 +100,7 @@ sealed class LivePreview : Component
         sb.AppendLine("using ReactWithDotNet;");
         sb.AppendLine("using static ReactWithDotNet.Mixin;");
         sb.AppendLine("using static ReactWithDotNet.Tailwind;");
+        sb.AppendLine("using static ReactWithDotNet.WebColors;");
         sb.AppendLine();
         sb.AppendLine("namespace Preview;");
         sb.AppendLine();
