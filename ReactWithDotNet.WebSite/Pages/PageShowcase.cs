@@ -77,6 +77,13 @@ sealed class PageShowcase : Component<PageShowcase.State>
             TargetType = typeof(WhatsAppUIDemo),
             Height     = 500,
             Label      = "WhatsApp UI"
+        },
+        
+        new()
+        {
+            TargetType = typeof(ReactFlowDemo),
+            Height     = 500,
+            Label      = "ReactFlow"
         }
         
     ];
