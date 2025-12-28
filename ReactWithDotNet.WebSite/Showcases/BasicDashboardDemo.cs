@@ -1,5 +1,6 @@
 ﻿namespace ReactWithDotNet.WebSite.Showcases;
 
+
 record BasicDashboardDemoState
 {
     public string SelectedMenuId { get; init; }

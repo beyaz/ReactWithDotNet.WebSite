@@ -11,6 +11,12 @@ sealed class PageShowcase : Component<PageShowcase.State>
     [
         new()
         {
+            TargetType = typeof(BasicCounterDemo),
+            Height     = 500,
+            Label      = "Basic Counter"
+        },
+        new()
+        {
             TargetType = typeof(MuiCardDemo),
             Height     = 400,
             Label      = "Mui Card"
